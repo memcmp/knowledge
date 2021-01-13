@@ -1,24 +1,24 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import "./App.css";
+import { CreateNote } from "./CreateNote";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="h-100">
+      <div
+        id="app-container"
+        className="menu-default menu-sub-hidden main-hidden sub-hidden"
+      >
+        <main>
+          <div className="container-fluid">
+            <div className="dashboard-wrapper">
+              <div className="row">
+                <CreateNote />
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
     </div>
   );
 }
