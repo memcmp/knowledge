@@ -19,30 +19,42 @@ function NoteDetail(): JSX.Element {
   console.log(children);
 
   return (
-    <div className="mb-4 col-lg-12 col-xl-6 offset-xl-3">
-      <Card>
-        <Card.Body>
-          <ReactQuill
-            theme="bubble"
-            formats={[]}
-            modules={{ toolbar: false }}
-            value={node.text}
-            readOnly={true}
-          />
-          {children.map(childNode => (
-            <div className="border-bottom" key={childNode.id}>
+    <>
+      <div className="row">
+        <div className="mb-4 col-lg-12 col-xl-6 offset-xl-3">
+          <Card>
+            <Card.Body>
               <ReactQuill
                 theme="bubble"
                 formats={[]}
                 modules={{ toolbar: false }}
-                value={childNode.text}
+                value={node.text}
                 readOnly={true}
               />
-            </div>
-          ))}
-        </Card.Body>
-      </Card>
-    </div>
+            </Card.Body>
+          </Card>
+        </div>
+      </div>
+      <div className="row">
+        <div className="mb-4 col-lg-12 col-xl-6 offset-xl-3">
+          <Card>
+            <Card.Body>
+              {children.map(childNode => (
+                <div className="border-bottom" key={childNode.id}>
+                  <ReactQuill
+                    theme="bubble"
+                    formats={[]}
+                    modules={{ toolbar: false }}
+                    value={childNode.text}
+                    readOnly={true}
+                  />
+                </div>
+              ))}
+            </Card.Body>
+          </Card>
+        </div>
+      </div>
+    </>
   );
 }
 
