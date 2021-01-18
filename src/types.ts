@@ -34,6 +34,8 @@ declare global {
     relations: Relations;
     nodes: Immutable.Map<string, KnowNode>;
   };
+
+  type AddRelations = (bucket: Store) => void;
 }
 
 export {};
