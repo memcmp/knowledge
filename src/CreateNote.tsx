@@ -1,14 +1,17 @@
 import React, { useState } from "react";
 import { Button } from "react-bootstrap";
-import ReactQuill from "react-quill";
+import ReactQuill, { Quill } from "react-quill";
 import Card from "react-bootstrap/Card";
 import { v4 } from "uuid";
 import Immutable from "immutable";
+import MarkdownShortcuts from "quill-markdown-shortcuts";
 
 import "react-quill/dist/quill.bubble.css";
 import "./editor.css";
 
 import { useAddBucket } from "./DataContext";
+
+Quill.register("modules/markdownShortcuts", MarkdownShortcuts);
 
 const PARAGRAPH = "<p><br></p>";
 
@@ -75,7 +78,7 @@ function CreateNote(): JSX.Element {
             <ReactQuill
               theme="bubble"
               formats={[]}
-              modules={{ toolbar: false }}
+              modules={{ toolbar: false, markdownShortcuts: {} }}
               placeholder="Create a Note"
               value={text}
               onChange={onChange}
