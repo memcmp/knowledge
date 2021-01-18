@@ -1,25 +1,30 @@
 import React, { useState } from "react";
+import { Route, Switch } from "react-router-dom";
 import "./App.css";
-import { CreateNote } from "./CreateNote";
+import { RelationContext } from "./DataContext";
+import { NoteDetail } from "./NoteDetail";
+import { Timeline } from "./Timeline";
+import Immutable from "immutable";
 
-import { Note } from "./Note";
-
-const TIMELINE = "TIMELINE";
+export const TIMELINE = "TIMELINE";
 
 function App() {
-  const [relations, setRelations] = useState<Relations>([]);
+  const [dataStore, setDataStore] = useState<Store>({
+    relations: [],
+    nodes: Immutable.Map({
+      [TIMELINE]: { id: TIMELINE, nodeType: "VIEW", text: "Timeline" }
+    })
+  });
 
-  const onCreateNode = (newRelations: Relations) => {
-    setRelations([...newRelations, ...relations]);
+  if (dataStore.relations.length > 0) {
+    console.log(dataStore.nodes.get(dataStore.relations[0].b));
+  }
+  const addBucket = (bucket: Store) => {
+    setDataStore({
+      nodes: dataStore.nodes.merge(bucket.nodes),
+      relations: [...bucket.relations, ...dataStore.relations]
+    });
   };
-
-  const nodesInTimeline = relations
-    .filter(
-      (relation: Relation): boolean =>
-        relation.a.nodeType === "VIEW" && relation.a.text === TIMELINE
-    )
-    .map((rel: Relation) => rel.b);
-
   return (
     <div className="h-100">
       <div
@@ -29,14 +34,22 @@ function App() {
         <main>
           <div className="container-fluid">
             <div className="dashboard-wrapper">
-              <div className="row">
-                <CreateNote onCreateNode={onCreateNode} />
-              </div>
-              {nodesInTimeline.map((node, i) => (
-                <div className="row" key={node.text + i}>
-                  <Note node={node} />
-                </div>
-              ))}
+              <RelationContext.Provider
+                value={{
+                  relations: dataStore.relations,
+                  nodes: dataStore.nodes,
+                  addBucket
+                }}
+              >
+                <Switch>
+                  <Route exact path="/">
+                    <Timeline viewID={TIMELINE} />
+                  </Route>
+                  <Route path="/notes/:id">
+                    <NoteDetail />
+                  </Route>
+                </Switch>
+              </RelationContext.Provider>
             </div>
           </div>
         </main>

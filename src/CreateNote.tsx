@@ -2,9 +2,13 @@ import React, { useState } from "react";
 import { Button } from "react-bootstrap";
 import ReactQuill from "react-quill";
 import Card from "react-bootstrap/Card";
+import { v4 } from "uuid";
+import Immutable from "immutable";
 
 import "react-quill/dist/quill.bubble.css";
 import "./editor.css";
+
+import { useAddBucket } from "./DataContext";
 
 const PARAGRAPH = "<p><br></p>";
 
@@ -12,12 +16,9 @@ function isEmpty(text: string): boolean {
   return text === PARAGRAPH || text === "";
 }
 
-type CreateNoteProps = {
-  onCreateNode: (relations: Relations) => void;
-};
-
-function CreateNote({ onCreateNode }: CreateNoteProps): JSX.Element {
+function CreateNote(): JSX.Element {
   const [text, setText] = useState<string>("");
+  const addBuckets = useAddBucket();
   const onChange = (content: string) => {
     setText(content);
   };
@@ -27,6 +28,7 @@ function CreateNote({ onCreateNode }: CreateNoteProps): JSX.Element {
     const topParagraph = paragraphs[0];
     const furtherParagraphs = paragraphs.slice(1);
     const topNode: KnowNode = {
+      id: v4(),
       text: topParagraph,
       nodeType: "URL"
     };
@@ -34,34 +36,39 @@ function CreateNote({ onCreateNode }: CreateNoteProps): JSX.Element {
       (text: string): KnowNode => {
         return {
           text,
-          nodeType: "QUOTE"
+          nodeType: "QUOTE",
+          id: v4()
         };
       }
     );
-    onCreateNode([
-      {
-        relationType: "CONTAINS",
-        a: {
-          nodeType: "VIEW",
-          text: "TIMELINE"
+    addBuckets({
+      nodes: Immutable.Map(children.map(child => [child.id, child])).set(
+        topNode.id,
+        topNode
+      ),
+      relations: [
+        {
+          relationType: "CONTAINS",
+          a: "TIMELINE",
+          b: topNode.id
         },
-        b: topNode
-      },
-      ...children.map(
-        (child: KnowNode): Relation => {
-          return {
-            relationType: "CONTAINS",
-            a: topNode,
-            b: child
-          };
-        }
-      )
-    ]);
+        ...children.map(
+          (child: KnowNode): Relation => {
+            return {
+              relationType: "CONTAINS",
+              a: topNode.id,
+              b: child.id
+            };
+          }
+        )
+      ]
+    });
+
     setText("");
   };
 
   return (
-    <div className="mb-4 col-lg-12 col-xl-6">
+    <div className="mb-4 col-lg-12 col-xl-6 offset-xl-3">
       <Card>
         <Card.Body>
           <div className="scrolling-container">

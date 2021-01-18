@@ -1,3 +1,5 @@
+import Immutable from "immutable";
+
 declare global {
   type RelationType = "CONTAINS"; // a contains b
   type NodeType =
@@ -15,15 +17,22 @@ declare global {
 
   type Relation = {
     relationType: RelationType;
-    a: KnowNode;
-    b: KnowNode;
+    a: string;
+    b: string;
   };
 
   type Relations = Array<Relation>;
+  type Nodes = Immutable.Map<string, KnowNode>;
 
   type KnowNode = {
+    id: string;
     text: string;
     nodeType: NodeType;
+  };
+
+  type Store = {
+    relations: Relations;
+    nodes: Immutable.Map<string, KnowNode>;
   };
 }
 
