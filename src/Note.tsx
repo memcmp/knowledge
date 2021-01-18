@@ -17,7 +17,7 @@ function Note({ node }: NoteProps): JSX.Element {
           <Card.Body>
             <ReactQuill
               theme="bubble"
-              formats={[]}
+              formats={["link", "header"]}
               modules={{ toolbar: false }}
               value={node.text}
               readOnly={true}

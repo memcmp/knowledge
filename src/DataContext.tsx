@@ -1,8 +1,6 @@
 import React from "react";
 import Immutable from "immutable";
 
-type AddRelations = (bucket: Store) => void;
-
 const RelationContext = React.createContext<
   | {
       relations: Relations;

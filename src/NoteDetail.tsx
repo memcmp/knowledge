@@ -16,7 +16,6 @@ function NoteDetail(): JSX.Element {
   const node = getNode(id);
   // TODO: Not found error
   const children = getChildren(id);
-  console.log(children);
 
   return (
     <>
@@ -26,7 +25,7 @@ function NoteDetail(): JSX.Element {
             <Card.Body>
               <ReactQuill
                 theme="bubble"
-                formats={[]}
+                formats={["link", "size"]}
                 modules={{ toolbar: false }}
                 value={node.text}
                 readOnly={true}
@@ -43,7 +42,7 @@ function NoteDetail(): JSX.Element {
                 <div className="border-bottom" key={childNode.id}>
                   <ReactQuill
                     theme="bubble"
-                    formats={[]}
+                    formats={["link", "size"]}
                     modules={{ toolbar: false }}
                     value={childNode.text}
                     readOnly={true}

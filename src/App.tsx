@@ -16,9 +16,6 @@ function App() {
     })
   });
 
-  if (dataStore.relations.length > 0) {
-    console.log(dataStore.nodes.get(dataStore.relations[0].b));
-  }
   const addBucket = (bucket: Store) => {
     setDataStore({
       nodes: dataStore.nodes.merge(bucket.nodes),
