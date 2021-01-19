@@ -1,9 +1,10 @@
 import Immutable from "immutable";
 
 declare global {
-  type RelationType = "CONTAINS"; // a contains b
+  type RelationType = "CONTAINS" | "RELEVANT"; // a contains b
   type NodeType =
     | "URL"
+    | "TITLE"
     | "ISBN"
     | "ISSN"
     | "CLAIM"
