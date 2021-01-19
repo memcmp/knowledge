@@ -16,17 +16,10 @@ function isEmpty(text: string): boolean {
   return text === PARAGRAPH || text === "";
 }
 
-function SubNode({
-  childNode,
-  showMenu,
-  setShowMenu
-}: {
-  childNode: KnowNode;
-  setShowMenu: (id: string | undefined) => void;
-  showMenu: boolean;
-}): JSX.Element {
+function SubNode({ childNode }: { childNode: KnowNode }): JSX.Element {
   const [showComment, setShowComment] = useState<boolean>();
   const [comment, setComment] = useState<string>("");
+  const [showMenu, setShowMenu] = useState<boolean>(false);
 
   const onChange = (content: string) => {
     setComment(content);
@@ -34,14 +27,14 @@ function SubNode({
 
   const onClickSave = (): void => {
     setShowComment(false);
-    setShowMenu(undefined);
+    setShowMenu(false);
   };
 
   return (
     <div className="border-bottom">
       <div key={childNode.id}>
         <div
-          onClick={() => setShowMenu(childNode.id)}
+          onClick={() => setShowMenu(!showMenu)}
           style={{ cursor: "pointer" }}
         >
           <ReactQuill
@@ -104,7 +97,6 @@ function NoteDetail(): JSX.Element {
   const { id } = useParams<{ id: string }>();
   const { getNode } = useSelectors();
   const { getChildren } = useSelectors();
-  const [showMenu, setShowMenu] = useState<undefined | string>(undefined);
 
   const node = getNode(id);
   // TODO: Not found error
@@ -132,11 +124,7 @@ function NoteDetail(): JSX.Element {
           <Card>
             <Card.Body>
               {children.map(childNode => (
-                <SubNode
-                  childNode={childNode}
-                  showMenu={showMenu === childNode.id}
-                  setShowMenu={setShowMenu}
-                />
+                <SubNode childNode={childNode} key={childNode.id} />
               ))}
             </Card.Body>
           </Card>
