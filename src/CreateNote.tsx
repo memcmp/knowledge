@@ -24,7 +24,7 @@ function createBucket(paragraphs: Array<string>): Store {
   const topNode: KnowNode = {
     id: v4(),
     text: topParagraph,
-    nodeType: "URL"
+    nodeType: "TITLE"
   };
   const children = furtherParagraphs.map(
     (text: string): KnowNode => {
