@@ -1,6 +1,6 @@
 import React from "react";
 import { CreateNote } from "./CreateNote";
-import { useRelations, useSelectors } from "./DataContext";
+import { useSelectors } from "./DataContext";
 import { Note } from "./Note";
 
 type TimelineProps = {
@@ -8,11 +8,8 @@ type TimelineProps = {
 };
 
 function Timeline({ viewID }: TimelineProps): JSX.Element {
-  const { getNode } = useSelectors();
-  const relations = useRelations();
-  const nodesInTimeline = relations
-    .filter(relation => getNode(relation.a).id === viewID)
-    .map((rel: Relation) => getNode(rel.b));
+  const { getChildren } = useSelectors();
+  const nodesInTimeline = getChildren(viewID);
 
   return (
     <>
