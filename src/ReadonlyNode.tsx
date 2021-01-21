@@ -1,15 +1,25 @@
 import React from "react";
 import ReactQuill from "react-quill";
 
-function ReadonlyNode({ text }: { text: string }): JSX.Element {
+function ReadonlyNode({ node }: { node: KnowNode }): JSX.Element {
   return (
-    <ReactQuill
-      theme="bubble"
-      formats={["link", "size"]}
-      modules={{ toolbar: false }}
-      value={text}
-      readOnly={true}
-    />
+    <div
+      className={`scrolling-container ${
+        node.nodeType === "QUESTION" || node.nodeType === "TOPIC"
+          ? "text-danger"
+          : ""
+      }
+            ${node.nodeType === "NOTE" ? "text-muted" : ""}
+              `}
+    >
+      <ReactQuill
+        theme="bubble"
+        formats={["link", "size"]}
+        modules={{ toolbar: false }}
+        value={node.text}
+        readOnly={true}
+      />
+    </div>
   );
 }
 
