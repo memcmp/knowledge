@@ -19,121 +19,181 @@ function isEmpty(text: string): boolean {
   return text === PARAGRAPH || text === "";
 }
 
-function SubNode({ childNode }: { childNode: KnowNode }): JSX.Element {
+function SubNode({
+  node,
+  parentNode
+}: {
+  node: KnowNode;
+  parentNode: KnowNode;
+}): JSX.Element {
   const [showComment, setShowComment] = useState<boolean>();
   const [comment, setComment] = useState<string>("");
   const [showMenu, setShowMenu] = useState<boolean>(false);
-  const { getChildren } = useSelectors();
   const addBucket = useAddBucket();
+  const { getChildren, getNode } = useSelectors();
 
   const onChange = (content: string) => {
     setComment(content);
   };
 
-  const createNote = (onTop: boolean): void => {
-    const newNode: KnowNode = {
-      id: v4(),
-      text: comment,
-      nodeType: "NOTE"
+  const createNodeAbove = (): void => {
+    const id = v4();
+    const relationToNode: Relation = {
+      relationType: "RELEVANT",
+      a: id,
+      b: node.id
     };
-    const relations: Relations = [
-      {
-        relationType: "RELEVANT",
-        a: childNode.id,
-        b: newNode.id
-      }
-    ];
-    addBucket({
-      nodes: Immutable.Map<string, KnowNode>().set(newNode.id, newNode),
-      relations
-    });
+    const relationToParent: Relation = {
+      relationType: "RELEVANT",
+      a: parentNode.id,
+      b: id
+    };
+    const newNode: KnowNode = {
+      id,
+      text: comment,
+      nodeType: "NOTE",
+      parentRelations: [relationToParent],
+      childRelations: [relationToNode]
+    };
+    const updatedNode = {
+      ...node,
+      parentRelations: [...node.parentRelations, relationToNode]
+    };
+    const updatedParent = {
+      ...parentNode,
+      childRelations: [relationToParent, ...parentNode.childRelations]
+    };
+    addBucket(
+      Immutable.Map<string, KnowNode>()
+        .set(newNode.id, newNode)
+        .set(updatedNode.id, updatedNode)
+        .set(updatedParent.id, updatedParent)
+    );
     setShowComment(false);
     setShowMenu(false);
     setComment("");
   };
 
-  const subNodes = getChildren(childNode.id);
+  const createNoteBelow = (): void => {
+    const id = v4();
+    const relation: Relation = {
+      relationType: "RELEVANT",
+      a: node.id,
+      b: id
+    };
+    const newNode: KnowNode = {
+      id: v4(),
+      text: comment,
+      nodeType: "NOTE",
+      parentRelations: [relation],
+      childRelations: []
+    };
+    const updatedWithComment = {
+      ...node,
+      childRelations: [...node.childRelations, relation]
+    };
+    addBucket(
+      Immutable.Map<string, KnowNode>()
+        .set(updatedWithComment.id, updatedWithComment)
+        .set(id, newNode)
+    );
+    setShowComment(false);
+    setShowMenu(false);
+    setComment("");
+  };
+
+  const subNodes = getChildren(node);
+  const parentNodes = node.parentRelations
+    .filter(rel => rel.a !== parentNode.id)
+    .map(rel => getNode(rel.a));
 
   return (
-    <div className="border-bottom">
-      <div key={childNode.id}>
-        <div
-          onClick={() => setShowMenu(!showMenu)}
-          style={{ cursor: "pointer" }}
-        >
-          <ReadonlyNode text={childNode.text} />
-        </div>
-      </div>
-      {showMenu && (
-        <div className="justify-content-center nav">
-          <button
-            className="header-icon btn btn-empty font-size-toolbar text-semi-muted"
-            type="button"
-            onClick={() => setShowComment(!showComment)}
-          >
-            <i className="simple-icon-speech d-block" />
-          </button>
-          <button
-            className="header-icon btn btn-empty font-size-toolbar text-semi-muted"
-            type="button"
-          >
-            <i className="simple-icon-size-fullscreen d-block" />
-          </button>
-        </div>
-      )}
-
-      {showMenu && showComment && (
-        <div className="mb-4">
-          <div className="scrolling-container text-muted">
-            <ReactQuill
-              theme="bubble"
-              formats={[]}
-              modules={{ toolbar: false }}
-              placeholder="Create a Note"
-              value={comment}
-              onChange={onChange}
-              scrollingContainer="scrolling-container"
-            />
-            {!isEmpty(comment) && (
-              <div className="justify-content-center nav">
-                <button
-                  className="header-icon btn btn-empty font-size-toolbar text-semi-muted"
-                  type="button"
-                  onClick={() => createNote(false)}
-                >
-                  <i className="iconsminds-down d-block" />
-                </button>
-                <button
-                  className="header-icon btn btn-empty font-size-toolbar text-semi-muted"
-                  type="button"
-                  onClick={() => createNote(true)}
-                >
-                  <i className="iconsminds-up d-block" />
-                </button>
-              </div>
-            )}
+    <>
+      {parentNodes.map(p => (
+        <div className="border-bottom" key={p.id}>
+          <div className="scrolling-container text-primary">
+            <ReadonlyNode text={p.text} />
           </div>
         </div>
-      )}
+      ))}
+      <div className="border-bottom">
+        <div key={node.id}>
+          <div
+            onClick={() => setShowMenu(!showMenu)}
+            style={{ cursor: "pointer" }}
+          >
+            <ReadonlyNode text={node.text} />
+          </div>
+        </div>
+        {showMenu && (
+          <div className="justify-content-center nav">
+            <button
+              className="header-icon btn btn-empty font-size-toolbar text-semi-muted"
+              type="button"
+              onClick={() => setShowComment(!showComment)}
+            >
+              <i className="simple-icon-speech d-block" />
+            </button>
+            <button
+              className="header-icon btn btn-empty font-size-toolbar text-semi-muted"
+              type="button"
+            >
+              <i className="simple-icon-size-fullscreen d-block" />
+            </button>
+          </div>
+        )}
+
+        {showMenu && showComment && (
+          <div className="mb-4">
+            <div className="scrolling-container text-muted">
+              <ReactQuill
+                theme="bubble"
+                formats={[]}
+                modules={{ toolbar: false }}
+                placeholder="Create a Note"
+                value={comment}
+                onChange={onChange}
+                scrollingContainer="scrolling-container"
+              />
+              {!isEmpty(comment) && (
+                <div className="justify-content-center nav">
+                  <button
+                    className="header-icon btn btn-empty font-size-toolbar text-semi-muted"
+                    type="button"
+                    onClick={() => createNoteBelow()}
+                  >
+                    <i className="iconsminds-down d-block" />
+                  </button>
+                  <button
+                    className="header-icon btn btn-empty font-size-toolbar text-semi-muted"
+                    type="button"
+                    onClick={() => createNodeAbove()}
+                  >
+                    <i className="iconsminds-up d-block" />
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
       {subNodes.map(sub => (
-        <div className="border-top">
+        <div className="border-bottom">
           <div className="scrolling-container text-muted">
             <ReadonlyNode text={sub.text} />
           </div>
         </div>
       ))}
-    </div>
+    </>
   );
 }
 
 function NoteDetail(): JSX.Element {
   const { id } = useParams<{ id: string }>();
-  const { getNode } = useSelectors();
-  const { getChildren } = useSelectors();
+  const { getNode, getChildren } = useSelectors();
 
   const node = getNode(id);
-  // TODO: Not found error
-  const children = getChildren(id);
+  const children = getChildren(node);
 
   return (
     <>
@@ -141,13 +201,7 @@ function NoteDetail(): JSX.Element {
         <div className="mb-4 col-lg-12 col-xl-6 offset-xl-3">
           <Card>
             <Card.Body>
-              <ReactQuill
-                theme="bubble"
-                formats={["link", "header"]}
-                modules={{ toolbar: false }}
-                value={node.text}
-                readOnly={true}
-              />
+              <ReadonlyNode text={node.text} />
             </Card.Body>
           </Card>
         </div>
@@ -157,7 +211,11 @@ function NoteDetail(): JSX.Element {
           <Card>
             <Card.Body>
               {children.map(childNode => (
-                <SubNode childNode={childNode} key={childNode.id} />
+                <SubNode
+                  node={childNode}
+                  parentNode={node}
+                  key={childNode.id}
+                />
               ))}
             </Card.Body>
           </Card>

@@ -10,7 +10,7 @@ import MarkdownIt from "markdown-it";
 import "react-quill/dist/quill.bubble.css";
 import "./editor.css";
 
-import { useAddBucket } from "./DataContext";
+import { useAddBucket, useSelectors } from "./DataContext";
 
 const PARAGRAPH = "<p><br></p>";
 
@@ -18,50 +18,69 @@ function isEmpty(text: string): boolean {
   return text === PARAGRAPH || text === "";
 }
 
-function createBucket(paragraphs: Array<string>): Store {
+function createBucket(
+  paragraphs: Array<string>
+): Store & {
+  relationToView: Relation;
+} {
   const topParagraph = paragraphs[0];
   const furtherParagraphs = paragraphs.slice(1);
-  const topNode: KnowNode = {
-    id: v4(),
-    text: topParagraph,
-    nodeType: "TITLE"
+
+  const topId = v4();
+
+  const relationToView: Relation = {
+    relationType: "CONTAINS",
+    a: "TIMELINE",
+    b: topId
   };
-  const children = furtherParagraphs.map(
-    (text: string): KnowNode => {
-      return {
-        text,
-        nodeType: "QUOTE",
-        id: v4()
-      };
-    }
-  );
-  return {
-    nodes: Immutable.Map(children.map(child => [child.id, child])).set(
-      topNode.id,
-      topNode
-    ),
-    relations: [
-      {
+
+  const bucket: Nodes = Immutable.OrderedMap(
+    furtherParagraphs.map((text: string): [string, KnowNode] => {
+      const id = v4();
+      const relation: Relation = {
         relationType: "CONTAINS",
-        a: "TIMELINE",
-        b: topNode.id
-      },
-      ...children.map(
-        (child: KnowNode): Relation => {
-          return {
-            relationType: "CONTAINS",
-            a: topNode.id,
-            b: child.id
-          };
+        a: topId,
+        b: id
+      };
+      return [
+        id,
+        {
+          text,
+          nodeType: "QUOTE",
+          id,
+          childRelations: [],
+          parentRelations: [relation]
+        }
+      ];
+    })
+  );
+
+  const childRelations: Relations = Array.from(
+    bucket
+      .map(
+        (node: KnowNode): Relation => {
+          return node.parentRelations[0];
         }
       )
-    ]
+      .values()
+  );
+  const topNode: KnowNode = {
+    id: topId,
+    text: topParagraph,
+    nodeType: "TITLE",
+    parentRelations: [relationToView],
+    childRelations
+  };
+  return {
+    nodes: bucket.set(topNode.id, topNode),
+    relationToView
   };
 }
 
 function CreateNote(): JSX.Element {
   const [text, setText] = useState<string>("");
   const addBuckets = useAddBucket();
+  const { getNode } = useSelectors();
   const { getRootProps, getInputProps } = useDropzone({
     accept: ".md",
     onDrop: (acceptedFiles: Array<File>) => {
@@ -79,25 +98,29 @@ function CreateNote(): JSX.Element {
           }
         )
       ).then((markdowns: Array<string>) => {
-        const buckets = markdowns.map((markdown: string) => {
-          const paragraphs = markdown.split("\n\n");
-          return createBucket(
-            paragraphs.map((paragraph: string) => {
-              const md = new MarkdownIt();
-              return md.render(paragraph);
-            })
-          );
-        });
-        const mergedBuckets = buckets.reduce(
-          (rdx: Store, bucket: Store): Store => {
-            return {
-              nodes: rdx.nodes.merge(bucket.nodes),
-              relations: [...rdx.relations, ...bucket.relations]
-            };
+        const nodes = markdowns.reduce(
+          (rdx: Immutable.Map<string, KnowNode>, markdown: string) => {
+            const timeline = rdx.get("TIMELINE") as KnowNode;
+            const paragraphs = markdown.split("\n\n");
+            const { nodes, relationToView } = createBucket(
+              paragraphs.map((paragraph: string) => {
+                const md = new MarkdownIt();
+                return md.render(paragraph);
+              })
+            );
+            return rdx
+              .set(timeline.id, {
+                ...timeline,
+                childRelations: [...timeline.childRelations, relationToView]
+              })
+              .merge(nodes);
           },
-          { relations: [], nodes: Immutable.Map() }
+          Immutable.Map<string, KnowNode>().set(
+            "TIMELINE",
+            getNode("TIMELINE") as KnowNode
+          )
         );
-        addBuckets(mergedBuckets);
+        addBuckets(nodes);
       });
     }
   });
@@ -106,7 +129,14 @@ function CreateNote(): JSX.Element {
   };
 
   const onClickSave = (): void => {
-    addBuckets(createBucket(text.split(PARAGRAPH)));
+    const timeline = getNode("TIMELINE");
+    const { nodes, relationToView } = createBucket(text.split(PARAGRAPH));
+    addBuckets(
+      nodes.set(timeline.id, {
+        ...timeline,
+        childRelations: [...timeline.childRelations, relationToView]
+      })
+    );
     setText("");
   };
 

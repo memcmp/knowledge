@@ -4,12 +4,12 @@ import { useSelectors } from "./DataContext";
 import { Note } from "./Note";
 
 type TimelineProps = {
-  viewID: string;
+  view: KnowNode;
 };
 
-function Timeline({ viewID }: TimelineProps): JSX.Element {
+function Timeline({ view }: TimelineProps): JSX.Element {
   const { getChildren } = useSelectors();
-  const nodesInTimeline = getChildren(viewID);
+  const nodesInTimeline = getChildren(view);
 
   return (
     <>

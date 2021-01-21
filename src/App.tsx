@@ -10,16 +10,20 @@ export const TIMELINE = "TIMELINE";
 
 function App() {
   const [dataStore, setDataStore] = useState<Store>({
-    relations: [],
     nodes: Immutable.Map({
-      [TIMELINE]: { id: TIMELINE, nodeType: "VIEW", text: "Timeline" }
+      [TIMELINE]: {
+        id: TIMELINE,
+        nodeType: "VIEW",
+        text: "Timeline",
+        parentRelations: [],
+        childRelations: []
+      }
     })
   });
 
-  const addBucket = (bucket: Store) => {
+  const addBucket = (nodes: Immutable.Map<string, KnowNode>) => {
     setDataStore({
-      nodes: dataStore.nodes.merge(bucket.nodes),
-      relations: [...dataStore.relations, ...bucket.relations]
+      nodes: dataStore.nodes.merge(nodes)
     });
   };
   return (
@@ -33,14 +37,15 @@ function App() {
             <div className="dashboard-wrapper">
               <RelationContext.Provider
                 value={{
-                  relations: dataStore.relations,
                   nodes: dataStore.nodes,
                   addBucket
                 }}
               >
                 <Switch>
                   <Route exact path="/">
-                    <Timeline viewID={TIMELINE} />
+                    <Timeline
+                      view={dataStore.nodes.get(TIMELINE) as KnowNode}
+                    />
                   </Route>
                   <Route path="/notes/:id">
                     <NoteDetail />
