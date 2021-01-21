@@ -3,16 +3,12 @@ import Immutable from "immutable";
 declare global {
   type RelationType = "CONTAINS" | "RELEVANT"; // a contains b
   type NodeType =
-    | "URL"
-    | "TITLE"
-    | "ISBN"
-    | "ISSN"
-    | "CLAIM"
     | "NOTE"
     | "TOPIC"
-    | "EVENT"
-    | "LOCATION"
-    | "PERSON"
+    | "ARGUMENT"
+    | "QUESTION"
+    | "URL"
+    | "TITLE"
     | "QUOTE"
     | "VIEW";
 

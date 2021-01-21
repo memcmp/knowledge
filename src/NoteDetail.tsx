@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import ReactQuill from "react-quill";
 import Immutable from "immutable";
 import Card from "react-bootstrap/Card";
@@ -19,6 +19,14 @@ function isEmpty(text: string): boolean {
   return text === PARAGRAPH || text === "";
 }
 
+function getPlaceHolder(nodeType: NodeType): string | undefined {
+  return new Map([
+    ["NOTE", "Create a Note"],
+    ["TOPIC", "Add Topic"],
+    ["QUESTION", "Ask a Question"]
+  ]).get(nodeType);
+}
+
 function SubNode({
   node,
   parentNode
@@ -26,11 +34,12 @@ function SubNode({
   node: KnowNode;
   parentNode: KnowNode;
 }): JSX.Element {
-  const [showComment, setShowComment] = useState<boolean>();
+  const [showEdit, setShowEdit] = useState<NodeType | undefined>();
   const [comment, setComment] = useState<string>("");
   const [showMenu, setShowMenu] = useState<boolean>(false);
   const addBucket = useAddBucket();
   const { getChildren, getNode } = useSelectors();
+  const quillRef = useRef<ReactQuill>();
 
   const onChange = (content: string) => {
     setComment(content);
@@ -51,7 +60,7 @@ function SubNode({
     const newNode: KnowNode = {
       id,
       text: comment,
-      nodeType: "NOTE",
+      nodeType: showEdit || "NOTE",
       parentRelations: [relationToParent],
       childRelations: [relationToNode]
     };
@@ -69,7 +78,7 @@ function SubNode({
         .set(updatedNode.id, updatedNode)
         .set(updatedParent.id, updatedParent)
     );
-    setShowComment(false);
+    setShowEdit(undefined);
     setShowMenu(false);
     setComment("");
   };
@@ -84,7 +93,7 @@ function SubNode({
     const newNode: KnowNode = {
       id: v4(),
       text: comment,
-      nodeType: "NOTE",
+      nodeType: showEdit || "NOTE",
       parentRelations: [relation],
       childRelations: []
     };
@@ -97,7 +106,7 @@ function SubNode({
         .set(updatedWithComment.id, updatedWithComment)
         .set(id, newNode)
     );
-    setShowComment(false);
+    setShowEdit(undefined);
     setShowMenu(false);
     setComment("");
   };
@@ -107,13 +116,18 @@ function SubNode({
     .filter(rel => rel.a !== parentNode.id)
     .map(rel => getNode(rel.a));
 
+  // TODO: Highlight current button
+  if (quillRef.current && showEdit) {
+    quillRef.current.getEditor().root.dataset.placeholder = getPlaceHolder(
+      showEdit
+    );
+  }
+
   return (
     <>
       {parentNodes.map(p => (
-        <div className="border-bottom" key={p.id}>
-          <div className="scrolling-container text-primary">
-            <ReadonlyNode text={p.text} />
-          </div>
+        <div className="border-bottom" style={{ marginLeft: -10 }} key={p.id}>
+          <ReadonlyNode node={p} />
         </div>
       ))}
       <div className="border-bottom">
@@ -122,38 +136,61 @@ function SubNode({
             onClick={() => setShowMenu(!showMenu)}
             style={{ cursor: "pointer" }}
           >
-            <ReadonlyNode text={node.text} />
+            <ReadonlyNode node={node} />
           </div>
         </div>
         {showMenu && (
           <div className="justify-content-center nav">
             <button
-              className="header-icon btn btn-empty font-size-toolbar text-semi-muted"
+              className={`header-icon btn btn-empty font-size-toolbar text-semi-muted ${
+                showEdit === "NOTE" ? "text-primary" : ""
+              }`}
               type="button"
-              onClick={() => setShowComment(!showComment)}
+              onClick={() =>
+                setShowEdit(showEdit === "NOTE" ? undefined : "NOTE")
+              }
             >
               <i className="simple-icon-speech d-block" />
             </button>
             <button
-              className="header-icon btn btn-empty font-size-toolbar text-semi-muted"
               type="button"
+              className={`header-icon btn btn-empty font-size-toolbar text-semi-muted ${
+                showEdit === "QUESTION" ? "text-primary" : ""
+              }`}
+              onClick={() =>
+                setShowEdit(showEdit === "QUESTION" ? undefined : "QUESTION")
+              }
             >
-              <i className="simple-icon-size-fullscreen d-block" />
+              <i className="simple-icon-question d-block" />
+            </button>
+            <button
+              className={`header-icon btn btn-empty font-size-toolbar text-semi-muted ${
+                showEdit === "TOPIC" ? "text-primary" : ""
+              }`}
+              type="button"
+              onClick={() =>
+                setShowEdit(showEdit === "TOPIC" ? undefined : "TOPIC")
+              }
+            >
+              <i className="simple-icon-social-tumblr d-block" />
             </button>
           </div>
         )}
 
-        {showMenu && showComment && (
+        {showMenu && showEdit && (
           <div className="mb-4">
             <div className="scrolling-container text-muted">
               <ReactQuill
                 theme="bubble"
                 formats={[]}
                 modules={{ toolbar: false }}
-                placeholder="Create a Note"
+                placeholder={getPlaceHolder(showEdit)}
                 value={comment}
                 onChange={onChange}
                 scrollingContainer="scrolling-container"
+                ref={el => {
+                  quillRef.current = el as ReactQuill;
+                }}
               />
               {!isEmpty(comment) && (
                 <div className="justify-content-center nav">
@@ -178,10 +215,8 @@ function SubNode({
         )}
       </div>
       {subNodes.map(sub => (
-        <div className="border-bottom">
-          <div className="scrolling-container text-muted">
-            <ReadonlyNode text={sub.text} />
-          </div>
+        <div className="border-bottom ml-4" key={sub.id}>
+          <ReadonlyNode node={sub} />
         </div>
       ))}
     </>
@@ -201,7 +236,7 @@ function NoteDetail(): JSX.Element {
         <div className="mb-4 col-lg-12 col-xl-6 offset-xl-3">
           <Card>
             <Card.Body>
-              <ReadonlyNode text={node.text} />
+              <ReadonlyNode node={node} />
             </Card.Body>
           </Card>
         </div>
