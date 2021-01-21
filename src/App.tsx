@@ -19,7 +19,7 @@ function App() {
   const addBucket = (bucket: Store) => {
     setDataStore({
       nodes: dataStore.nodes.merge(bucket.nodes),
-      relations: [...bucket.relations, ...dataStore.relations]
+      relations: [...dataStore.relations, ...bucket.relations]
     });
   };
   return (
