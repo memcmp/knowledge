@@ -13,6 +13,8 @@ import { v4 } from "uuid";
 
 import { ReadonlyNode } from "./ReadonlyNode";
 
+import { NoteDetailSuggestions } from "./NoteDetailSuggestion";
+
 const PARAGRAPH = "<p><br></p>";
 
 function isEmpty(text: string): boolean {
@@ -131,6 +133,9 @@ function SubNode({
         </div>
       ))}
       <div className="border-bottom">
+        {showMenu && (
+          <NoteDetailSuggestions parentNode={parentNode} node={node} />
+        )}
         <div key={node.id}>
           <div
             onClick={() => setShowMenu(!showMenu)}
