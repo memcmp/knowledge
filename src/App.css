@@ -40,3 +40,33 @@
 .font-size-toolbar {
   font-size: 16px;
 }
+
+.ql-disabled .ql-editor {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
+.rbt {
+  position: relative;
+  flex: 1;
+}
+
+.rbt > .form-control {
+  padding: 0.5rem;
+}
+
+.rbt-aux {
+  align-items: center;
+  display: flex;
+  bottom: 0;
+  justify-content: center;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 34px;
+}
+
+.rbt-aux .rbt-close {
+  pointer-events: auto;
+}

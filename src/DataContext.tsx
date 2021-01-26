@@ -33,13 +33,19 @@ function getNode(nodes: Nodes, id: string): KnowNode {
   return node as KnowNode;
 }
 
-function getChildren(nodes: Nodes, node: KnowNode): Array<KnowNode> {
-  return node.childRelations.map(relation => getNode(nodes, relation.b));
+function getChildren(
+  nodes: Nodes,
+  node: KnowNode,
+  filter?: Array<NodeType>
+): Array<KnowNode> {
+  return node.childRelations
+    .map(relation => getNode(nodes, relation.b))
+    .filter(n => (filter === undefined ? true : filter.includes(n.nodeType)));
 }
 
 function useSelectors(): {
   getNode: (id: string) => KnowNode;
-  getChildren: (node: KnowNode) => Array<KnowNode>;
+  getChildren: (node: KnowNode, filter?: Array<NodeType>) => Array<KnowNode>;
 } {
   const context = React.useContext(RelationContext);
   if (context === undefined) {
@@ -49,8 +55,11 @@ function useSelectors(): {
     getNode: (id: string): KnowNode => {
       return getNode(context.nodes, id);
     },
-    getChildren: (node: KnowNode): Array<KnowNode> => {
-      return getChildren(context.nodes, node);
+    getChildren: (
+      node: KnowNode,
+      filter?: Array<NodeType>
+    ): Array<KnowNode> => {
+      return getChildren(context.nodes, node, filter);
     }
   };
 }

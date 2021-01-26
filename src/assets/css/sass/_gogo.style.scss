@@ -4190,6 +4190,11 @@ select.form-control:not([size]):not([multiple]) {
 
 .autosuggest {
   position: relative;
+  flex: 1;
+}
+
+.autosuggest>.form-control {
+  padding: 0.5rem;
 }
 
 .react-autosuggest__suggestions-container {
