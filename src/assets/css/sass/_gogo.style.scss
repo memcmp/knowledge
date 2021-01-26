@@ -2809,8 +2809,8 @@ main {
   }
 
   @include respond-below(sm) {
-    margin-left: $main-margin-xs !important;
-    margin-right: $main-margin-xs !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
     margin-top: $main-margin-xs !important;
     margin-bottom: 0;
   }
