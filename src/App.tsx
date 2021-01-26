@@ -6,6 +6,11 @@ import { NoteDetail } from "./NoteDetail";
 import { Timeline } from "./Timeline";
 import Immutable from "immutable";
 
+import { userSession, authenticate } from "./auth";
+import { getDataStore, saveDataStore } from "./storage";
+
+import { Button } from "react-bootstrap";
+
 export const TIMELINE = "TIMELINE";
 
 function App() {
@@ -20,12 +25,25 @@ function App() {
       }
     })
   });
-
   const addBucket = (nodes: Immutable.Map<string, KnowNode>) => {
-    setDataStore({
-      nodes: dataStore.nodes.merge(nodes)
-    });
+    const newStorage = { nodes: dataStore.nodes.merge(nodes) };
+    setDataStore(newStorage);
+    if (userSession.isUserSignedIn()) {
+      saveDataStore(newStorage);
+    }
   };
+
+  if (userSession.isSignInPending()) {
+    userSession.handlePendingSignIn().then(loadedUserData => {
+      window.history.replaceState({}, document.title, "/");
+    });
+  } else if (userSession.isUserSignedIn()) {
+    (async () => {
+      const loadedStore = await getDataStore();
+      setDataStore(loadedStore);
+    })();
+  }
+
   return (
     <div className="h-100">
       <div
@@ -35,6 +53,9 @@ function App() {
         <main>
           <div className="container-fluid">
             <div className="dashboard-wrapper">
+              {!userSession.isUserSignedIn() && (
+                <Button onClick={() => authenticate()}>Login</Button>
+              )}
               <RelationContext.Provider
                 value={{
                   nodes: dataStore.nodes,
