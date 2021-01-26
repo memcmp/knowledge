@@ -14,6 +14,7 @@ import { Button } from "react-bootstrap";
 export const TIMELINE = "TIMELINE";
 
 function App() {
+  const [dataLoaded, setDataLoaded] = useState<boolean>(false);
   const [dataStore, setDataStore] = useState<Store>({
     nodes: Immutable.Map({
       [TIMELINE]: {
@@ -37,7 +38,8 @@ function App() {
     userSession.handlePendingSignIn().then(loadedUserData => {
       window.history.replaceState({}, document.title, "/");
     });
-  } else if (userSession.isUserSignedIn()) {
+  } else if (userSession.isUserSignedIn() && !dataLoaded) {
+    setDataLoaded(true);
     (async () => {
       const loadedStore = await getDataStore();
       setDataStore(loadedStore);
