@@ -98,6 +98,14 @@ $success-color: #3e884f;
 $warning-color: #b69329;
 $error-color: #c43d4b;
 
+/* Custom */
+.dashboard-wrapper {
+  @include respond-below(sm) {
+    overflow-x: hidden;
+  }
+}
+
+
 /* 01.Base */
 html {
   width: 100%;
