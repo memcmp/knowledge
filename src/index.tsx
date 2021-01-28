@@ -6,10 +6,16 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { BrowserRouter } from "react-router-dom";
 
+import { AppConfig, UserSession } from "@stacks/connect";
+
+const appConfig = new AppConfig(["store_write", "publish_data"]);
+
+const userSession = new UserSession({ appConfig });
+
 ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter>
-      <App />
+      <App userSession={userSession} />
     </BrowserRouter>
   </React.StrictMode>,
   document.getElementById("root")

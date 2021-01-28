@@ -1,50 +1,63 @@
-import React, { useState } from "react";
+import React from "react";
 import { Route, Switch } from "react-router-dom";
 import "./App.css";
 import { RelationContext } from "./DataContext";
 import { NoteDetail } from "./NoteDetail";
 import { Timeline } from "./Timeline";
 import Immutable from "immutable";
+import { Storage } from "@stacks/storage";
+import { UserSession } from "@stacks/connect";
+import {
+  QueryClient,
+  QueryClientProvider,
+  useMutation,
+  useQueryClient
+} from "react-query";
 
-import { userSession, authenticate } from "./auth";
-import { getDataStore, saveDataStore } from "./storage";
+import { saveDataStore } from "./storage";
 
-import { Button } from "react-bootstrap";
+import { useQueries } from "./useQueries";
 
 export const TIMELINE = "TIMELINE";
 
-function App() {
-  const [dataLoaded, setDataLoaded] = useState<boolean>(false);
-  const [dataStore, setDataStore] = useState<Store>({
-    nodes: Immutable.Map({
-      [TIMELINE]: {
-        id: TIMELINE,
-        nodeType: "VIEW",
-        text: "Timeline",
-        parentRelations: [],
-        childRelations: []
+function Main({ userSession }: { userSession: UserSession }): JSX.Element {
+  const queryClient = useQueryClient();
+  const { userQuery, storageQuery } = useQueries({ userSession });
+
+  const storage = new Storage({ userSession });
+
+  const updateStorageMutation = useMutation(
+    (newData: Store) => saveDataStore(storage, newData),
+    {
+      onMutate: async (newStore: Store) => {
+        await queryClient.cancelQueries("store");
+        const previousValue = queryClient.getQueryData("store");
+        queryClient.setQueryData("store", newStore);
+        return previousValue;
+      },
+      onError: (err, variables, previousValue) => {
+        queryClient.setQueryData("store", previousValue);
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries("store");
       }
-    })
-  });
+    }
+  );
+
+  if (
+    userQuery.isLoading ||
+    storageQuery.isLoading ||
+    storageQuery.data === undefined
+  ) {
+    return <div className="loading" />;
+  }
+
+  const dataStore = storageQuery.data;
+
   const addBucket = (nodes: Immutable.Map<string, KnowNode>) => {
     const newStorage = { nodes: dataStore.nodes.merge(nodes) };
-    setDataStore(newStorage);
-    if (userSession.isUserSignedIn()) {
-      saveDataStore(newStorage);
-    }
+    updateStorageMutation.mutate(newStorage);
   };
-
-  if (userSession.isSignInPending()) {
-    userSession.handlePendingSignIn().then(loadedUserData => {
-      window.history.replaceState({}, document.title, "/");
-    });
-  } else if (userSession.isUserSignedIn() && !dataLoaded) {
-    setDataLoaded(true);
-    (async () => {
-      const loadedStore = await getDataStore();
-      setDataStore(loadedStore);
-    })();
-  }
 
   return (
     <div className="h-100">
@@ -55,9 +68,6 @@ function App() {
         <main>
           <div className="container-fluid">
             <div className="dashboard-wrapper">
-              {!userSession.isUserSignedIn() && (
-                <Button onClick={() => authenticate()}>Login</Button>
-              )}
               <RelationContext.Provider
                 value={{
                   nodes: dataStore.nodes,
@@ -80,6 +90,15 @@ function App() {
         </main>
       </div>
     </div>
+  );
+}
+
+function App({ userSession }: { userSession: UserSession }): JSX.Element {
+  const queryClient = new QueryClient();
+  return (
+    <QueryClientProvider client={queryClient}>
+      <Main userSession={userSession} />
+    </QueryClientProvider>
   );
 }
 
