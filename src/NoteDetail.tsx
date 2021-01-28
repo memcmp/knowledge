@@ -24,8 +24,7 @@ function isEmpty(text: string): boolean {
 function getPlaceHolder(nodeType: NodeType): string | undefined {
   return new Map([
     ["NOTE", "Create a Note"],
-    ["TOPIC", "Add Topic"],
-    ["QUESTION", "Ask a Question"]
+    ["TOPIC", "Add Topic"]
   ]).get(nodeType);
 }
 
@@ -156,17 +155,6 @@ function SubNode({
               }
             >
               <i className="simple-icon-speech d-block" />
-            </button>
-            <button
-              type="button"
-              className={`header-icon btn btn-empty font-size-toolbar text-semi-muted ${
-                showEdit === "QUESTION" ? "text-primary" : ""
-              }`}
-              onClick={() =>
-                setShowEdit(showEdit === "QUESTION" ? undefined : "QUESTION")
-              }
-            >
-              <i className="simple-icon-question d-block" />
             </button>
             <button
               className={`header-icon btn btn-empty font-size-toolbar text-semi-muted ${
