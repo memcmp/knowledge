@@ -1,12 +1,12 @@
 import Immutable from "immutable";
 
 declare global {
-  type RelationType = "CONTAINS" | "RELEVANT"; // a contains b
+  type RelationType = "CONTAINS" | "RELEVANT"; // a contains b SUMMARIZE?
   type NodeType =
     | "NOTE"
     | "TOPIC"
     | "ARGUMENT"
-    | "QUESTION"
+    | "QUESTION" // remove
     | "URL"
     | "TITLE"
     | "QUOTE"

@@ -1,19 +1,20 @@
 import { Storage } from "@stacks/storage";
-import { userSession } from "./auth";
 import Immutable from "immutable";
 
-const storage = new Storage({ userSession });
 export const TIMELINE = "TIMELINE";
 export const STORAGE_FILE = "knowledge_v1.json";
 
-export async function saveDataStore(store: Store): Promise<void> {
+export async function saveDataStore(
+  storage: Storage,
+  store: Store
+): Promise<void> {
   await storage.putFile(STORAGE_FILE, JSON.stringify(store), {
     encrypt: false,
     dangerouslyIgnoreEtag: true
   });
 }
 
-export async function getDataStore(): Promise<Store> {
+export async function getDataStore(storage: Storage): Promise<Store> {
   try {
     const json = await storage.getFile(STORAGE_FILE, { decrypt: false });
     if (!json) {

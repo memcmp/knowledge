@@ -1,8 +1,4 @@
-import { AppConfig, UserSession, showConnect } from "@stacks/connect";
-
-const appConfig = new AppConfig(["store_write", "publish_data"]);
-
-export const userSession = new UserSession({ appConfig });
+import { UserSession, showConnect, UserData } from "@stacks/connect";
 
 export function authenticate() {
   showConnect({
@@ -17,6 +13,16 @@ export function authenticate() {
   });
 }
 
-export function getUserData() {
+export async function signInUser(
+  userSession: UserSession
+): Promise<UserData | null> {
+  if (!userSession.isUserSignedIn && userSession.isSignInPending()) {
+    await userSession.handlePendingSignIn();
+    window.history.replaceState({}, document.title, "/");
+  }
+  if (!userSession.isUserSignedIn()) {
+    authenticate();
+    return null;
+  }
   return userSession.loadUserData();
 }
