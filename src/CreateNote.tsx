@@ -48,18 +48,18 @@ function createBucket(
           text,
           nodeType: "QUOTE",
           id,
-          childRelations: [],
-          parentRelations: [relation]
+          relationsToObjects: [],
+          relationsToSubjects: [relation]
         }
       ];
     })
   );
 
-  const childRelations: Relations = Array.from(
+  const relationsToObjects: Relations = Array.from(
     bucket
       .map(
         (node: KnowNode): Relation => {
-          return node.parentRelations[0];
+          return node.relationsToSubjects[0];
         }
       )
       .values()
@@ -68,8 +68,8 @@ function createBucket(
     id: topId,
     text: topParagraph,
     nodeType: "TITLE",
-    parentRelations: [relationToView],
-    childRelations
+    relationsToSubjects: [relationToView],
+    relationsToObjects
   };
   return {
     nodes: bucket.set(topNode.id, topNode),
@@ -111,7 +111,10 @@ function CreateNote(): JSX.Element {
             return rdx
               .set(timeline.id, {
                 ...timeline,
-                childRelations: [...timeline.childRelations, relationToView]
+                relationsToObjects: [
+                  ...timeline.relationsToObjects,
+                  relationToView
+                ]
               })
               .merge(nodes);
           },
@@ -134,7 +137,7 @@ function CreateNote(): JSX.Element {
     addBuckets(
       nodes.set(timeline.id, {
         ...timeline,
-        childRelations: [...timeline.childRelations, relationToView]
+        relationsToObjects: [...timeline.relationsToObjects, relationToView]
       })
     );
     setText("");

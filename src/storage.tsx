@@ -3,7 +3,7 @@ import Immutable from "immutable";
 
 export const TIMELINE = "TIMELINE";
 export const INTERESTS = "INTERESTS";
-export const STORAGE_FILE = "knowledge_v1.json";
+export const STORAGE_FILE = "knowledge_v2.json";
 
 export async function saveDataStore(
   storage: Storage,
@@ -21,15 +21,15 @@ const DEFAULT_STORE: Store = {
       id: TIMELINE,
       nodeType: "VIEW",
       text: "Timeline",
-      parentRelations: [],
-      childRelations: []
+      relationsToObjects: [],
+      relationsToSubjects: []
     },
     [INTERESTS]: {
       id: INTERESTS,
       nodeType: "VIEW",
       text: "My Topics",
-      parentRelations: [],
-      childRelations: []
+      relationsToObjects: [],
+      relationsToSubjects: []
     }
   })
 };

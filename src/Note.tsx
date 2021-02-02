@@ -1,9 +1,10 @@
 import React from "react";
-import ReactQuill from "react-quill";
 import Card from "react-bootstrap/Card";
 import "react-quill/dist/quill.bubble.css";
 import "./editor.css";
 import { Link } from "react-router-dom";
+
+import { ReadonlyNode } from "./ReadonlyNode";
 
 type NoteProps = {
   node: KnowNode;
@@ -15,13 +16,7 @@ function Note({ node }: NoteProps): JSX.Element {
       <Link to={`/notes/${node.id}`}>
         <Card>
           <Card.Body>
-            <ReactQuill
-              theme="bubble"
-              formats={["link", "header"]}
-              modules={{ toolbar: false }}
-              value={node.text}
-              readOnly={true}
-            />
+            <ReadonlyNode node={node} />
           </Card.Body>
         </Card>
       </Link>

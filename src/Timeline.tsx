@@ -9,10 +9,10 @@ type TimelineProps = {
 };
 
 function Timeline({ view }: TimelineProps): JSX.Element {
-  const { getChildren, getNode } = useSelectors();
+  const { getObjects, getSubjects, getNode } = useSelectors();
   const nodesInTimeline = [
-    ...getChildren(getNode(INTERESTS)),
-    ...getChildren(view)
+    ...getSubjects(getNode(INTERESTS)),
+    ...getObjects(view)
   ];
 
   return (

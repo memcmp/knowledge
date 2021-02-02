@@ -6,7 +6,6 @@ declare global {
     | "NOTE"
     | "TOPIC"
     | "ARGUMENT"
-    | "QUESTION" // remove
     | "URL"
     | "TITLE"
     | "QUOTE"
@@ -25,8 +24,8 @@ declare global {
     id: string;
     text: string;
     nodeType: NodeType;
-    childRelations: Relations;
-    parentRelations: Relations;
+    relationsToObjects: Relations;
+    relationsToSubjects: Relations;
   };
 
   type Store = {

@@ -20,7 +20,7 @@ export function connectRelevantNodes(
   };
   // check if the relationship doesn't exist yet
   if (
-    subjectNode.childRelations.filter(
+    subjectNode.relationsToSubjects.filter(
       rel =>
         rel.relationType === relation.relationType &&
         rel.a === relation.a &&
@@ -32,11 +32,11 @@ export function connectRelevantNodes(
 
   const updatedObject = {
     ...objectNode,
-    parentRelations: [...objectNode.parentRelations, relation]
+    relationsToSubjects: [...objectNode.relationsToSubjects, relation]
   };
   const updatedSubject = {
     ...subjectNode,
-    childRelations: [...subjectNode.childRelations, relation]
+    relationsToObjects: [...subjectNode.relationsToObjects, relation]
   };
   return nodes.set(objectID, updatedObject).set(subjectID, updatedSubject);
 }
@@ -46,7 +46,7 @@ export function newNode(text: string, nodeType: NodeType): KnowNode {
     id: v4(),
     text,
     nodeType,
-    parentRelations: [],
-    childRelations: []
+    relationsToObjects: [],
+    relationsToSubjects: []
   };
 }

@@ -33,13 +33,23 @@ function getNode(nodes: Nodes, id: string): KnowNode {
   return node as KnowNode;
 }
 
-function getChildren(
+function getObjects(
   nodes: Nodes,
   node: KnowNode,
   filter?: Array<NodeType>
 ): Array<KnowNode> {
-  return node.childRelations
+  return node.relationsToObjects
     .map(relation => getNode(nodes, relation.b))
+    .filter(n => (filter === undefined ? true : filter.includes(n.nodeType)));
+}
+
+function getSubjects(
+  nodes: Nodes,
+  node: KnowNode,
+  filter?: Array<NodeType>
+): Array<KnowNode> {
+  return node.relationsToSubjects
+    .map(relation => getNode(nodes, relation.a))
     .filter(n => (filter === undefined ? true : filter.includes(n.nodeType)));
 }
 
@@ -50,7 +60,8 @@ function getAllNodesByType(nodes: Nodes, nodeType: NodeType): Array<KnowNode> {
 
 function useSelectors(): {
   getNode: (id: string) => KnowNode;
-  getChildren: (node: KnowNode, filter?: Array<NodeType>) => Array<KnowNode>;
+  getObjects: (node: KnowNode, filter?: Array<NodeType>) => Array<KnowNode>;
+  getSubjects: (node: KnowNode, filter?: Array<NodeType>) => Array<KnowNode>;
   getAllNodesByType: (nodeType: NodeType) => Array<KnowNode>;
 } {
   const context = React.useContext(RelationContext);
@@ -61,11 +72,14 @@ function useSelectors(): {
     getNode: (id: string): KnowNode => {
       return getNode(context.nodes, id);
     },
-    getChildren: (
+    getObjects: (node: KnowNode, filter?: Array<NodeType>): Array<KnowNode> => {
+      return getObjects(context.nodes, node, filter);
+    },
+    getSubjects: (
       node: KnowNode,
       filter?: Array<NodeType>
     ): Array<KnowNode> => {
-      return getChildren(context.nodes, node, filter);
+      return getSubjects(context.nodes, node, filter);
     },
     getAllNodesByType: (nodeType: NodeType): Array<KnowNode> => {
       return getAllNodesByType(context.nodes, nodeType);
