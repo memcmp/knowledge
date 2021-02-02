@@ -43,9 +43,15 @@ function getChildren(
     .filter(n => (filter === undefined ? true : filter.includes(n.nodeType)));
 }
 
+function getAllNodesByType(nodes: Nodes, nodeType: NodeType): Array<KnowNode> {
+  // TODO: reverse or just use a better algorithm to find nodes for the context
+  return Array.from(nodes.filter(node => node.nodeType === nodeType).values());
+}
+
 function useSelectors(): {
   getNode: (id: string) => KnowNode;
   getChildren: (node: KnowNode, filter?: Array<NodeType>) => Array<KnowNode>;
+  getAllNodesByType: (nodeType: NodeType) => Array<KnowNode>;
 } {
   const context = React.useContext(RelationContext);
   if (context === undefined) {
@@ -60,6 +66,9 @@ function useSelectors(): {
       filter?: Array<NodeType>
     ): Array<KnowNode> => {
       return getChildren(context.nodes, node, filter);
+    },
+    getAllNodesByType: (nodeType: NodeType): Array<KnowNode> => {
+      return getAllNodesByType(context.nodes, nodeType);
     }
   };
 }

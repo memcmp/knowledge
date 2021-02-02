@@ -30,7 +30,7 @@ declare global {
   };
 
   type Store = {
-    nodes: Immutable.Map<string, KnowNode>;
+    nodes: Nodes;
   };
 
   type AddRelations = (nodes: Immutable.Map<string, KnowNode>) => void;

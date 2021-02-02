@@ -2,14 +2,18 @@ import React from "react";
 import { CreateNote } from "./CreateNote";
 import { useSelectors } from "./DataContext";
 import { Note } from "./Note";
+import { INTERESTS } from "./storage";
 
 type TimelineProps = {
   view: KnowNode;
 };
 
 function Timeline({ view }: TimelineProps): JSX.Element {
-  const { getChildren } = useSelectors();
-  const nodesInTimeline = getChildren(view);
+  const { getChildren, getNode } = useSelectors();
+  const nodesInTimeline = [
+    ...getChildren(getNode(INTERESTS)),
+    ...getChildren(view)
+  ];
 
   return (
     <>

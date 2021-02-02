@@ -1,43 +1,66 @@
 import React, { useState } from "react";
-import { Button, InputGroup } from "react-bootstrap";
-import { Typeahead } from "react-bootstrap-typeahead";
 
-import { ReadonlyNode } from "./ReadonlyNode";
+import { Searchbox } from "./Searchbox";
+import { NewTopicModal } from "./NewTopic";
+
+import { Button, InputGroup } from "react-bootstrap";
+import Immutable from "immutable";
+
+type SelectionState = {
+  createNew: boolean;
+  value: KnowNode | string;
+};
 
 function Suggest({
   nodes,
   onAddNodeAbove
 }: {
   nodes: Array<KnowNode>;
-  onAddNodeAbove: (node: KnowNode) => void;
+  onAddNodeAbove: (node: KnowNode, additionalNodes: Nodes) => void;
 }): JSX.Element {
-  const [selection, setSelection] = useState<Array<KnowNode>>([
-    ...nodes.slice(0, 1)
-  ]);
+  const [showNewTopicModal, setShowNewTopicModal] = useState<
+    string | undefined
+  >(undefined);
+  const [selection, setSelection] = useState<SelectionState | undefined>(
+    undefined
+  );
+
+  const onClickAddAbove = () => {
+    const sel = selection as SelectionState;
+    if (sel.createNew) {
+      setShowNewTopicModal(sel.value as string);
+      return;
+    }
+    onAddNodeAbove(sel.value as KnowNode, Immutable.Map());
+  };
+
   return (
     <>
-      <Typeahead
-        clearButton
-        defaultSelected={selection}
-        id="suggest"
-        options={nodes}
-        onChange={(selection: Array<KnowNode>) => {
-          setSelection(selection);
-        }}
-        labelKey={(option: KnowNode) => {
-          const div = document.createElement("div");
-          div.innerHTML = option.text;
-          return div.textContent as string;
-        }}
-        renderMenuItemChildren={(option: KnowNode) => {
-          return <ReadonlyNode node={option} />;
-        }}
+      {showNewTopicModal !== undefined && (
+        <NewTopicModal
+          topic={showNewTopicModal}
+          onHide={() => setShowNewTopicModal(undefined)}
+          onCreateNewTopic={(topic: KnowNode, additionalNodes: Nodes) => {
+            onAddNodeAbove(topic, additionalNodes);
+            setShowNewTopicModal(undefined);
+          }}
+        />
+      )}
+      <Searchbox
+        suggestions={nodes}
+        onSelectNode={(node: KnowNode) =>
+          setSelection({ value: node, createNew: false })
+        }
+        onCreateNode={(node: string) =>
+          setSelection({ value: node, createNew: true })
+        }
+        onClear={() => setSelection(undefined)}
       />
       <InputGroup.Append>
         <Button
           variant="outline-primary"
-          disabled={selection.length === 0}
-          onClick={() => onAddNodeAbove(selection[0])}
+          disabled={selection === undefined}
+          onClick={() => onClickAddAbove()}
         >
           <i className="iconsminds-up d-block" />
         </Button>
