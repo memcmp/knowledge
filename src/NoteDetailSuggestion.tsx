@@ -41,8 +41,9 @@ function NoteDetailSuggestions({
   // TODO: Use last suggestion again
   const suggestions = getAllNodesByType("TOPIC").filter(
     suggestion =>
+      suggestion.id !== node.id &&
       node.relationsToObjects.filter(rel => rel.b === suggestion.id).length ===
-      0
+        0
   );
 
   return (
