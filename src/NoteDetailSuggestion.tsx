@@ -14,7 +14,7 @@ function NoteDetailSuggestions({
   node: KnowNode;
 }): JSX.Element {
   const addBucket = useAddBucket();
-  const { getChildren } = useSelectors();
+  const { getAllNodesByType } = useSelectors();
 
   const insertNodeAbove = (
     insertNode: KnowNode,
@@ -24,11 +24,10 @@ function NoteDetailSuggestions({
       [node.id]: node,
       [parentNode.id]: parentNode,
       [insertNode.id]: insertNode
-    });
-    // TODO: Overthink relation direction ( should be the other way around )
+    }).merge(additionalNodes);
     const connectWithEachOther = connectRelevantNodes(
-      insertNode.id,
       node.id,
+      insertNode.id,
       nodes
     );
     const connectWithParent = connectRelevantNodes(
@@ -39,11 +38,11 @@ function NoteDetailSuggestions({
     addBucket(connectWithParent);
   };
 
-  const suggestions = getChildren(parentNode, ["TOPIC", "NOTE"]).filter(
+  // TODO: Use last suggestion again
+  const suggestions = getAllNodesByType("TOPIC").filter(
     suggestion =>
-      node.parentRelations.filter(
-        parentRelation => parentRelation.a === suggestion.id
-      ).length === 0
+      node.relationsToObjects.filter(rel => rel.b === suggestion.id).length ===
+      0
   );
 
   return (

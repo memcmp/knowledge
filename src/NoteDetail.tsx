@@ -9,11 +9,11 @@ import { useParams } from "react-router-dom";
 
 import { useAddBucket, useSelectors } from "./DataContext";
 
-import { v4 } from "uuid";
-
 import { ReadonlyNode } from "./ReadonlyNode";
 
 import { NoteDetailSuggestions } from "./NoteDetailSuggestion";
+
+import { connectRelevantNodes, newNode } from "./connections";
 
 const PARAGRAPH = "<p><br></p>";
 
@@ -39,7 +39,7 @@ function SubNode({
   const [comment, setComment] = useState<string>("");
   const [showMenu, setShowMenu] = useState<boolean>(false);
   const addBucket = useAddBucket();
-  const { getChildren, getNode } = useSelectors();
+  const { getObjects, getSubjects } = useSelectors();
   const quillRef = useRef<ReactQuill>();
 
   const onChange = (content: string) => {
@@ -47,77 +47,34 @@ function SubNode({
   };
 
   const createNodeAbove = (): void => {
-    const id = v4();
-    const relationToNode: Relation = {
-      relationType: "RELEVANT",
-      a: id,
-      b: node.id
-    };
-    const relationToParent: Relation = {
-      relationType: "RELEVANT",
-      a: parentNode.id,
-      b: id
-    };
-    const newNode: KnowNode = {
-      id,
-      text: comment,
-      nodeType: showEdit || "NOTE",
-      parentRelations: [relationToParent],
-      childRelations: [relationToNode]
-    };
-    const updatedNode = {
-      ...node,
-      parentRelations: [...node.parentRelations, relationToNode]
-    };
-    const updatedParent = {
-      ...parentNode,
-      childRelations: [relationToParent, ...parentNode.childRelations]
-    };
-    addBucket(
-      Immutable.Map<string, KnowNode>()
-        .set(newNode.id, newNode)
-        .set(updatedNode.id, updatedNode)
-        .set(updatedParent.id, updatedParent)
-    );
+    const above = newNode(comment, showEdit || "NOTE");
+    const nodes = Immutable.Map<string, KnowNode>()
+      .set(above.id, above)
+      .set(parentNode.id, parentNode)
+      .set(node.id, node);
+    const relToParent = connectRelevantNodes(above.id, parentNode.id, nodes);
+    addBucket(connectRelevantNodes(node.id, above.id, relToParent));
     setShowEdit(undefined);
     setShowMenu(false);
     setComment("");
   };
 
   const createNoteBelow = (): void => {
-    const id = v4();
-    const relation: Relation = {
-      relationType: "RELEVANT",
-      a: node.id,
-      b: id
-    };
-    const newNode: KnowNode = {
-      id: v4(),
-      text: comment,
-      nodeType: showEdit || "NOTE",
-      parentRelations: [relation],
-      childRelations: []
-    };
-    const updatedWithComment = {
-      ...node,
-      childRelations: [...node.childRelations, relation]
-    };
-    addBucket(
-      Immutable.Map<string, KnowNode>()
-        .set(updatedWithComment.id, updatedWithComment)
-        .set(id, newNode)
-    );
+    const below = newNode(comment, showEdit || "NOTE");
+    const nodes = Immutable.Map<string, KnowNode>()
+      .set(below.id, below)
+      .set(node.id, node);
+    addBucket(connectRelevantNodes(below.id, node.id, nodes));
     setShowEdit(undefined);
     setShowMenu(false);
     setComment("");
   };
 
-  const subNodes = getChildren(node);
-  const parentNodes = node.parentRelations
-    .filter(rel => rel.a !== parentNode.id)
-    .map(rel => getNode(rel.a));
+  const subNodes = getSubjects(node).filter(
+    subject => subject.id !== parentNode.id
+  );
+  const parentNodes = getObjects(node).filter(p => p.id !== parentNode.id);
 
-  // TODO: Highlight current button
   if (quillRef.current && showEdit) {
     quillRef.current.getEditor().root.dataset.placeholder = getPlaceHolder(
       showEdit
@@ -155,17 +112,6 @@ function SubNode({
               }
             >
               <i className="simple-icon-speech d-block" />
-            </button>
-            <button
-              className={`header-icon btn btn-empty font-size-toolbar text-semi-muted ${
-                showEdit === "TOPIC" ? "text-primary" : ""
-              }`}
-              type="button"
-              onClick={() =>
-                setShowEdit(showEdit === "TOPIC" ? undefined : "TOPIC")
-              }
-            >
-              <i className="simple-icon-social-tumblr d-block" />
             </button>
           </div>
         )}
@@ -218,10 +164,17 @@ function SubNode({
 
 function NoteDetail(): JSX.Element {
   const { id } = useParams<{ id: string }>();
-  const { getNode, getChildren } = useSelectors();
+  const { getNode, getSubjects, getObjects } = useSelectors();
 
   const node = getNode(id);
-  const children = getChildren(node);
+  // TODO: A filter by relationship type might be better
+  const children = [
+    ...(["TITLE", "QUOTE", "URL"].includes(node.nodeType)
+      ? getObjects(node, ["TOPIC"])
+      : []),
+    ...getSubjects(node, ["TOPIC", "NOTE"]),
+    ...getObjects(node, ["QUOTE", "TITLE"])
+  ];
 
   return (
     <>
