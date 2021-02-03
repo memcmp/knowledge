@@ -185,7 +185,7 @@ function NoteDetail(): JSX.Element {
       <div className="row">
         <div className="mb-4 col-lg-12 col-xl-6 offset-xl-3">
           <Card>
-          <Tab.Container defaultActiveKey="quotes">
+          <Tab.Container defaultActiveKey="all">
             <Card.Header>
             <Nav variant="tabs" className="card-header-all" as="ul">
               <Nav.Item as="li" key="all">
@@ -206,6 +206,7 @@ function NoteDetail(): JSX.Element {
             </Nav>
             </Card.Header>
             <Card.Body>
+            <ReadonlyNode node={node} />
               <Tab.Content>
                 <TabPane eventKey="all" key="all">
                 {children.map(childNode => (
