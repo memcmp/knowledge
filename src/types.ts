@@ -2,14 +2,7 @@ import Immutable from "immutable";
 
 declare global {
   type RelationType = "CONTAINS" | "RELEVANT"; // a contains b SUMMARIZE?
-  type NodeType =
-    | "NOTE"
-    | "TOPIC"
-    | "ARGUMENT"
-    | "URL"
-    | "TITLE"
-    | "QUOTE"
-    | "VIEW";
+  type NodeType = "NOTE" | "TOPIC" | "URL" | "TITLE" | "QUOTE" | "VIEW";
 
   type Relation = {
     relationType: RelationType;

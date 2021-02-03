@@ -74,11 +74,25 @@ function SubNode({
     setComment("");
   };
 
-  const subNodes = getSubjects(node).filter(
-    subject => subject.id !== parentNode.id
-  );
-  const parentNodes = getObjects(node).filter(p => p.id !== parentNode.id);
+  const readingSource =
+    node.nodeType === "TOPIC" && ["TITLE", "URL"].includes(parentNode.nodeType);
+  const subNodes = getSubjects(node)
+    .filter(
+      subject => subject.id !== parentNode.id
+      // don't show subtopics of topics when reading a source
+    )
+    .filter(
+      subNode =>
+        !(
+          readingSource &&
+          node.nodeType === "TOPIC" &&
+          subNode.nodeType === "TOPIC"
+        )
+    );
 
+  const showSubnodes = readingSource || showMenu;
+
+  const parentNodes = getObjects(node).filter(p => p.id !== parentNode.id);
   if (quillRef.current && showEdit) {
     quillRef.current.getEditor().root.dataset.placeholder = getPlaceHolder(
       showEdit
@@ -159,11 +173,12 @@ function SubNode({
           </div>
         )}
       </div>
-      {subNodes.map(sub => (
-        <div className="border-bottom ml-4" key={sub.id}>
-          <ReadonlyNode node={sub} />
-        </div>
-      ))}
+      {showSubnodes &&
+        subNodes.map(sub => (
+          <div className="border-bottom ml-4" key={sub.id}>
+            <ReadonlyNode node={sub} />
+          </div>
+        ))}
     </>
   );
 }
