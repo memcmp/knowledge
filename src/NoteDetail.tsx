@@ -33,18 +33,20 @@ function getPlaceHolder(nodeType: NodeType): string | undefined {
 }
 
 function SubNode({
-  node,
+  nodeID,
   parentNode
 }: {
-  node: KnowNode;
+  nodeID: string;
   parentNode: KnowNode;
 }): JSX.Element {
   const [showEdit, setShowEdit] = useState<NodeType | undefined>();
   const [comment, setComment] = useState<string>("");
   const [showMenu, setShowMenu] = useState<boolean>(false);
   const addBucket = useAddBucket();
-  const { getObjects, getSubjects } = useSelectors();
+  const { getObjects, getSubjects, getNode } = useSelectors();
   const quillRef = useRef<ReactQuill>();
+
+  const node = getNode(nodeID);
 
   const onChange = (content: string) => {
     setComment(content);
@@ -195,13 +197,17 @@ function NoteDetail(): JSX.Element {
 
   const node = getNode(id);
   // TODO: A filter by relationship type might be better
-  const children = [
-    ...(["TITLE", "QUOTE", "URL"].includes(node.nodeType)
-      ? getObjects(node, ["TOPIC"])
-      : []),
-    ...getSubjects(node, ["TOPIC", "NOTE"]),
-    ...getObjects(node, ["QUOTE", "TITLE"])
-  ];
+  const children = Array.from(
+    new Set(
+      [
+        ...(["TITLE", "QUOTE", "URL"].includes(node.nodeType)
+          ? getObjects(node, ["TOPIC"])
+          : []),
+        ...getSubjects(node, ["TOPIC", "NOTE"]),
+        ...getObjects(node, ["QUOTE", "TITLE"])
+      ].map(child => child.id)
+    )
+  );
 
   return (
     <>
@@ -219,11 +225,7 @@ function NoteDetail(): JSX.Element {
           <Card>
             <Card.Body>
               {children.map(childNode => (
-                <SubNode
-                  node={childNode}
-                  parentNode={node}
-                  key={childNode.id}
-                />
+                <SubNode nodeID={childNode} parentNode={node} key={childNode} />
               ))}
             </Card.Body>
           </Card>
