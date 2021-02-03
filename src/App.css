@@ -58,6 +58,11 @@
   line-height: 2rem;
 }
 
+.rbt-menu .lead .ql-editor > p {
+  font-size: 0.9rem;
+  line-height: 1rem;
+}
+
 .ql-editor > p {
   font-size: 0.9rem;
 }
