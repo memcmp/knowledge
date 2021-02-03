@@ -74,8 +74,7 @@ function SubNode({
     setComment("");
   };
 
-  const readingSource =
-    node.nodeType === "TOPIC" && ["TITLE", "URL"].includes(parentNode.nodeType);
+  const readingSource = ["TITLE", "URL"].includes(parentNode.nodeType);
   const subNodes = getSubjects(node)
     .filter(
       subject => subject.id !== parentNode.id
@@ -90,7 +89,9 @@ function SubNode({
         )
     );
 
-  const showSubnodes = readingSource || showMenu;
+  // automatically expanad TOPICS and NOTES when reading a source
+  const showSubnodes =
+    (["TOPIC", "NOTE"].includes(node.nodeType) && readingSource) || showMenu;
 
   const parentNodes = getObjects(node).filter(p => p.id !== parentNode.id);
   if (quillRef.current && showEdit) {
@@ -170,6 +171,11 @@ function SubNode({
                 </div>
               )}
             </div>
+          </div>
+        )}
+        {!showSubnodes && subNodes.length > 0 && (
+          <div>
+            <p className="text-center text-info">({subNodes.length})</p>
           </div>
         )}
       </div>
