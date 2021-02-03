@@ -112,8 +112,8 @@ function CreateNote(): JSX.Element {
               .set(timeline.id, {
                 ...timeline,
                 relationsToObjects: [
-                  ...timeline.relationsToObjects,
-                  relationToView
+                  relationToView,
+                  ...timeline.relationsToObjects
                 ]
               })
               .merge(nodes);
@@ -137,7 +137,7 @@ function CreateNote(): JSX.Element {
     addBuckets(
       nodes.set(timeline.id, {
         ...timeline,
-        relationsToObjects: [...timeline.relationsToObjects, relationToView]
+        relationsToObjects: [relationToView, ...timeline.relationsToObjects]
       })
     );
     setText("");
