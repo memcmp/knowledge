@@ -177,12 +177,20 @@ function NoteDetail(): JSX.Element {
     ...getObjects(node, ["QUOTE", "TITLE"])
   ];
 
-  const topicchildren = getSubjects(node, ["TOPIC"])
-  const quotechildren = getObjects(node, ["QUOTE"])
+  const filteredchildrentopic = children.filter(child => child.nodeType === "TOPIC" )
+  const filteredchildrenquotes = children.filter(child => child.nodeType === "QUOTE" )
   
+
   return (
     <>
       <div className="row">
+      <div className="mb-4 col-lg-12 col-xl-6 offset-xl-3">
+          <Card>
+            <Card.Body>
+            <ReadonlyNode node={node} />
+            </Card.Body>
+          </Card>
+          </div>
         <div className="mb-4 col-lg-12 col-xl-6 offset-xl-3">
           <Card>
           <Tab.Container defaultActiveKey="all">
@@ -206,7 +214,6 @@ function NoteDetail(): JSX.Element {
             </Nav>
             </Card.Header>
             <Card.Body>
-            <ReadonlyNode node={node} />
               <Tab.Content>
                 <TabPane eventKey="all" key="all">
                 {children.map(childNode => (
@@ -218,7 +225,7 @@ function NoteDetail(): JSX.Element {
               ))}
              </TabPane>
              <TabPane eventKey="topics" key="topics">
-             {topicchildren.map(childNode => (
+             {filteredchildrentopic.map(childNode => (
                 <SubNode
                   node={childNode}
                   parentNode={node}
@@ -227,7 +234,7 @@ function NoteDetail(): JSX.Element {
               ))}
              </TabPane>
              <TabPane eventKey="quotes" key="quotes">
-             {quotechildren.map(childNode => (
+             {filteredchildrenquotes.map(childNode => (
                 <SubNode
                   node={childNode}
                   parentNode={node}
