@@ -46,6 +46,22 @@
   padding-right: 0px;
 }
 
+.lead .ql-editor > p {
+  font-size: 1.75rem;
+  font-weight: 300;
+  line-height: 2rem;
+}
+
+.lead .ql-editor > p {
+  font-size: 1.25rem;
+  font-weight: 300;
+  line-height: 2rem;
+}
+
+.ql-editor > p {
+  font-size: 0.9rem;
+}
+
 .rbt {
   position: relative;
   flex: 1;

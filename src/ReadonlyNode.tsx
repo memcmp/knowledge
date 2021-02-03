@@ -5,8 +5,9 @@ function ReadonlyNode({ node }: { node: KnowNode }): JSX.Element {
   return (
     <div
       className={`scrolling-container ${
-        node.nodeType === "TOPIC" ? "text-danger" : ""
+        ["TOPIC", "TITLE"].includes(node.nodeType) ? "lead" : ""
       }
+            ${node.nodeType === "TOPIC" ? "text-primary" : ""}
             ${node.nodeType === "NOTE" ? "text-muted" : ""}
               `}
     >
