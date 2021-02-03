@@ -14,7 +14,7 @@ function NoteDetailSuggestions({
   node: KnowNode;
 }): JSX.Element {
   const addBucket = useAddBucket();
-  const { getAllNodesByType } = useSelectors();
+  const { getAllNodesByType, getObjects, getNode } = useSelectors();
 
   const insertNodeAbove = (
     insertNode: KnowNode,
@@ -38,13 +38,37 @@ function NoteDetailSuggestions({
     addBucket(connectWithParent);
   };
 
-  // TODO: Use last suggestion again
-  const suggestions = getAllNodesByType("TOPIC").filter(
-    suggestion =>
-      suggestion.id !== node.id &&
-      node.relationsToObjects.filter(rel => rel.b === suggestion.id).length ===
-        0
+  // memoize!
+  const findSuggestions = (node: KnowNode, levels: number): Array<string> => {
+    if (levels === 0) {
+      return [];
+    }
+    const objects = getObjects(node, ["TOPIC"]);
+    return [
+      ...objects.map(subj => subj.id),
+      ...objects
+        .map((obj: KnowNode) => {
+          return findSuggestions(obj, levels - 1);
+        })
+        .flat()
+    ];
+  };
+
+  // TODO: Don't show suggestions with existing connections
+  const closeSuggestions = new Set(findSuggestions(parentNode, 2));
+  const otherSuggestions = getAllNodesByType("TOPIC")
+    .map(topic => topic.id)
+    .filter(topic => !closeSuggestions.has(topic));
+
+  const existingSuggestions = getObjects(node, ["TOPIC"]).map(
+    topic => topic.id
   );
+  const suggestions = [
+    ...Array.from(closeSuggestions),
+    ...Array.from(otherSuggestions)
+  ]
+    .filter(id => !existingSuggestions.includes(id))
+    .map(id => getNode(id));
 
   return (
     <div>
