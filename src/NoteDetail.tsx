@@ -15,6 +15,10 @@ import { NoteDetailSuggestions } from "./NoteDetailSuggestion";
 
 import { connectRelevantNodes, newNode } from "./connections";
 
+import { Badge } from "react-bootstrap";
+
+import { extractPlainText } from "./Searchbox";
+
 const PARAGRAPH = "<p><br></p>";
 
 function isEmpty(text: string): boolean {
@@ -83,12 +87,14 @@ function SubNode({
 
   return (
     <>
-      {parentNodes.map(p => (
-        <div className="border-bottom" style={{ marginLeft: -10 }} key={p.id}>
-          <ReadonlyNode node={p} />
-        </div>
-      ))}
       <div className="border-bottom">
+        <div className="pt-3">
+          {parentNodes.map(p => (
+            <Badge variant="outline-info" className="mr-1" pill key={p.id}>
+              {extractPlainText(p)}
+            </Badge>
+          ))}
+        </div>
         {showMenu && (
           <NoteDetailSuggestions parentNode={parentNode} node={node} />
         )}

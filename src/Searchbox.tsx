@@ -13,12 +13,16 @@ type KnowNodeWithPlainText = KnowNode & {
   plainText: string;
 };
 
-function addPlainText(node: KnowNode): KnowNodeWithPlainText {
+export function extractPlainText(node: KnowNode): string {
   const div = document.createElement("div");
   div.innerHTML = node.text;
+  return div.textContent as string;
+}
+
+function addPlainText(node: KnowNode): KnowNodeWithPlainText {
   return {
     ...node,
-    plainText: div.textContent as string
+    plainText: extractPlainText(node)
   };
 }
 
