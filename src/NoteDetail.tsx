@@ -4,6 +4,7 @@ import Immutable from "immutable";
 import Card from "react-bootstrap/Card";
 import "react-quill/dist/quill.bubble.css";
 import "./editor.css";
+import { Nav, Tab, TabPane } from "react-bootstrap";
 
 import { useParams } from "react-router-dom";
 
@@ -176,29 +177,66 @@ function NoteDetail(): JSX.Element {
     ...getObjects(node, ["QUOTE", "TITLE"])
   ];
 
+  const topicchildren = getSubjects(node, ["TOPIC"])
+  const quotechildren = getObjects(node, ["QUOTE"])
+  
   return (
     <>
       <div className="row">
         <div className="mb-4 col-lg-12 col-xl-6 offset-xl-3">
           <Card>
+          <Tab.Container defaultActiveKey="quotes">
+            <Card.Header>
+            <Nav variant="tabs" className="card-header-all" as="ul">
+              <Nav.Item as="li" key="all">
+                <Nav.Link eventKey="all" className="nav-link">
+                  See All
+                </Nav.Link>
+              </Nav.Item>
+              <Nav.Item as="li" key="topics">
+                <Nav.Link eventKey="topics" className="nav-link" >
+                  Topics 
+              </Nav.Link>
+              </Nav.Item>
+              <Nav.Item as="li" key="quotes">
+                <Nav.Link eventKey="quotes" className="nav-link">
+                  Quotes
+                </Nav.Link>
+              </Nav.Item>
+            </Nav>
+            </Card.Header>
             <Card.Body>
-              <ReadonlyNode node={node} />
-            </Card.Body>
-          </Card>
-        </div>
-      </div>
-      <div className="row">
-        <div className="mb-4 col-lg-12 col-xl-6 offset-xl-3">
-          <Card>
-            <Card.Body>
-              {children.map(childNode => (
+              <Tab.Content>
+                <TabPane eventKey="all" key="all">
+                {children.map(childNode => (
                 <SubNode
                   node={childNode}
                   parentNode={node}
                   key={childNode.id}
                 />
               ))}
+             </TabPane>
+             <TabPane eventKey="topics" key="topics">
+             {topicchildren.map(childNode => (
+                <SubNode
+                  node={childNode}
+                  parentNode={node}
+                  key={childNode.id}
+                />
+              ))}
+             </TabPane>
+             <TabPane eventKey="quotes" key="quotes">
+             {quotechildren.map(childNode => (
+                <SubNode
+                  node={childNode}
+                  parentNode={node}
+                  key={childNode.id}
+                />
+              ))}
+             </TabPane>
+             </Tab.Content>
             </Card.Body>
+            </Tab.Container>
           </Card>
         </div>
       </div>
