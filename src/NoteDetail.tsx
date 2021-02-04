@@ -140,7 +140,7 @@ function SubNode({
           <NoteDetailSuggestions
             parentNode={parentNode}
             node={node}
-            allowNodeBelow={allowAddTopicBelow}
+            allowNodeBelow={allowAddTopicBelow && node.nodeType === "TOPIC"}
             onClose={() => {
               setShowEdit(undefined);
               setShowMenu(false);

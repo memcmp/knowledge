@@ -96,7 +96,7 @@ function NoteDetailSuggestions({
     ...Array.from(closeSuggestions),
     ...Array.from(otherSuggestions)
   ]
-    .filter(id => !existingSuggestions.includes(id))
+    .filter(id => !existingSuggestions.includes(id) && id !== node.id)
     .map(id => getNode(id));
 
   return (
