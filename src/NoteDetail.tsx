@@ -15,7 +15,7 @@ import { NoteDetailSuggestions } from "./NoteDetailSuggestion";
 
 import { connectRelevantNodes, newNode } from "./connections";
 
-import { Badge } from "react-bootstrap";
+import { Badge, Collapse } from "react-bootstrap";
 
 import { extractPlainText } from "./Searchbox";
 
@@ -136,18 +136,20 @@ function SubNode({
             </Link>
           ))}
         </div>
-        {showMenu && (
-          <NoteDetailSuggestions
-            parentNode={parentNode}
-            node={node}
-            allowNodeBelow={allowAddTopicBelow && node.nodeType === "TOPIC"}
-            onClose={() => {
-              setShowEdit(undefined);
-              setShowMenu(false);
-              setComment("");
-            }}
-          />
-        )}
+        <Collapse in={showMenu} mountOnEnter={true}>
+          <div>
+            <NoteDetailSuggestions
+              parentNode={parentNode}
+              node={node}
+              allowNodeBelow={allowAddTopicBelow && node.nodeType === "TOPIC"}
+              onClose={() => {
+                setShowEdit(undefined);
+                setShowMenu(false);
+                setComment("");
+              }}
+            />
+          </div>
+        </Collapse>
         <div key={node.id}>
           <div
             onClick={() => setShowMenu(!showMenu)}
@@ -156,30 +158,32 @@ function SubNode({
             <ReadonlyNode node={node} />
           </div>
         </div>
-        {showMenu && (
-          <div className="justify-content-center nav">
-            <button
-              className={`header-icon btn btn-empty font-size-toolbar text-semi-muted ${
-                showEdit === "NOTE" ? "text-primary" : ""
-              }`}
-              type="button"
-              onClick={() =>
-                setShowEdit(showEdit === "NOTE" ? undefined : "NOTE")
-              }
-            >
-              <i className="simple-icon-speech d-block" />
-            </button>
-            {showLink && (
-              <Link to={`/notes/${node.id}`}>
-                <button
-                  className={`header-icon btn btn-empty font-size-toolbar text-semi-muted`}
-                >
-                  <i className="simple-icon-link d-block" />
-                </button>
-              </Link>
-            )}
+        <Collapse in={showMenu} mountOnEnter={true}>
+          <div>
+            <div className="justify-content-center nav">
+              <button
+                className={`header-icon btn btn-empty font-size-toolbar text-semi-muted ${
+                  showEdit === "NOTE" ? "text-primary" : ""
+                }`}
+                type="button"
+                onClick={() =>
+                  setShowEdit(showEdit === "NOTE" ? undefined : "NOTE")
+                }
+              >
+                <i className="simple-icon-speech d-block" />
+              </button>
+              {showLink && (
+                <Link to={`/notes/${node.id}`}>
+                  <button
+                    className={`header-icon btn btn-empty font-size-toolbar text-semi-muted`}
+                  >
+                    <i className="simple-icon-link d-block" />
+                  </button>
+                </Link>
+              )}
+            </div>
           </div>
-        )}
+        </Collapse>
 
         {showMenu && showEdit && (
           <div className="mb-4">
