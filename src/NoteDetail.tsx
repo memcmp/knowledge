@@ -95,7 +95,9 @@ function SubNode({
   const showSubnodes =
     (["TOPIC", "NOTE"].includes(node.nodeType) && readingSource) || showMenu;
 
-  const parentNodes = getObjects(node).filter(p => p.id !== parentNode.id);
+  const parentNodes = getObjects(node, undefined, ["RELEVANT"]).filter(
+    p => p.id !== parentNode.id
+  );
   if (quillRef.current && showEdit) {
     quillRef.current.getEditor().root.dataset.placeholder = getPlaceHolder(
       showEdit

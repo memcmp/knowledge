@@ -36,9 +36,15 @@ function getNode(nodes: Nodes, id: string): KnowNode {
 function getObjects(
   nodes: Nodes,
   node: KnowNode,
-  filter?: Array<NodeType>
+  filter?: Array<NodeType>,
+  filterRelations?: Array<RelationType>
 ): Array<KnowNode> {
   return node.relationsToObjects
+    .filter(r =>
+      filterRelations === undefined
+        ? true
+        : filterRelations.includes(r.relationType)
+    )
     .map(relation => getNode(nodes, relation.b))
     .filter(n => (filter === undefined ? true : filter.includes(n.nodeType)));
 }
@@ -60,7 +66,11 @@ function getAllNodesByType(nodes: Nodes, nodeType: NodeType): Array<KnowNode> {
 
 function useSelectors(): {
   getNode: (id: string) => KnowNode;
-  getObjects: (node: KnowNode, filter?: Array<NodeType>) => Array<KnowNode>;
+  getObjects: (
+    node: KnowNode,
+    filter?: Array<NodeType>,
+    filterRelations?: Array<RelationType>
+  ) => Array<KnowNode>;
   getSubjects: (node: KnowNode, filter?: Array<NodeType>) => Array<KnowNode>;
   getAllNodesByType: (nodeType: NodeType) => Array<KnowNode>;
 } {
@@ -72,8 +82,12 @@ function useSelectors(): {
     getNode: (id: string): KnowNode => {
       return getNode(context.nodes, id);
     },
-    getObjects: (node: KnowNode, filter?: Array<NodeType>): Array<KnowNode> => {
-      return getObjects(context.nodes, node, filter);
+    getObjects: (
+      node: KnowNode,
+      filter?: Array<NodeType>,
+      filterRelations?: Array<RelationType>
+    ): Array<KnowNode> => {
+      return getObjects(context.nodes, node, filter, filterRelations);
     },
     getSubjects: (
       node: KnowNode,
