@@ -22,7 +22,7 @@ function Suggest({
     string | undefined
   >(undefined);
   const [selection, setSelection] = useState<SelectionState | undefined>(
-    undefined
+    nodes.length > 0 ? { value: nodes[0], createNew: false } : undefined
   );
 
   const onClickAddAbove = () => {
