@@ -37,13 +37,15 @@ function SubNode({
   parentNode,
   allowAddTopicBelow,
   showChildren,
-  showLink
+  showLink,
+  borderBottom
 }: {
   nodeID: string;
   parentNode?: KnowNode;
   allowAddTopicBelow?: boolean;
   showChildren?: boolean;
   showLink?: boolean;
+  borderBottom: boolean;
 }): JSX.Element {
   const [showEdit, setShowEdit] = useState<NodeType | undefined>();
   const [comment, setComment] = useState<string>("");
@@ -119,7 +121,7 @@ function SubNode({
 
   return (
     <>
-      <div className="border-bottom">
+      <div className={borderBottom ? "border-bottom" : ""}>
         <div className="pt-3">
           {parentNodes.map(p => (
             <Link to={`/notes/${p.id}`}>
@@ -268,6 +270,7 @@ function NoteDetail(): JSX.Element {
                 allowAddTopicBelow={true}
                 showChildren={false}
                 showLink={false}
+                borderBottom={false}
               />
             </Card.Body>
           </Card>
@@ -278,7 +281,7 @@ function NoteDetail(): JSX.Element {
           <div className="mb-4 col-lg-12 col-xl-6 offset-xl-3">
             <Card>
               <Card.Body>
-                {children.map(childNode => (
+                {children.map((childNode, i) => (
                   <SubNode
                     nodeID={childNode}
                     parentNode={node}
@@ -286,6 +289,7 @@ function NoteDetail(): JSX.Element {
                     allowAddTopicBelow={false}
                     showChildren={true}
                     showLink={true}
+                    borderBottom={i + 1 < children.length}
                   />
                 ))}
               </Card.Body>
