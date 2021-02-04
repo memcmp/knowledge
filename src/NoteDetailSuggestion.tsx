@@ -14,7 +14,12 @@ function NoteDetailSuggestions({
   node: KnowNode;
 }): JSX.Element {
   const addBucket = useAddBucket();
-  const { getAllNodesByType, getObjects, getNode } = useSelectors();
+  const {
+    getAllNodesByType,
+    getObjects,
+    getSubjects,
+    getNode
+  } = useSelectors();
 
   const insertNodeAbove = (
     insertNode: KnowNode,
@@ -39,13 +44,17 @@ function NoteDetailSuggestions({
   };
 
   // memoize!
+  // TODO: reference counting for better score
   const findSuggestions = (node: KnowNode, levels: number): Array<string> => {
     if (levels === 0) {
       return [];
     }
-    const objects = getObjects(node, ["TOPIC"]);
+    const objects = [
+      ...getObjects(node, ["TOPIC"]),
+      ...getSubjects(node, ["NOTE"])
+    ];
     return [
-      ...objects.map(subj => subj.id),
+      ...objects.map(obj => obj.id),
       ...objects
         .map((obj: KnowNode) => {
           return findSuggestions(obj, levels - 1);
