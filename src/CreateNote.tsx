@@ -12,6 +12,10 @@ import "./editor.css";
 
 import { useAddBucket, useSelectors } from "./DataContext";
 
+import { INTERESTS } from "./storage";
+
+import { connectRelevantNodes, newNode } from "./connections";
+
 const PARAGRAPH = "<p><br></p>";
 
 function isEmpty(text: string): boolean {
@@ -143,6 +147,16 @@ function CreateNote(): JSX.Element {
     setText("");
   };
 
+  const onClickCreateTopic = (): void => {
+    const interests = getNode(INTERESTS);
+    const topic = newNode(text, "TOPIC");
+    const nodes = Immutable.Map<string, KnowNode>()
+      .set(interests.id, interests)
+      .set(topic.id, topic);
+    addBuckets(connectRelevantNodes(topic.id, interests.id, nodes));
+    setText("");
+  };
+
   return (
     <div className="mb-4 col-lg-12 col-xl-6 offset-xl-3">
       <Card>
@@ -151,7 +165,12 @@ function CreateNote(): JSX.Element {
             <Nav variant="tabs" className="card-header-tabs" as="ul">
               <Nav.Item as="li" key="write">
                 <Nav.Link eventKey="write" className="nav-link">
-                  New
+                  New Note
+                </Nav.Link>
+              </Nav.Item>
+              <Nav.Item as="li" key="createTopic">
+                <Nav.Link eventKey="createTopic" className="nav-link">
+                  New Topic
                 </Nav.Link>
               </Nav.Item>
               <Nav.Item as="li" key="upload">
@@ -192,6 +211,29 @@ function CreateNote(): JSX.Element {
                       className="float-right"
                       disabled={isEmpty(text)}
                       onClick={onClickSave}
+                    >
+                      Save
+                    </Button>
+                  </div>
+                </div>
+              </Tab.Pane>
+              <Tab.Pane eventKey="createTopic" key="createTopic">
+                <div className="scrolling-container">
+                  <ReactQuill
+                    theme="bubble"
+                    formats={[]}
+                    modules={{ toolbar: false }}
+                    placeholder="Create a Topic"
+                    value={text}
+                    onChange={onChange}
+                    scrollingContainer="scrolling-container"
+                  />
+                  <div className="mt-4">
+                    <Button
+                      variant="success"
+                      className="float-right"
+                      disabled={isEmpty(text)}
+                      onClick={onClickCreateTopic}
                     >
                       Save
                     </Button>
