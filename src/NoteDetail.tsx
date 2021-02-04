@@ -5,7 +5,7 @@ import Card from "react-bootstrap/Card";
 import "react-quill/dist/quill.bubble.css";
 import "./editor.css";
 
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 import { useAddBucket, useSelectors } from "./DataContext";
 
@@ -107,14 +107,18 @@ function SubNode({
       <div className="border-bottom">
         <div className="pt-3">
           {parentNodes.map(p => (
-            <Badge
-              variant={p.nodeType === "TOPIC" ? "outline-info" : "outline-dark"}
-              className="mr-1"
-              pill
-              key={p.id}
-            >
-              {extractPlainText(p)}
-            </Badge>
+            <Link to={`/notes/${p.id}`}>
+              <Badge
+                variant={
+                  p.nodeType === "TOPIC" ? "outline-info" : "outline-dark"
+                }
+                className="mr-1"
+                pill
+                key={p.id}
+              >
+                {extractPlainText(p)}
+              </Badge>
+            </Link>
           ))}
         </div>
         {showMenu && (
@@ -189,7 +193,9 @@ function SubNode({
       {showSubnodes &&
         subNodes.map(sub => (
           <div className="border-bottom ml-4" key={sub.id}>
-            <ReadonlyNode node={sub} />
+            <Link to={`/notes/${sub.id}`}>
+              <ReadonlyNode node={sub} />
+            </Link>
           </div>
         ))}
     </>
