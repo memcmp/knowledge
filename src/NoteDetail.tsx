@@ -107,7 +107,12 @@ function SubNode({
       <div className="border-bottom">
         <div className="pt-3">
           {parentNodes.map(p => (
-            <Badge variant="outline-info" className="mr-1" pill key={p.id}>
+            <Badge
+              variant={p.nodeType === "TOPIC" ? "outline-info" : "outline-dark"}
+              className="mr-1"
+              pill
+              key={p.id}
+            >
               {extractPlainText(p)}
             </Badge>
           ))}
