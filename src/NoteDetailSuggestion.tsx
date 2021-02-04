@@ -45,6 +45,7 @@ function NoteDetailSuggestions({
 
   // memoize!
   // TODO: reference counting for better score
+  // TODO: check why I don't find notes of other topics
   const findSuggestions = (node: KnowNode, levels: number): Array<string> => {
     if (levels === 0) {
       return [];
@@ -64,7 +65,7 @@ function NoteDetailSuggestions({
   };
 
   // TODO: Don't show suggestions with existing connections
-  const closeSuggestions = new Set(findSuggestions(parentNode, 2));
+  const closeSuggestions = new Set(findSuggestions(parentNode, 3));
   const otherSuggestions = getAllNodesByType("TOPIC")
     .map(topic => topic.id)
     .filter(topic => !closeSuggestions.has(topic));
