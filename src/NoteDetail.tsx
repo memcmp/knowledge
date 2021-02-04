@@ -147,6 +147,13 @@ function SubNode({
             >
               <i className="simple-icon-speech d-block" />
             </button>
+            <Link to={`/notes/${node.id}`}>
+              <button
+                className={`header-icon btn btn-empty font-size-toolbar text-semi-muted`}
+              >
+                <i className="simple-icon-link d-block" />
+              </button>
+            </Link>
           </div>
         )}
 
@@ -216,7 +223,7 @@ function NoteDetail(): JSX.Element {
         ...(["TITLE", "QUOTE", "URL"].includes(node.nodeType)
           ? getObjects(node, ["TOPIC"])
           : []),
-        ...getSubjects(node, ["TOPIC", "NOTE"]),
+        ...getSubjects(node, ["TOPIC", "NOTE", "QUOTE"]),
         ...getObjects(node, ["QUOTE", "TITLE"])
       ].map(child => child.id)
     )
