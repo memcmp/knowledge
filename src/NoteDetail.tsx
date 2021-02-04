@@ -34,10 +34,16 @@ function getPlaceHolder(nodeType: NodeType): string | undefined {
 
 function SubNode({
   nodeID,
-  parentNode
+  parentNode,
+  allowAddTopicBelow,
+  showChildren,
+  showLink
 }: {
   nodeID: string;
-  parentNode: KnowNode;
+  parentNode?: KnowNode;
+  allowAddTopicBelow?: boolean;
+  showChildren?: boolean;
+  showLink?: boolean;
 }): JSX.Element {
   const [showEdit, setShowEdit] = useState<NodeType | undefined>();
   const [comment, setComment] = useState<string>("");
@@ -56,10 +62,14 @@ function SubNode({
     const above = newNode(comment, showEdit || "NOTE");
     const nodes = Immutable.Map<string, KnowNode>()
       .set(above.id, above)
-      .set(parentNode.id, parentNode)
-      .set(node.id, node);
-    const relToParent = connectRelevantNodes(above.id, parentNode.id, nodes);
-    addBucket(connectRelevantNodes(node.id, above.id, relToParent));
+      .set(node.id, node)
+      .merge(parentNode ? { [parentNode.id]: parentNode } : {});
+    // NOTE IS RELEVANT FOR PARENT (Overthing this and maybe make it like topics
+    const connectWithEachOther = connectRelevantNodes(node.id, above.id, nodes);
+    const connectWithParentIfExists = parentNode
+      ? connectRelevantNodes(above.id, parentNode.id, connectWithEachOther)
+      : connectWithEachOther;
+    addBucket(connectWithParentIfExists);
     setShowEdit(undefined);
     setShowMenu(false);
     setComment("");
@@ -76,10 +86,12 @@ function SubNode({
     setComment("");
   };
 
-  const readingSource = ["TITLE", "URL"].includes(parentNode.nodeType);
+  const readingSource = parentNode
+    ? ["TITLE", "URL"].includes(parentNode.nodeType)
+    : false;
   const subNodes = getSubjects(node)
     .filter(
-      subject => subject.id !== parentNode.id
+      subject => !(parentNode && subject.id === parentNode.id)
       // don't show subtopics of topics when reading a source
     )
     .filter(
@@ -93,10 +105,11 @@ function SubNode({
 
   // automatically expanad TOPICS and NOTES when reading a source
   const showSubnodes =
-    (["TOPIC", "NOTE"].includes(node.nodeType) && readingSource) || showMenu;
+    showChildren &&
+    ((["TOPIC", "NOTE"].includes(node.nodeType) && readingSource) || showMenu);
 
   const parentNodes = getObjects(node, undefined, ["RELEVANT"]).filter(
-    p => p.id !== parentNode.id
+    p => !(parentNode && p.id === parentNode.id)
   );
   if (quillRef.current && showEdit) {
     quillRef.current.getEditor().root.dataset.placeholder = getPlaceHolder(
@@ -124,7 +137,11 @@ function SubNode({
           ))}
         </div>
         {showMenu && (
-          <NoteDetailSuggestions parentNode={parentNode} node={node} />
+          <NoteDetailSuggestions
+            parentNode={parentNode}
+            node={node}
+            allowNodeBelow={true}
+          />
         )}
         <div key={node.id}>
           <div
@@ -147,13 +164,15 @@ function SubNode({
             >
               <i className="simple-icon-speech d-block" />
             </button>
-            <Link to={`/notes/${node.id}`}>
-              <button
-                className={`header-icon btn btn-empty font-size-toolbar text-semi-muted`}
-              >
-                <i className="simple-icon-link d-block" />
-              </button>
-            </Link>
+            {showLink && (
+              <Link to={`/notes/${node.id}`}>
+                <button
+                  className={`header-icon btn btn-empty font-size-toolbar text-semi-muted`}
+                >
+                  <i className="simple-icon-link d-block" />
+                </button>
+              </Link>
+            )}
           </div>
         )}
 
@@ -193,7 +212,7 @@ function SubNode({
             </div>
           </div>
         )}
-        {!showSubnodes && subNodes.length > 0 && (
+        {showChildren && !showSubnodes && subNodes.length > 0 && (
           <div>
             <p className="text-center text-info">({subNodes.length})</p>
           </div>
@@ -235,22 +254,36 @@ function NoteDetail(): JSX.Element {
         <div className="mb-4 col-lg-12 col-xl-6 offset-xl-3">
           <Card>
             <Card.Body>
-              <ReadonlyNode node={node} />
+              <SubNode
+                nodeID={node.id}
+                allowAddTopicBelow={true}
+                showChildren={false}
+                showLink={false}
+              />
             </Card.Body>
           </Card>
         </div>
       </div>
-      <div className="row">
-        <div className="mb-4 col-lg-12 col-xl-6 offset-xl-3">
-          <Card>
-            <Card.Body>
-              {children.map(childNode => (
-                <SubNode nodeID={childNode} parentNode={node} key={childNode} />
-              ))}
-            </Card.Body>
-          </Card>
+      {children.length > 0 && (
+        <div className="row">
+          <div className="mb-4 col-lg-12 col-xl-6 offset-xl-3">
+            <Card>
+              <Card.Body>
+                {children.map(childNode => (
+                  <SubNode
+                    nodeID={childNode}
+                    parentNode={node}
+                    key={childNode}
+                    allowAddTopicBelow={false}
+                    showChildren={true}
+                    showLink={true}
+                  />
+                ))}
+              </Card.Body>
+            </Card>
+          </div>
         </div>
-      </div>
+      )}
     </>
   );
 }

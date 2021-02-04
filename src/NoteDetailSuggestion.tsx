@@ -8,10 +8,12 @@ import { connectRelevantNodes } from "./connections";
 
 function NoteDetailSuggestions({
   node,
-  parentNode
+  parentNode,
+  allowNodeBelow
 }: {
-  parentNode: KnowNode;
+  parentNode?: KnowNode;
   node: KnowNode;
+  allowNodeBelow?: boolean;
 }): JSX.Element {
   const addBucket = useAddBucket();
   const {
@@ -27,20 +29,31 @@ function NoteDetailSuggestions({
   ): void => {
     const nodes = Immutable.Map({
       [node.id]: node,
-      [parentNode.id]: parentNode,
       [insertNode.id]: insertNode
-    }).merge(additionalNodes);
+    })
+      .merge(parentNode ? { [parentNode.id]: parentNode } : {})
+      .merge(additionalNodes);
     const connectWithEachOther = connectRelevantNodes(
       node.id,
       insertNode.id,
       nodes
     );
-    const connectWithParent = connectRelevantNodes(
-      parentNode.id,
-      insertNode.id,
-      connectWithEachOther
-    );
-    addBucket(connectWithParent);
+    const connectWithParentIfExists = parentNode
+      ? connectRelevantNodes(parentNode.id, insertNode.id, connectWithEachOther)
+      : connectWithEachOther;
+    addBucket(connectWithParentIfExists);
+  };
+
+  const insertNodeBelow = (
+    insertNode: KnowNode,
+    additionalNodes: Nodes
+  ): void => {
+    const nodes = Immutable.Map({
+      [node.id]: node,
+      [insertNode.id]: insertNode
+    }).merge(additionalNodes);
+    const connect = connectRelevantNodes(insertNode.id, node.id, nodes);
+    addBucket(connect);
   };
 
   // memoize!
@@ -65,7 +78,9 @@ function NoteDetailSuggestions({
   };
 
   // TODO: Don't show suggestions with existing connections
-  const closeSuggestions = new Set(findSuggestions(parentNode, 3));
+  const closeSuggestions = new Set(
+    findSuggestions(parentNode ? parentNode : node, 3)
+  );
   const otherSuggestions = getAllNodesByType("TOPIC")
     .map(topic => topic.id)
     .filter(topic => !closeSuggestions.has(topic));
@@ -94,6 +109,13 @@ function NoteDetailSuggestions({
             onAddNodeAbove={(insertNode: KnowNode, additionalNodes: Nodes) => {
               insertNodeAbove(insertNode, additionalNodes);
             }}
+            onAddNodeBelow={
+              allowNodeBelow
+                ? (insertNode: KnowNode, additionalNodes: Nodes) => {
+                    insertNodeBelow(insertNode, additionalNodes);
+                  }
+                : undefined
+            }
           />
         </InputGroup>
       </Form.Group>
