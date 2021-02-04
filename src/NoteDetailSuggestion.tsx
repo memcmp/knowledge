@@ -9,11 +9,13 @@ import { connectRelevantNodes } from "./connections";
 function NoteDetailSuggestions({
   node,
   parentNode,
-  allowNodeBelow
+  allowNodeBelow,
+  onClose
 }: {
   parentNode?: KnowNode;
   node: KnowNode;
   allowNodeBelow?: boolean;
+  onClose: () => void;
 }): JSX.Element {
   const addBucket = useAddBucket();
   const {
@@ -42,6 +44,7 @@ function NoteDetailSuggestions({
       ? connectRelevantNodes(parentNode.id, insertNode.id, connectWithEachOther)
       : connectWithEachOther;
     addBucket(connectWithParentIfExists);
+    onClose();
   };
 
   const insertNodeBelow = (
@@ -54,6 +57,7 @@ function NoteDetailSuggestions({
     }).merge(additionalNodes);
     const connect = connectRelevantNodes(insertNode.id, node.id, nodes);
     addBucket(connect);
+    onClose();
   };
 
   // memoize!

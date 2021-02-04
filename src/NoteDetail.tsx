@@ -140,7 +140,12 @@ function SubNode({
           <NoteDetailSuggestions
             parentNode={parentNode}
             node={node}
-            allowNodeBelow={true}
+            allowNodeBelow={allowAddTopicBelow}
+            onClose={() => {
+              setShowEdit(undefined);
+              setShowMenu(false);
+              setComment("");
+            }}
           />
         )}
         <div key={node.id}>
