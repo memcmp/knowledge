@@ -52,7 +52,7 @@ function NoteDetailSuggestions({
     }
     const objects = [
       ...getObjects(node, ["TOPIC"]),
-      ...getSubjects(node, ["NOTE"])
+      ...getSubjects(node, ["TOPIC", "NOTE"])
     ];
     return [
       ...objects.map(obj => obj.id),
