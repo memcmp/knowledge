@@ -91,6 +91,7 @@ function NoteDetailSuggestions({
     new Set([
       ...closeSuggestions,
       ...otherSuggestions,
+      ...getAllNodesByType("TITLE").map(note => note.id),
       ...getAllNodesByType("NOTE").map(note => note.id)
     ])
   )
