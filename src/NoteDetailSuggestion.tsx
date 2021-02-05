@@ -94,7 +94,8 @@ function NoteDetailSuggestions({
   );
   const suggestions = [
     ...Array.from(closeSuggestions),
-    ...Array.from(otherSuggestions)
+    ...Array.from(otherSuggestions),
+    ...Array.from(getAllNodesByType("NOTE").map(note => note.id))
   ]
     .filter(id => !existingSuggestions.includes(id) && id !== node.id)
     .map(id => getNode(id));
