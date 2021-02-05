@@ -265,7 +265,11 @@ function NoteDetail(): JSX.Element {
             getObjects(node, ["TOPIC", "NOTE"], ["RELEVANT"])
           : []),
         // Relevant for Node
-        ...getSubjects(node, ["TOPIC", "NOTE", "TITLE", "QUOTE"], ["RELEVANT"]),
+        ...getSubjects(
+          node,
+          ["TOPIC", "NOTE", "TITLE", "QUOTE"],
+          ["RELEVANT", "CONTAINS"]
+        ),
         ...getObjects(node, ["QUOTE", "TITLE"], ["CONTAINS"])
       ].map(child => child.id)
     )
