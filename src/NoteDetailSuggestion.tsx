@@ -91,6 +91,7 @@ function NoteDetailSuggestions({
     new Set([
       ...closeSuggestions,
       ...otherSuggestions,
+      // This can be done more efficient
       ...getAllNodesByType("TITLE").map(note => note.id),
       ...getAllNodesByType("NOTE").map(note => note.id)
     ])
@@ -102,11 +103,6 @@ function NoteDetailSuggestions({
     <div>
       <Form.Group>
         <InputGroup className="input-group-sm mt-4">
-          <InputGroup.Prepend>
-            <InputGroup.Text className="text-primary">
-              Relevant for
-            </InputGroup.Text>
-          </InputGroup.Prepend>
           <Suggest
             nodes={suggestions}
             onAddNodeAbove={(insertNode: KnowNode, additionalNodes: Nodes) => {

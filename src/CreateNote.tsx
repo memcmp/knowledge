@@ -12,9 +12,13 @@ import "./editor.css";
 
 import { useAddBucket, useSelectors } from "./DataContext";
 
-import { INTERESTS } from "./storage";
+import { INTERESTS, TIMELINE } from "./storage";
 
-import { connectRelevantNodes, newNode } from "./connections";
+import {
+  connectContainingNodes,
+  connectRelevantNodes,
+  newNode
+} from "./connections";
 
 const PARAGRAPH = "<p><br></p>";
 
@@ -135,15 +139,13 @@ function CreateNote(): JSX.Element {
     setText(content);
   };
 
-  const onClickSave = (): void => {
-    const timeline = getNode("TIMELINE");
-    const { nodes, relationToView } = createBucket(text.split(PARAGRAPH));
-    addBuckets(
-      nodes.set(timeline.id, {
-        ...timeline,
-        relationsToObjects: [relationToView, ...timeline.relationsToObjects]
-      })
-    );
+  const onClickCreateNote = (): void => {
+    const timeline = getNode(TIMELINE);
+    const note = newNode(text, "NOTE");
+    const nodes = Immutable.Map<string, KnowNode>()
+      .set(timeline.id, timeline)
+      .set(note.id, note);
+    addBuckets(connectContainingNodes(timeline.id, note.id, nodes));
     setText("");
   };
 
@@ -160,11 +162,11 @@ function CreateNote(): JSX.Element {
   return (
     <div className="mb-4 col-lg-12 col-xl-6 offset-xl-3">
       <Card>
-        <Tab.Container defaultActiveKey="write">
+        <Tab.Container defaultActiveKey="createNote">
           <Card.Header>
             <Nav variant="tabs" className="card-header-tabs" as="ul">
-              <Nav.Item as="li" key="write">
-                <Nav.Link eventKey="write" className="nav-link">
+              <Nav.Item as="li" key="createNote">
+                <Nav.Link eventKey="createNote" className="nav-link">
                   New Note
                 </Nav.Link>
               </Nav.Item>
@@ -194,7 +196,7 @@ function CreateNote(): JSX.Element {
                   <input {...getInputProps()} />
                 </div>
               </Tab.Pane>
-              <Tab.Pane eventKey="write" key="write">
+              <Tab.Pane eventKey="createNote" key="createNote">
                 <div className="scrolling-container">
                   <ReactQuill
                     theme="bubble"
@@ -210,7 +212,7 @@ function CreateNote(): JSX.Element {
                       variant="success"
                       className="float-right"
                       disabled={isEmpty(text)}
-                      onClick={onClickSave}
+                      onClick={onClickCreateNote}
                     >
                       Save
                     </Button>

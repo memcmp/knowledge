@@ -152,7 +152,9 @@ function SubNode({
             <NoteDetailSuggestions
               parentNode={parentNode}
               node={node}
-              allowNodeBelow={allowAddTopicBelow && node.nodeType === "TOPIC"}
+              allowNodeBelow={
+                allowAddTopicBelow && ["TOPIC", "NOTE"].includes(node.nodeType)
+              }
               onClose={() => {
                 setShowEdit(undefined);
                 setShowMenu(false);
