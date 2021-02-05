@@ -66,7 +66,6 @@ function SubNode({
       .set(above.id, above)
       .set(node.id, node)
       .merge(parentNode ? { [parentNode.id]: parentNode } : {});
-    // NOTE IS RELEVANT FOR PARENT (Overthing this and maybe make it like topics
     const connectWithEachOther = connectRelevantNodes(node.id, above.id, nodes);
     const connectWithParentIfExists = parentNode
       ? connectRelevantNodes(parentNode.id, above.id, connectWithEachOther)
