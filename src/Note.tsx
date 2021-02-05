@@ -15,7 +15,7 @@ function Note({ node }: NoteProps): JSX.Element {
     <div className="mb-4 col-lg-12 col-xl-6 offset-xl-3">
       <Link to={`/notes/${node.id}`}>
         <Card>
-          <Card.Body>
+          <Card.Body className="timeline">
             <ReadonlyNode node={node} />
           </Card.Body>
         </Card>

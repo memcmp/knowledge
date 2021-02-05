@@ -200,7 +200,7 @@ function SubNode({
 
         {showMenu && showEdit && (
           <div className="mb-4">
-            <div className="scrolling-container text-muted">
+            <div className="scrolling-container">
               <ReactQuill
                 theme="bubble"
                 formats={[]}
@@ -282,7 +282,7 @@ function NoteDetail(): JSX.Element {
       <div className="row">
         <div className="mb-4 col-lg-12 col-xl-6 offset-xl-3">
           <Card>
-            <Card.Body>
+            <Card.Body className="timeline">
               <SubNode
                 nodeID={node.id}
                 allowAddTopicBelow={true}

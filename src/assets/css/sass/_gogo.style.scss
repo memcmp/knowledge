@@ -51,6 +51,7 @@ Table of Contents
 
 /* 00.Variables and Imports */
 @import url("https://fonts.googleapis.com/css?family=Nunito:300,400,400i,600,700");
+@import url("https://fonts.googleapis.com/css?family=Noto+Serif:300,400,400i,600,700");
 
 $main-menu-item-height: 110px;
 $main-menu-width: 120px;
@@ -396,8 +397,8 @@ a {
 }
 
 p {
-  font-size: 0.85rem;
-  line-height: 1.3rem;
+  font-size: 1rem;
+  line-height: 1.5rem;
   font-family: "Nunito", sans-serif;
 }
 
