@@ -95,6 +95,8 @@ function SubNode({
     .filter(subject => !(parentNode && subject.id === parentNode.id))
     .filter(
       subject =>
+        // needs to be solved differntly
+        subject.nodeType === "NOTE" ||
         !(
           readingSource &&
           parentNode &&
