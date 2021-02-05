@@ -82,21 +82,18 @@ function NoteDetailSuggestions({
   };
 
   // TODO: Don't show suggestions with existing connections
-  const closeSuggestions = new Set(
-    findSuggestions(parentNode ? parentNode : node, 3)
-  );
-  const otherSuggestions = getAllNodesByType("TOPIC")
-    .map(topic => topic.id)
-    .filter(topic => !closeSuggestions.has(topic));
-
+  const closeSuggestions = findSuggestions(parentNode ? parentNode : node, 3);
+  const otherSuggestions = getAllNodesByType("TOPIC").map(topic => topic.id);
   const existingSuggestions = getObjects(node, ["TOPIC"]).map(
     topic => topic.id
   );
-  const suggestions = [
-    ...Array.from(closeSuggestions),
-    ...Array.from(otherSuggestions),
-    ...Array.from(getAllNodesByType("NOTE").map(note => note.id))
-  ]
+  const suggestions = Array.from(
+    new Set([
+      ...closeSuggestions,
+      ...otherSuggestions,
+      ...getAllNodesByType("NOTE").map(note => note.id)
+    ])
+  )
     .filter(id => !existingSuggestions.includes(id) && id !== node.id)
     .map(id => getNode(id));
 
