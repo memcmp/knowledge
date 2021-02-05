@@ -8,7 +8,8 @@ function ReadonlyNode({ node }: { node: KnowNode }): JSX.Element {
         ["TOPIC", "TITLE"].includes(node.nodeType) ? "lead" : ""
       }
             ${node.nodeType === "TOPIC" ? "text-info" : ""}
-            ${node.nodeType === "NOTE" ? "text-muted" : ""}
+            ${node.nodeType === "NOTE" ? "" : ""}
+            ${node.nodeType === "QUOTE" ? "quote" : ""}
               `}
     >
       <ReactQuill
