@@ -95,17 +95,19 @@ function SubNode({
     .filter(subject => !(parentNode && subject.id === parentNode.id))
     .filter(
       subject =>
-        readingSource &&
-        parentNode &&
-        // Only show SubNodes which are related for the parent
-        // TODO: think if that's suitable for non source node types
-        subject.relationsToObjects.filter(
-          relToObj => relToObj.b === parentNode.id
-        ).length +
-          subject.relationsToSubjects.filter(
-            relToSubj => relToSubj.a === parentNode.id
-          ).length >
-          0
+        !(
+          readingSource &&
+          parentNode &&
+          // Only show SubNodes which are related for the parent
+          // TODO: think if that's suitable for non source node types
+          subject.relationsToObjects.filter(
+            relToObj => relToObj.b === parentNode.id
+          ).length +
+            subject.relationsToSubjects.filter(
+              relToSubj => relToSubj.a === parentNode.id
+            ).length ===
+            0
+        )
     );
 
   // automatically expanad TOPICS and NOTES when reading a source
