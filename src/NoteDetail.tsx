@@ -69,7 +69,7 @@ function SubNode({
     // NOTE IS RELEVANT FOR PARENT (Overthing this and maybe make it like topics
     const connectWithEachOther = connectRelevantNodes(node.id, above.id, nodes);
     const connectWithParentIfExists = parentNode
-      ? connectRelevantNodes(above.id, parentNode.id, connectWithEachOther)
+      ? connectRelevantNodes(parentNode.id, above.id, connectWithEachOther)
       : connectWithEachOther;
     addBucket(connectWithParentIfExists);
     setShowEdit(undefined);
@@ -91,18 +91,21 @@ function SubNode({
   const readingSource = parentNode
     ? ["TITLE", "URL"].includes(parentNode.nodeType)
     : false;
-  const subNodes = getSubjects(node)
+  const subNodes = getSubjects(node, undefined, ["RELEVANT"])
+    .filter(subject => !(parentNode && subject.id === parentNode.id))
     .filter(
-      subject => !(parentNode && subject.id === parentNode.id)
-      // don't show subtopics of topics when reading a source
-    )
-    .filter(
-      subNode =>
-        !(
-          readingSource &&
-          node.nodeType === "TOPIC" &&
-          subNode.nodeType === "TOPIC"
-        )
+      subject =>
+        readingSource &&
+        parentNode &&
+        // Only show SubNodes which are related for the parent
+        // TODO: think if that's suitable for non source node types
+        subject.relationsToObjects.filter(
+          relToObj => relToObj.b === parentNode.id
+        ).length +
+          subject.relationsToSubjects.filter(
+            relToSubj => relToSubj.a === parentNode.id
+          ).length >
+          0
     );
 
   // automatically expanad TOPICS and NOTES when reading a source
@@ -111,7 +114,10 @@ function SubNode({
     ((["TOPIC", "NOTE"].includes(node.nodeType) && readingSource) || showMenu);
 
   const parentNodes = getObjects(node, undefined, ["RELEVANT"]).filter(
-    p => !(parentNode && p.id === parentNode.id)
+    // remove whenever parent notes are prettier
+    p =>
+      !(parentNode && p.id === parentNode.id) &&
+      !(node.nodeType === "TITLE" && p.nodeType === "NOTE")
   );
   if (quillRef.current && showEdit) {
     quillRef.current.getEditor().root.dataset.placeholder = getPlaceHolder(
@@ -250,11 +256,14 @@ function NoteDetail(): JSX.Element {
   const children = Array.from(
     new Set(
       [
+        // For what is this Source Relevant?
         ...(["TITLE", "QUOTE", "URL"].includes(node.nodeType)
-          ? getObjects(node, ["TOPIC"])
+          ? // "NOTE" is legacy
+            getObjects(node, ["TOPIC", "NOTE"], ["RELEVANT"])
           : []),
-        ...getSubjects(node, ["TOPIC", "NOTE", "QUOTE"]),
-        ...getObjects(node, ["QUOTE", "TITLE"])
+        // Relevant for Node
+        ...getSubjects(node, ["TOPIC", "NOTE", "TITLE", "QUOTE"], ["RELEVANT"]),
+        ...getObjects(node, ["QUOTE", "TITLE"], ["CONTAINS"])
       ].map(child => child.id)
     )
   );
