@@ -23,8 +23,7 @@ export function useQueries({ userSession }: UseQueryProps): QueryResult {
   const storageQuery = useQuery({
     queryKey: "store",
     queryFn: async () => getDataStore(new Storage({ userSession })),
-    enabled: userQuery.isSuccess,
-    refetchOnWindowFocus: false
+    enabled: userQuery.isSuccess
   });
   return {
     userQuery,
