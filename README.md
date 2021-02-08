@@ -12,11 +12,6 @@ Another Zettelkasten, but not another pile of Notes
 - [React](https://reactjs.org/) & [Typescript](https://www.typescriptlang.org/)
 - [Blockstack](https://www.stacks.co/)
 
-## Installations
-
-- [Staging](https://staging-my-wisdom.netlify.app/)
-- [Production](https://my-wisdom.netlify.app/)
-
 ## Available Scripts
 
 In the project directory, you can run:
