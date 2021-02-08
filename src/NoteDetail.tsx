@@ -60,6 +60,12 @@ function SubNode({
     setComment(content);
   };
 
+  const closeEditMenu = () => {
+    setShowEdit(undefined);
+    setShowMenu(false);
+    setComment("");
+  };
+
   const createNodeAbove = (): void => {
     const above = newNode(comment, showEdit || "NOTE");
     const nodes = Immutable.Map<string, KnowNode>()
@@ -71,9 +77,7 @@ function SubNode({
       ? connectRelevantNodes(parentNode.id, above.id, connectWithEachOther)
       : connectWithEachOther;
     addBucket(connectWithParentIfExists);
-    setShowEdit(undefined);
-    setShowMenu(false);
-    setComment("");
+    closeEditMenu();
   };
 
   const createNoteBelow = (): void => {
@@ -82,9 +86,7 @@ function SubNode({
       .set(below.id, below)
       .set(node.id, node);
     addBucket(connectRelevantNodes(below.id, node.id, nodes));
-    setShowEdit(undefined);
-    setShowMenu(false);
-    setComment("");
+    closeEditMenu();
   };
 
   const readingSource = parentNode
@@ -111,11 +113,7 @@ function SubNode({
         )
     );
 
-  // automatically expanad TOPICS and NOTES when reading a source
-  const showSubnodes =
-    showChildren &&
-    ((["TOPIC", "NOTE"].includes(node.nodeType) && readingSource) || showMenu);
-
+  const expandSubNodes = showChildren && showMenu;
   const parentNodes = getObjects(node, undefined, ["RELEVANT"]).filter(
     // remove whenever parent notes are prettier
     p =>
@@ -155,11 +153,7 @@ function SubNode({
               allowNodeBelow={
                 allowAddTopicBelow && ["TOPIC", "NOTE"].includes(node.nodeType)
               }
-              onClose={() => {
-                setShowEdit(undefined);
-                setShowMenu(false);
-                setComment("");
-              }}
+              onClose={closeEditMenu}
             />
           </div>
         </Collapse>
@@ -234,13 +228,13 @@ function SubNode({
             </div>
           </div>
         )}
-        {showChildren && !showSubnodes && subNodes.length > 0 && (
+        {showChildren && !expandSubNodes && subNodes.length > 0 && (
           <div>
             <p className="text-center text-info">({subNodes.length})</p>
           </div>
         )}
       </div>
-      {showSubnodes &&
+      {expandSubNodes &&
         subNodes.map(sub => (
           <div className="border-bottom ml-4" key={sub.id}>
             <Link to={`/notes/${sub.id}`}>
