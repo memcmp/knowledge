@@ -1,6 +1,11 @@
 language: node_js
 node_js:
   - "node" 
+# safelist
+branches:
+  only:
+  - master
+  - staging
 script:
   - "npm run prettier"
   - "npm run lint"
