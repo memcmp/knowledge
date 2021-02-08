@@ -7,7 +7,7 @@ import { signInUser } from "./auth";
 import { getDataStore } from "./storage";
 
 type UseQueryProps = {
-  userSession: UserSession;
+  readonly userSession: UserSession;
 };
 
 type QueryResult = {

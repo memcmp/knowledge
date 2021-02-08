@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 
-import { Searchbox } from "./Searchbox";
-import { NewTopicModal } from "./NewTopic";
-
 import { Button, InputGroup } from "react-bootstrap";
 import Immutable from "immutable";
+import { Searchbox } from "./Searchbox";
+import { NewTopicModal } from "./NewTopic";
 
 import { newNode } from "./connections";
 
@@ -29,7 +28,7 @@ function Suggest({
     nodes.length > 0 ? { value: nodes[0], createNew: false } : undefined
   );
 
-  const onClickAddAbove = () => {
+  const onClickAddAbove = (): void => {
     const sel = selection as SelectionState;
     if (sel.createNew) {
       setShowNewTopicModal({
@@ -41,7 +40,7 @@ function Suggest({
     onAddNodeAbove(sel.value as KnowNode, Immutable.Map());
   };
 
-  const onClickAddNodeBelow = () => {
+  const onClickAddNodeBelow = (): void => {
     const sel = selection as SelectionState;
     if (onAddNodeBelow) {
       if (sel.createNew) {

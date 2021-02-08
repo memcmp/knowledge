@@ -30,7 +30,7 @@ function getNode(nodes: Nodes, id: string): KnowNode {
   if (!node) {
     throw new Error("Node not found");
   }
-  return node as KnowNode;
+  return node;
 }
 
 function getObjects(

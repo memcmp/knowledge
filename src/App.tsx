@@ -1,9 +1,6 @@
 import React from "react";
 import { Route, Switch } from "react-router-dom";
 import "./App.css";
-import { RelationContext } from "./DataContext";
-import { NoteDetail } from "./NoteDetail";
-import { Timeline } from "./Timeline";
 import Immutable from "immutable";
 import { Storage } from "@stacks/storage";
 import { UserSession } from "@stacks/connect";
@@ -13,6 +10,9 @@ import {
   useMutation,
   useQueryClient
 } from "react-query";
+import { Timeline } from "./Timeline";
+import { NoteDetail } from "./NoteDetail";
+import { RelationContext } from "./DataContext";
 
 import { saveDataStore } from "./storage";
 
@@ -38,8 +38,8 @@ function Main({ userSession }: { userSession: UserSession }): JSX.Element {
       onError: (err, variables, previousValue) => {
         queryClient.setQueryData("store", previousValue);
       },
-      onSuccess: () => {
-        queryClient.invalidateQueries("store");
+      onSuccess: async () => {
+        await queryClient.invalidateQueries("store");
       }
     }
   );
@@ -54,7 +54,7 @@ function Main({ userSession }: { userSession: UserSession }): JSX.Element {
 
   const dataStore = storageQuery.data;
 
-  const addBucket = (nodes: Immutable.Map<string, KnowNode>) => {
+  const addBucket = (nodes: Immutable.Map<string, KnowNode>): void => {
     const newStorage = { nodes: dataStore.nodes.merge(nodes) };
     updateStorageMutation.mutate(newStorage);
   };

@@ -11,7 +11,6 @@ declare global {
   };
 
   type Relations = Array<Relation>;
-  type Nodes = Immutable.Map<string, KnowNode>;
 
   type KnowNode = {
     id: string;
@@ -21,11 +20,11 @@ declare global {
     relationsToSubjects: Relations;
   };
 
+  type Nodes = Immutable.Map<string, KnowNode>;
   type Store = {
     nodes: Nodes;
   };
 
+  // eslint-disable-next-line no-unused-vars
   type AddRelations = (nodes: Immutable.Map<string, KnowNode>) => void;
 }
-
-export {};

@@ -7,6 +7,7 @@ import "./editor.css";
 
 import { Link, useParams } from "react-router-dom";
 
+import { Badge, Collapse } from "react-bootstrap";
 import { useAddBucket, useSelectors } from "./DataContext";
 
 import { ReadonlyNode } from "./ReadonlyNode";
@@ -14,8 +15,6 @@ import { ReadonlyNode } from "./ReadonlyNode";
 import { NoteDetailSuggestions } from "./NoteDetailSuggestion";
 
 import { connectRelevantNodes, newNode, createContext } from "./connections";
-
-import { Badge, Collapse } from "react-bootstrap";
 
 import { extractPlainText } from "./Searchbox";
 
@@ -56,11 +55,11 @@ function SubNode({
 
   const node = getNode(nodeID);
 
-  const onChange = (content: string) => {
+  const onChange = (content: string): void => {
     setComment(content);
   };
 
-  const closeEditMenu = () => {
+  const closeEditMenu = (): void => {
     setShowEdit(undefined);
     setShowMenu(false);
     setComment("");
@@ -130,6 +129,8 @@ function SubNode({
     );
   }
 
+  /* eslint-disable jsx-a11y/click-events-have-key-events */
+  /* eslint-disable jsx-a11y/no-static-element-interactions */
   return (
     <>
       <div className={borderBottom ? "border-bottom" : ""}>
@@ -148,7 +149,7 @@ function SubNode({
             </Link>
           ))}
         </div>
-        <Collapse in={showMenu} mountOnEnter={true}>
+        <Collapse in={showMenu} mountOnEnter>
           <div>
             <NoteDetailSuggestions
               parentNode={parentNode}
@@ -168,7 +169,7 @@ function SubNode({
             <ReadonlyNode node={node} />
           </div>
         </div>
-        <Collapse in={showMenu} mountOnEnter={true}>
+        <Collapse in={showMenu} mountOnEnter>
           <div>
             <div className="justify-content-center nav">
               <button
@@ -185,7 +186,8 @@ function SubNode({
               {showLink && (
                 <Link to={`/notes/${node.id}`}>
                   <button
-                    className={`header-icon btn btn-empty font-size-toolbar text-semi-muted`}
+                    type="button"
+                    className="header-icon btn btn-empty font-size-toolbar text-semi-muted"
                   >
                     <i className="simple-icon-link d-block" />
                   </button>
@@ -280,7 +282,7 @@ function NoteDetail(): JSX.Element {
             <Card.Body className="header">
               <SubNode
                 nodeID={node.id}
-                allowAddTopicBelow={true}
+                allowAddTopicBelow
                 showChildren={false}
                 showLink={false}
                 borderBottom={false}
@@ -300,8 +302,8 @@ function NoteDetail(): JSX.Element {
                     parentNode={node}
                     key={childNode}
                     allowAddTopicBelow={false}
-                    showChildren={true}
-                    showLink={true}
+                    showChildren
+                    showLink
                     borderBottom={i + 1 < children.length}
                   />
                 ))}
