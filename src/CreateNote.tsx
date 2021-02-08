@@ -91,8 +91,8 @@ function CreateNote(): JSX.Element {
   const { getNode } = useSelectors();
   const { getRootProps, getInputProps } = useDropzone({
     accept: ".md",
-    onDrop: (acceptedFiles: Array<File>) => {
-      Promise.all(
+    onDrop: async (acceptedFiles: Array<File>) => {
+      const markdowns = await Promise.all(
         acceptedFiles.map(
           (file: File): Promise<string> => {
             return new Promise((resolve, reject) => {
@@ -105,37 +105,33 @@ function CreateNote(): JSX.Element {
             });
           }
         )
-      ).then((markdowns: Array<string>) => {
-        const nodes = markdowns.reduce(
-          (rdx: Immutable.Map<string, KnowNode>, markdown: string) => {
-            const timeline = rdx.get("TIMELINE") as KnowNode;
-            const paragraphs = markdown.split("\n\n");
-            const { nodes, relationToView } = createBucket(
-              paragraphs.map((paragraph: string) => {
-                const md = new MarkdownIt();
-                return md.render(paragraph);
-              })
-            );
-            return rdx
-              .set(timeline.id, {
-                ...timeline,
-                relationsToObjects: [
-                  relationToView,
-                  ...timeline.relationsToObjects
-                ]
-              })
-              .merge(nodes);
-          },
-          Immutable.Map<string, KnowNode>().set(
-            "TIMELINE",
-            getNode("TIMELINE") as KnowNode
-          )
-        );
-        addBuckets(nodes);
-      });
+      );
+      const mdNodes = markdowns.reduce(
+        (rdx: Immutable.Map<string, KnowNode>, markdown: string) => {
+          const timeline = rdx.get("TIMELINE") as KnowNode;
+          const paragraphs = markdown.split("\n\n");
+          const { nodes, relationToView } = createBucket(
+            paragraphs.map((paragraph: string) => {
+              const md = new MarkdownIt();
+              return md.render(paragraph);
+            })
+          );
+          return rdx
+            .set(timeline.id, {
+              ...timeline,
+              relationsToObjects: [
+                relationToView,
+                ...timeline.relationsToObjects
+              ]
+            })
+            .merge(nodes);
+        },
+        Immutable.Map<string, KnowNode>().set("TIMELINE", getNode("TIMELINE"))
+      );
+      addBuckets(mdNodes);
     }
   });
-  const onChange = (content: string) => {
+  const onChange = (content: string): void => {
     setText(content);
   };
 
@@ -159,6 +155,7 @@ function CreateNote(): JSX.Element {
     setText("");
   };
 
+  /* eslint-disable react/jsx-props-no-spreading */
   return (
     <div className="mb-4 col-lg-12 col-xl-6 offset-xl-3">
       <Card>

@@ -5,17 +5,6 @@
   "dependencies": {
     "@stacks/connect": "^4.3.15",
     "@stacks/storage": "^1.0.1",
-    "@types/jest": "^26.0.20",
-    "@types/markdown-it": "^12.0.1",
-    "@types/node": "^12.19.13",
-    "@types/react": "^16.14.2",
-    "@types/react-autosuggest": "^10.0.1",
-    "@types/react-bootstrap": "^0.32.25",
-    "@types/react-bootstrap-typeahead": "^5.1.1",
-    "@types/react-dom": "^16.9.10",
-    "@types/react-router-bootstrap": "^0.24.5",
-    "@types/react-router-dom": "^5.1.7",
-    "@types/uuid": "^8.3.0",
     "blockstack": "^21.1.1",
     "bootstrap": "^4.3.1",
     "immutable": "^4.0.0-rc.12",
@@ -40,7 +29,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "lint": "eslint src --ext .js,.jsx,.ts,.tsx",
+    "prettier": "prettier -c \"src/**/*.+(ts|tsx|js|jsx|json|md|)\" \"README.md\" \"scripts/*.js\""
   },
   "eslintConfig": {
     "extends": [
@@ -64,6 +55,23 @@
     "@testing-library/jest-dom": "^5.11.9",
     "@testing-library/react": "^11.2.3",
     "@testing-library/user-event": "^12.6.0",
+    "@types/jest": "^26.0.20",
+    "@types/markdown-it": "^12.0.1",
+    "@types/node": "^12.19.13",
+    "@types/react": "^16.14.2",
+    "@types/react-autosuggest": "^10.0.1",
+    "@types/react-bootstrap": "^0.32.25",
+    "@types/react-bootstrap-typeahead": "^5.1.1",
+    "@types/react-dom": "^16.9.10",
+    "@types/react-router-bootstrap": "^0.24.5",
+    "@types/react-router-dom": "^5.1.7",
+    "@types/uuid": "^8.3.0",
+    "@typescript-eslint/eslint-plugin": "^4.15.0",
+    "eslint-config-airbnb": "^18.2.1",
+    "eslint-config-prettier": "^7.2.0",
+    "eslint-plugin-functional": "^3.2.1",
+    "eslint-plugin-jsx": "^0.1.0",
+    "eslint-plugin-prettier": "^3.3.1",
     "node-sass": "^4.14.1",
     "prettier": "^1.19.1"
   }

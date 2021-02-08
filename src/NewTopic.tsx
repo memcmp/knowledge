@@ -51,16 +51,16 @@ function NewTopicModal({
   >(Immutable.List([topic]));
   const [topNode, setTopNode] = useState<KnowNode | undefined>();
 
-  const onCreateNode = (newTopic: string | undefined, index: number) => {
+  const onCreateNode = (newTopic: string | undefined, index: number): void => {
     setNewTopics(newTopics.set(index, newTopic));
   };
 
-  const onSelectNode = (selectedNode: KnowNode, index: number) => {
+  const onSelectNode = (selectedNode: KnowNode, index: number): void => {
     setTopNode(selectedNode);
     setNewTopics(newTopics.slice(0, index));
   };
 
-  const submit = () => {
+  const submit = (): void => {
     const topicsAsNodes = newTopics
       .map(newTopic => {
         return newNode(newTopic as string, "TOPIC");
@@ -119,7 +119,7 @@ function NewTopicModal({
                 },
                 ...allTopics
               ]}
-              onCreateNode={newNode => onCreateNode(newNode, i)}
+              onCreateNode={createNode => onCreateNode(createNode, i)}
               onSelectNode={selected => onSelectNode(selected, i)}
               onClear={() => {
                 onCreateNode(undefined, i);

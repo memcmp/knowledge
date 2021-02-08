@@ -17,7 +17,7 @@ function ReadonlyNode({ node }: { node: KnowNode }): JSX.Element {
         formats={["link", "size"]}
         modules={{ toolbar: false }}
         value={node.text}
-        readOnly={true}
+        readOnly
       />
     </div>
   );

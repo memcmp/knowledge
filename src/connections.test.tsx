@@ -1,6 +1,6 @@
+import Immutable from "immutable";
 import { newNode, connectRelevantNodes } from "./connections";
 import { getNode } from "./DataContext";
-import Immutable from "immutable";
 
 test("Don't duplicate connections", () => {
   const flyingCars = newNode("Flying Cars", "TOPIC");

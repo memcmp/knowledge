@@ -1,13 +1,11 @@
 import React from "react";
 import Immutable from "immutable";
-import { Route } from "react-router-dom";
+import { Route, MemoryRouter } from "react-router-dom";
 
-import { newNode, createContext } from "./connections";
 import { render, RenderResult } from "@testing-library/react";
+import { newNode, createContext } from "./connections";
 
 import { NoteDetail } from "./NoteDetail";
-
-import { MemoryRouter } from "react-router-dom";
 
 import { RelationContext } from "./DataContext";
 
@@ -58,7 +56,7 @@ test("Display what's relevant for a Topic", () => {
     <MemoryRouter initialEntries={[`/notes/${flyingCars.id}/`]}>
       <RelationContext.Provider
         value={{
-          addBucket: () => {},
+          addBucket: jest.fn(),
           nodes: context.nodes
         }}
       >

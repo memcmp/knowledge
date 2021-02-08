@@ -55,7 +55,7 @@ function Searchbox({
 
   const onChange = (
     newSelection: Array<KnowNodeWithPlainText | CustomOption>
-  ) => {
+  ): void => {
     if (newSelection.length === 0) {
       onClear();
       return;
@@ -68,6 +68,7 @@ function Searchbox({
     onSelectNode(selectedNode as KnowNode);
   };
 
+  /* eslint-disable react/jsx-props-no-spreading */
   return (
     <>
       <Typeahead

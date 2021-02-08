@@ -1,10 +1,10 @@
 import { UserSession, showConnect, UserData } from "@stacks/connect";
 
-export function authenticate() {
+export function authenticate(): void {
   showConnect({
     appDetails: {
       name: "Knowledge",
-      icon: window.location.origin + "/logo.svg"
+      icon: `${window.location.origin}/logo.svg`
     },
     redirectTo: "/",
     finished: () => {

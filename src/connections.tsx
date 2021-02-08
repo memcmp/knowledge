@@ -8,10 +8,10 @@ export function connectRelevantNodes(
   const objectNode = nodes.get(objectID);
   const subjectNode = nodes.get(subjectID);
   if (!objectNode) {
-    throw new Error("Can't find childNode with ID" + objectID);
+    throw new Error(`Can't find childNode with ID${objectID}`);
   }
   if (!subjectNode) {
-    throw new Error("Can't find parentNode with ID" + objectID);
+    throw new Error(`Can't find parentNode with ID${objectID}`);
   }
   const relation: Relation = {
     relationType: "RELEVANT",
@@ -52,10 +52,10 @@ export function connectContainingNodes(
   const objectNode = nodes.get(objectID);
   const subjectNode = nodes.get(subjectID);
   if (!objectNode) {
-    throw new Error("Can't find childNode with ID" + objectID);
+    throw new Error(`Can't find childNode with ID${objectID}`);
   }
   if (!subjectNode) {
-    throw new Error("Can't find parentNode with ID" + objectID);
+    throw new Error(`Can't find parentNode with ID${objectID}`);
   }
   const relation: Relation = {
     relationType: "CONTAINS",
@@ -118,10 +118,16 @@ export function createContext(nodes: Nodes): DataManipulatingContext {
       const node = newNode(text, nodeType);
       return createContext(nodes.set(node.id, node));
     },
-    connectRelevant: (subjectID: string, objectID: string) => {
+    connectRelevant: (
+      subjectID: string,
+      objectID: string
+    ): DataManipulatingContext => {
       return createContext(connectRelevantNodes(subjectID, objectID, nodes));
     },
-    connectContains: (subjectID: string, objectID: string) => {
+    connectContains: (
+      subjectID: string,
+      objectID: string
+    ): DataManipulatingContext => {
       return createContext(connectContainingNodes(subjectID, objectID, nodes));
     }
   };

@@ -1,8 +1,8 @@
 import React from "react";
 import { Form, InputGroup } from "react-bootstrap";
+import Immutable from "immutable";
 import { useAddBucket, useSelectors } from "./DataContext";
 import { Suggest } from "./Suggest";
-import Immutable from "immutable";
 
 import { connectRelevantNodes } from "./connections";
 
@@ -63,13 +63,16 @@ function NoteDetailSuggestions({
   // memoize!
   // TODO: reference counting for better score
   // TODO: check why I don't find notes of other topics
-  const findSuggestions = (node: KnowNode, levels: number): Array<string> => {
+  const findSuggestions = (
+    forNode: KnowNode,
+    levels: number
+  ): Array<string> => {
     if (levels === 0) {
       return [];
     }
     const objects = [
-      ...getObjects(node, ["TOPIC"]),
-      ...getSubjects(node, ["TOPIC", "NOTE"])
+      ...getObjects(forNode, ["TOPIC"]),
+      ...getSubjects(forNode, ["TOPIC", "NOTE"])
     ];
     return [
       ...objects.map(obj => obj.id),
@@ -82,7 +85,7 @@ function NoteDetailSuggestions({
   };
 
   // TODO: Don't show suggestions with existing connections
-  const closeSuggestions = findSuggestions(parentNode ? parentNode : node, 3);
+  const closeSuggestions = findSuggestions(parentNode || node, 3);
   const otherSuggestions = getAllNodesByType("TOPIC").map(topic => topic.id);
   const existingSuggestions = getObjects(node, ["TOPIC"]).map(
     topic => topic.id

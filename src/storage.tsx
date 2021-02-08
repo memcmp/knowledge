@@ -40,12 +40,11 @@ export async function getDataStore(storage: Storage): Promise<Store> {
     if (!json) {
       return DEFAULT_STORE;
     }
-    const store = JSON.parse(json as string);
+    const store: Store = JSON.parse(json as string) as Store;
     return {
       nodes: DEFAULT_STORE.nodes.merge(Immutable.Map(store.nodes))
     };
   } catch {
-    console.log("File does not exist");
     return DEFAULT_STORE;
   }
 }
