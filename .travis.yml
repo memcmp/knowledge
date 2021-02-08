@@ -6,6 +6,7 @@ branches:
   only:
   - master
   - staging
+  - production
 script:
   - "npm run prettier"
   - "npm run lint"
