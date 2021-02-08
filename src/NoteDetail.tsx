@@ -13,7 +13,7 @@ import { ReadonlyNode } from "./ReadonlyNode";
 
 import { NoteDetailSuggestions } from "./NoteDetailSuggestion";
 
-import { connectRelevantNodes, newNode } from "./connections";
+import { connectRelevantNodes, newNode, createContext } from "./connections";
 
 import { Badge, Collapse } from "react-bootstrap";
 
@@ -68,15 +68,17 @@ function SubNode({
 
   const createNodeAbove = (): void => {
     const above = newNode(comment, showEdit || "NOTE");
-    const nodes = Immutable.Map<string, KnowNode>()
-      .set(above.id, above)
-      .set(node.id, node)
-      .merge(parentNode ? { [parentNode.id]: parentNode } : {});
-    const connectWithEachOther = connectRelevantNodes(node.id, above.id, nodes);
-    const connectWithParentIfExists = parentNode
-      ? connectRelevantNodes(parentNode.id, above.id, connectWithEachOther)
-      : connectWithEachOther;
-    addBucket(connectWithParentIfExists);
+    const context = createContext(Immutable.Map())
+      .set(above)
+      .set(node)
+      .connectRelevant(node.id, above.id);
+    if (parentNode) {
+      addBucket(
+        context.set(parentNode).connectRelevant(parentNode.id, above.id).nodes
+      );
+    } else {
+      addBucket(context.nodes);
+    }
     closeEditMenu();
   };
 
@@ -114,8 +116,10 @@ function SubNode({
     );
 
   const expandSubNodes = showChildren && showMenu;
-  const parentNodes = getObjects(node, undefined, ["RELEVANT"]).filter(
-    // remove whenever parent notes are prettier
+  const parentNodes = [
+    ...getObjects(node, undefined, ["RELEVANT"]),
+    ...getSubjects(node, ["VIEW"], ["CONTAINS"])
+  ].filter(
     p =>
       !(parentNode && p.id === parentNode.id) &&
       !(node.nodeType === "TITLE" && p.nodeType === "NOTE")
@@ -131,14 +135,13 @@ function SubNode({
       <div className={borderBottom ? "border-bottom" : ""}>
         <div className="pt-3">
           {parentNodes.map(p => (
-            <Link to={`/notes/${p.id}`}>
+            <Link to={`/notes/${p.id}`} key={p.id}>
               <Badge
                 variant={
                   p.nodeType === "TOPIC" ? "outline-info" : "outline-dark"
                 }
                 className="mr-1"
                 pill
-                key={p.id}
               >
                 {extractPlainText(p)}
               </Badge>
@@ -249,9 +252,7 @@ function SubNode({
 function NoteDetail(): JSX.Element {
   const { id } = useParams<{ id: string }>();
   const { getNode, getSubjects, getObjects } = useSelectors();
-
   const node = getNode(id);
-  // TODO: A filter by relationship type might be better
   const children = Array.from(
     new Set(
       [
@@ -276,7 +277,7 @@ function NoteDetail(): JSX.Element {
       <div className="row">
         <div className="mb-4 col-lg-12 col-xl-6 offset-xl-3">
           <Card>
-            <Card.Body className="timeline">
+            <Card.Body className="header">
               <SubNode
                 nodeID={node.id}
                 allowAddTopicBelow={true}

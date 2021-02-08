@@ -112,4 +112,4 @@ function useSelectors(): {
   };
 }
 
-export { useNodes, useAddBucket, RelationContext, useSelectors };
+export { useNodes, useAddBucket, RelationContext, useSelectors, getNode };

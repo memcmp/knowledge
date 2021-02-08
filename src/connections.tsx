@@ -20,7 +20,10 @@ export function connectRelevantNodes(
   };
   // check if the relationship doesn't exist yet
   if (
-    subjectNode.relationsToSubjects.filter(
+    [
+      ...subjectNode.relationsToSubjects,
+      ...subjectNode.relationsToObjects
+    ].filter(
       rel =>
         rel.relationType === relation.relationType &&
         rel.a === relation.a &&
@@ -88,5 +91,38 @@ export function newNode(text: string, nodeType: NodeType): KnowNode {
     nodeType,
     relationsToObjects: [],
     relationsToSubjects: []
+  };
+}
+
+type DataManipulatingContext = {
+  nodes: Nodes;
+  addNewNode: (text: string, nodeType: NodeType) => DataManipulatingContext;
+  set: (node: KnowNode) => DataManipulatingContext;
+  connectRelevant: (
+    subjectID: string,
+    objectID: string
+  ) => DataManipulatingContext;
+  connectContains: (
+    subjectID: string,
+    objectID: string
+  ) => DataManipulatingContext;
+};
+
+export function createContext(nodes: Nodes): DataManipulatingContext {
+  return {
+    nodes,
+    set: (node: KnowNode): DataManipulatingContext => {
+      return createContext(nodes.set(node.id, node));
+    },
+    addNewNode: (text: string, nodeType: NodeType): DataManipulatingContext => {
+      const node = newNode(text, nodeType);
+      return createContext(nodes.set(node.id, node));
+    },
+    connectRelevant: (subjectID: string, objectID: string) => {
+      return createContext(connectRelevantNodes(subjectID, objectID, nodes));
+    },
+    connectContains: (subjectID: string, objectID: string) => {
+      return createContext(connectContainingNodes(subjectID, objectID, nodes));
+    }
   };
 }
