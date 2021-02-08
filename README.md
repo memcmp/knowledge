@@ -1,5 +1,8 @@
 [![Build Status](https://travis-ci.com/OnkelBogi/knowledge.svg?branch=master)](https://travis-ci.com/OnkelBogi/knowledge)
 
+[![Netlify Status](https://api.netlify.com/api/v1/badges/8d4abe36-771c-4a5e-9124-827355cdafda/deploy-status)](https://app.netlify.com/sites/my-wisdom/deploys)
+
+
 # Knowledge
 
 Another Zettelkasten, but not another pile of Notes
@@ -8,6 +11,11 @@ Another Zettelkasten, but not another pile of Notes
 
 - [React](https://reactjs.org/) & [Typescript](https://www.typescriptlang.org/)
 - [Blockstack](https://www.stacks.co/)
+
+## Installations
+
+- [Staging](https://staging-my-wisdom.netlify.app/)
+- [Production](https://my-wisdom.netlify.app/)
 
 ## Available Scripts
 
