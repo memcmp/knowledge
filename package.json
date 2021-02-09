@@ -31,7 +31,8 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "eslint src --ext .js,.jsx,.ts,.tsx",
-    "prettier": "prettier -c \"src/**/*.+(ts|tsx|js|jsx|json|md|)\" \"README.md\" \"scripts/*.js\""
+    "prettier": "prettier -c \"src/**/*.+(ts|tsx|js|jsx|json|md|)\" \"README.md\" \"scripts/*.js\"",
+    "format": "prettier --write -c \"src/**/*.+(ts|tsx|js|jsx|json|md|)\" \"README.md\" \"scripts/*.js\""
   },
   "eslintConfig": {
     "extends": [
