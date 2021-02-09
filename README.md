@@ -2,7 +2,6 @@
 
 [![Netlify Status](https://api.netlify.com/api/v1/badges/8d4abe36-771c-4a5e-9124-827355cdafda/deploy-status)](https://app.netlify.com/sites/my-wisdom/deploys)
 
-
 # Knowledge
 
 Another Zettelkasten, but not another pile of Notes
