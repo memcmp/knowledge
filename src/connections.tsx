@@ -1,4 +1,5 @@
 import { v4 } from "uuid";
+import Immutable from "immutable";
 
 export function connectRelevantNodes(
   subjectID: string,
@@ -20,26 +21,25 @@ export function connectRelevantNodes(
   };
   // check if the relationship doesn't exist yet
   if (
-    [
-      ...subjectNode.relationsToSubjects,
-      ...subjectNode.relationsToObjects
-    ].filter(
-      rel =>
-        rel.relationType === relation.relationType &&
-        rel.a === relation.a &&
-        rel.b === relation.b
-    ).length > 0
+    subjectNode.relationsToSubjects
+      .concat(subjectNode.relationsToObjects)
+      .filter(
+        rel =>
+          rel.relationType === relation.relationType &&
+          rel.a === relation.a &&
+          rel.b === relation.b
+      ).size > 0
   ) {
     return nodes;
   }
 
   const updatedObject = {
     ...objectNode,
-    relationsToSubjects: [...objectNode.relationsToSubjects, relation]
+    relationsToSubjects: objectNode.relationsToSubjects.push(relation)
   };
   const updatedSubject = {
     ...subjectNode,
-    relationsToObjects: [...subjectNode.relationsToObjects, relation]
+    relationsToObjects: subjectNode.relationsToObjects.push(relation)
   };
   return nodes.set(objectID, updatedObject).set(subjectID, updatedSubject);
 }
@@ -69,17 +69,17 @@ export function connectContainingNodes(
         rel.relationType === relation.relationType &&
         rel.a === relation.a &&
         rel.b === relation.b
-    ).length > 0
+    ).size > 0
   ) {
     return nodes;
   }
   const updatedObject = {
     ...objectNode,
-    relationsToSubjects: [...objectNode.relationsToSubjects, relation]
+    relationsToSubjects: objectNode.relationsToSubjects.push(relation)
   };
   const updatedSubject = {
     ...subjectNode,
-    relationsToObjects: [relation, ...subjectNode.relationsToObjects]
+    relationsToObjects: subjectNode.relationsToObjects.insert(0, relation)
   };
   return nodes.set(objectID, updatedObject).set(subjectID, updatedSubject);
 }
@@ -89,8 +89,8 @@ export function newNode(text: string, nodeType: NodeType): KnowNode {
     id: v4(),
     text,
     nodeType,
-    relationsToObjects: [],
-    relationsToSubjects: []
+    relationsToObjects: Immutable.List<Relation>(),
+    relationsToSubjects: Immutable.List<Relation>()
   };
 }
 
@@ -131,4 +131,18 @@ export function createContext(nodes: Nodes): DataManipulatingContext {
       return createContext(connectContainingNodes(subjectID, objectID, nodes));
     }
   };
+}
+
+export function moveRelations(
+  displayedRelations: Array<string>,
+  relations: Relations,
+  oldIndex: number,
+  newIndex: number
+): Relations {
+  const subjectToMove = displayedRelations[oldIndex];
+  const moveBeforeSubject = displayedRelations[newIndex];
+  const oldIdx = relations.findIndex(rel => rel.a === subjectToMove);
+  const relation = relations.get(oldIdx) as Relation;
+  const newIdx = relations.findIndex(rel => rel.a === moveBeforeSubject);
+  return relations.remove(oldIdx).insert(newIdx, relation);
 }

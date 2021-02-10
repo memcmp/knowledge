@@ -10,7 +10,7 @@ declare global {
     b: string;
   };
 
-  type Relations = Array<Relation>;
+  type Relations = Immutable.List<Relation>;
 
   type KnowNode = {
     id: string;

@@ -56,18 +56,18 @@ function createBucket(
           text,
           nodeType: "QUOTE",
           id,
-          relationsToObjects: [],
-          relationsToSubjects: [relation]
+          relationsToObjects: Immutable.List<Relation>(),
+          relationsToSubjects: Immutable.List<Relation>([relation])
         }
       ];
     })
   );
 
-  const relationsToObjects: Relations = Array.from(
+  const relationsToObjects: Relations = Immutable.List<Relation>(
     bucket
       .map(
         (node: KnowNode): Relation => {
-          return node.relationsToSubjects[0];
+          return node.relationsToSubjects.get(0) as Relation;
         }
       )
       .values()
@@ -76,7 +76,7 @@ function createBucket(
     id: topId,
     text: topParagraph,
     nodeType: "TITLE",
-    relationsToSubjects: [relationToView],
+    relationsToSubjects: Immutable.List<Relation>([relationToView]),
     relationsToObjects
   };
   return {
@@ -119,10 +119,10 @@ function CreateNote(): JSX.Element {
           return rdx
             .set(timeline.id, {
               ...timeline,
-              relationsToObjects: [
-                relationToView,
-                ...timeline.relationsToObjects
-              ]
+              relationsToObjects: timeline.relationsToObjects.insert(
+                0,
+                relationToView
+              )
             })
             .merge(nodes);
         },
