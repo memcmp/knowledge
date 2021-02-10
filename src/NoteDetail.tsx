@@ -8,13 +8,19 @@ import "./editor.css";
 import { Link, useParams } from "react-router-dom";
 
 import { Badge, Collapse } from "react-bootstrap";
+import { SortableContainer, SortableElement } from "react-sortable-hoc";
 import { useAddBucket, useSelectors } from "./DataContext";
 
 import { ReadonlyNode } from "./ReadonlyNode";
 
 import { NoteDetailSuggestions } from "./NoteDetailSuggestion";
 
-import { connectRelevantNodes, newNode, createContext } from "./connections";
+import {
+  connectRelevantNodes,
+  newNode,
+  createContext,
+  moveRelations
+} from "./connections";
 
 import { extractPlainText } from "./Searchbox";
 
@@ -106,10 +112,10 @@ function SubNode({
           // TODO: think if that's suitable for non source node types
           subject.relationsToObjects.filter(
             relToObj => relToObj.b === parentNode.id
-          ).length +
+          ).size +
             subject.relationsToSubjects.filter(
               relToSubj => relToSubj.a === parentNode.id
-            ).length ===
+            ).size ===
             0
         )
     );
@@ -131,12 +137,13 @@ function SubNode({
 
   /* eslint-disable jsx-a11y/click-events-have-key-events */
   /* eslint-disable jsx-a11y/no-static-element-interactions */
+  /* eslint-disable react/no-array-index-key */
   return (
     <>
       <div className={borderBottom ? "border-bottom" : ""}>
         <div className="pt-3">
-          {parentNodes.map(p => (
-            <Link to={`/notes/${p.id}`} key={p.id}>
+          {parentNodes.map((p, i) => (
+            <Link to={`/notes/${p.id}`} key={`${p.id}-${i}`}>
               <Badge
                 variant={
                   p.nodeType === "TOPIC" ? "outline-info" : "outline-dark"
@@ -251,26 +258,128 @@ function SubNode({
   );
 }
 
+const SortableNodeList = SortableContainer(
+  ({ children }: { children: React.ReactNode }) => {
+    return <div>{children}</div>;
+  }
+);
+
+const SortableNode = SortableElement(
+  ({
+    nodeID,
+    parentNode,
+    borderBottom
+  }: {
+    nodeID: string;
+    parentNode: KnowNode;
+    borderBottom: boolean;
+  }) => {
+    return (
+      <SubNode
+        nodeID={nodeID}
+        parentNode={parentNode}
+        allowAddTopicBelow={false}
+        showChildren
+        showLink
+        borderBottom={borderBottom}
+      />
+    );
+  }
+);
+
+type SectionProps = {
+  title: string;
+  childNodes: Array<string>;
+  parentNode: KnowNode;
+};
+
+type SortableSectionProps = SectionProps & {
+  onSortEnd: (props: { oldIndex: number; newIndex: number }) => void;
+};
+
+function SortableSection({
+  title,
+  onSortEnd,
+  childNodes,
+  parentNode
+}: SortableSectionProps): JSX.Element {
+  return (
+    <div className="row">
+      <div className="mb-4 col-lg-12 col-xl-6 offset-xl-3">
+        <Card>
+          <Card.Body>
+            <Card.Title>{title}</Card.Title>
+            <SortableNodeList
+              pressDelay={200}
+              onSortEnd={onSortEnd}
+              useWindowAsScrollContainer
+            >
+              {childNodes.map((childNode, i) => (
+                <SortableNode
+                  index={i}
+                  key={childNode}
+                  nodeID={childNode}
+                  parentNode={parentNode}
+                  borderBottom={i + 1 < childNodes.length}
+                />
+              ))}
+            </SortableNodeList>
+          </Card.Body>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+function Section({ title, childNodes, parentNode }: SectionProps): JSX.Element {
+  return (
+    <div className="row">
+      <div className="mb-4 col-lg-12 col-xl-6 offset-xl-3">
+        <Card>
+          <Card.Body>
+            <Card.Title>{title}</Card.Title>
+            {childNodes.map((childNode, i) => (
+              <SubNode
+                key={childNode}
+                nodeID={childNode}
+                parentNode={parentNode}
+                borderBottom={i + 1 < childNodes.length}
+              />
+            ))}
+          </Card.Body>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
 function NoteDetail(): JSX.Element {
   const { id } = useParams<{ id: string }>();
   const { getNode, getSubjects, getObjects } = useSelectors();
+  const addBucket = useAddBucket();
   const node = getNode(id);
-  const children = Array.from(
+  const relevantSubjects = Array.from(
     new Set(
-      [
-        // For what is this Source Relevant?
-        ...(["TITLE", "QUOTE", "URL"].includes(node.nodeType)
-          ? // "NOTE" is legacy
-            getObjects(node, ["TOPIC", "NOTE"], ["RELEVANT"])
-          : []),
-        // Relevant for Node
-        ...getSubjects(
-          node,
-          ["TOPIC", "NOTE", "TITLE", "QUOTE"],
-          ["RELEVANT", "CONTAINS"]
-        ),
-        ...getObjects(node, ["QUOTE", "TITLE"], ["CONTAINS"])
-      ].map(child => child.id)
+      getSubjects(
+        node,
+        ["TOPIC", "NOTE", "TITLE", "QUOTE"],
+        ["RELEVANT", "CONTAINS"]
+      ).map(child => child.id)
+    )
+  );
+
+  const relevantObjects = Array.from(
+    new Set(
+      (["TITLE", "QUOTE", "URL"].includes(node.nodeType)
+        ? // "NOTE" is legacy
+          getObjects(node, ["TOPIC", "NOTE"], ["RELEVANT"])
+        : []
+      ).map(child => child.id)
+    )
+  );
+  const containsObjects = Array.from(
+    new Set(
+      getObjects(node, ["QUOTE", "TITLE"], ["CONTAINS"]).map(child => child.id)
     )
   );
 
@@ -291,26 +400,47 @@ function NoteDetail(): JSX.Element {
           </Card>
         </div>
       </div>
-      {children.length > 0 && (
-        <div className="row">
-          <div className="mb-4 col-lg-12 col-xl-6 offset-xl-3">
-            <Card>
-              <Card.Body>
-                {children.map((childNode, i) => (
-                  <SubNode
-                    nodeID={childNode}
-                    parentNode={node}
-                    key={childNode}
-                    allowAddTopicBelow={false}
-                    showChildren
-                    showLink
-                    borderBottom={i + 1 < children.length}
-                  />
-                ))}
-              </Card.Body>
-            </Card>
-          </div>
-        </div>
+      {relevantSubjects.length > 0 && (
+        <SortableSection
+          title="Relevant Subjects"
+          childNodes={relevantSubjects}
+          parentNode={node}
+          onSortEnd={({
+            oldIndex,
+            newIndex
+          }: {
+            oldIndex: number;
+            newIndex: number;
+          }) => {
+            addBucket(
+              Immutable.Map({
+                [node.id]: {
+                  ...node,
+                  relationsToSubjects: moveRelations(
+                    relevantSubjects,
+                    node.relationsToSubjects,
+                    oldIndex,
+                    newIndex
+                  )
+                }
+              })
+            );
+          }}
+        />
+      )}
+      {relevantObjects.length > 0 && (
+        <Section
+          title="Source is relevant for"
+          childNodes={relevantObjects}
+          parentNode={node}
+        />
+      )}
+      {containsObjects.length > 0 && (
+        <Section
+          title="Quotes"
+          childNodes={containsObjects}
+          parentNode={node}
+        />
       )}
     </>
   );

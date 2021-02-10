@@ -11,10 +11,8 @@ const appConfig = new AppConfig(["store_write", "publish_data"]);
 const userSession = new UserSession({ appConfig });
 
 ReactDOM.render(
-  <React.StrictMode>
-    <BrowserRouter>
-      <App userSession={userSession} />
-    </BrowserRouter>
-  </React.StrictMode>,
+  <BrowserRouter>
+    <App userSession={userSession} />
+  </BrowserRouter>,
   document.getElementById("root")
 );

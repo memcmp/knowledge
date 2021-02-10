@@ -1,35 +1,12 @@
-import React from "react";
 import Immutable from "immutable";
-import { Route, MemoryRouter } from "react-router-dom";
-
-import { render, RenderResult } from "@testing-library/react";
 import { newNode, createContext } from "./connections";
 
-import { NoteDetail } from "./NoteDetail";
-
-import { RelationContext } from "./DataContext";
-
-function isInHeader(el: HTMLElement): boolean {
-  return el.closest(".header") !== null;
-}
-
-function getInHeader(result: RenderResult, text: string): HTMLElement {
-  const el = result.getByText(text);
-  expect(isInHeader(el)).toBeTruthy();
-  return el;
-}
-
-function getInBody(result: RenderResult, text: string): HTMLElement {
-  const el = result.getByText(text);
-  expect(isInHeader(el)).toBeFalsy();
-  return el;
-}
-
-function getBadge(result: RenderResult, text: string): HTMLElement {
-  const el = result.getByText(text);
-  expect(el.classList.contains("badge-pill")).toBeTruthy();
-  return el;
-}
+import {
+  getInHeader,
+  getInBody,
+  getBadge,
+  renderNoteDetail
+} from "./utils.test";
 
 test("Display what's relevant for a Topic", () => {
   const flyingCars = newNode("Flying Cars", "TOPIC");
@@ -52,20 +29,10 @@ test("Display what's relevant for a Topic", () => {
     .connectRelevant(quote.id, flyingCars.id)
     .connectContains(readingList.id, flyingCars.id);
 
-  const renderResult = render(
-    <MemoryRouter initialEntries={[`/notes/${flyingCars.id}/`]}>
-      <RelationContext.Provider
-        value={{
-          addBucket: jest.fn(),
-          nodes: context.nodes
-        }}
-      >
-        <Route path="/notes/:id">
-          <NoteDetail />
-        </Route>
-      </RelationContext.Provider>
-    </MemoryRouter>
-  );
+  const renderResult = renderNoteDetail({
+    nodes: context.nodes,
+    id: flyingCars.id
+  });
   getInHeader(renderResult, "Flying Cars");
   getInBody(renderResult, "Checkout Aerocars near you");
   getInBody(renderResult, "Aerocar");

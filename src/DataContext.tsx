@@ -28,7 +28,7 @@ function useNodes(): Nodes {
 function getNode(nodes: Nodes, id: string): KnowNode {
   const node = nodes.get(id);
   if (!node) {
-    throw new Error("Node not found");
+    throw new Error(`Node ${id} not found`);
   }
   return node;
 }
@@ -46,7 +46,8 @@ function getObjects(
         : filterRelations.includes(r.relationType)
     )
     .map(relation => getNode(nodes, relation.b))
-    .filter(n => (filter === undefined ? true : filter.includes(n.nodeType)));
+    .filter(n => (filter === undefined ? true : filter.includes(n.nodeType)))
+    .toArray();
 }
 
 function getSubjects(
@@ -62,7 +63,8 @@ function getSubjects(
         : filterRelations.includes(r.relationType)
     )
     .map(relation => getNode(nodes, relation.a))
-    .filter(n => (filter === undefined ? true : filter.includes(n.nodeType)));
+    .filter(n => (filter === undefined ? true : filter.includes(n.nodeType)))
+    .toArray();
 }
 
 function getAllNodesByType(nodes: Nodes, nodeType: NodeType): Array<KnowNode> {
