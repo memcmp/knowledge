@@ -338,6 +338,7 @@ function SortableSection({
                             ref={providedDraggable.innerRef}
                             {...providedDraggable.draggableProps}
                             {...providedDraggable.dragHandleProps}
+                            style={providedDraggable.draggableProps.style}
                           >
                             <SubNode
                               nodeID={childNode}
