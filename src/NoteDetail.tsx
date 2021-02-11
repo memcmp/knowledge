@@ -8,7 +8,10 @@ import "./editor.css";
 import { Link, useParams } from "react-router-dom";
 
 import { Badge, Collapse } from "react-bootstrap";
-import { SortableContainer, SortableElement } from "react-sortable-hoc";
+import {
+  SortableContainer,
+  SortableElement
+} from "react-sortable-hoc-fix-touch";
 import { useAddBucket, useSelectors } from "./DataContext";
 
 import { ReadonlyNode } from "./ReadonlyNode";
