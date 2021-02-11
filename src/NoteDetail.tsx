@@ -320,37 +320,6 @@ function SubNode({
   );
 }
 
-/*
-const SortableNodeList = SortableContainer(
-  ({ children }: { children: React.ReactNode }) => {
-    return <div>{children}</div>;
-  }
-);
-
-const SortableNode = SortableElement(
-  ({
-    nodeID,
-    parentNode,
-    borderBottom
-  }: {
-    nodeID: string;
-    parentNode: KnowNode;
-    borderBottom: boolean;
-  }) => {
-    return (
-      <SubNode
-        nodeID={nodeID}
-        parentNode={parentNode}
-        allowAddTopicBelow={false}
-        showChildren
-        showLink
-        borderBottom={borderBottom}
-      />
-    );
-  }
-);
-   */
-
 type SectionProps = {
   title: string;
   childNodes: Array<string>;
