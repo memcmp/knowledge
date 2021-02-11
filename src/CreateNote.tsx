@@ -22,7 +22,7 @@ import {
 
 const PARAGRAPH = "<p><br></p>";
 
-function isEmpty(text: string): boolean {
+export function isEmpty(text: string): boolean {
   return text === PARAGRAPH || text === "";
 }
 

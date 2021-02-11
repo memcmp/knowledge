@@ -1,7 +1,17 @@
 import React from "react";
 import ReactQuill from "react-quill";
 
-function ReadonlyNode({ node }: { node: KnowNode }): JSX.Element {
+type OnChange = (content: string) => void;
+
+function QuillNode({
+  node,
+  readOnly,
+  onChange
+}: {
+  node: KnowNode;
+  readOnly: boolean;
+  onChange?: OnChange;
+}): JSX.Element {
   return (
     <div
       className={`scrolling-container ${
@@ -17,10 +27,25 @@ function ReadonlyNode({ node }: { node: KnowNode }): JSX.Element {
         formats={["link", "size"]}
         modules={{ toolbar: false }}
         value={node.text}
-        readOnly
+        readOnly={readOnly}
+        onChange={onChange}
       />
     </div>
   );
 }
 
-export { ReadonlyNode };
+function ReadonlyNode({ node }: { node: KnowNode }): JSX.Element {
+  return <QuillNode readOnly node={node} />;
+}
+
+function EditableNode({
+  node,
+  onChange
+}: {
+  node: KnowNode;
+  onChange: OnChange;
+}): JSX.Element {
+  return <QuillNode node={node} readOnly={false} onChange={onChange} />;
+}
+
+export { ReadonlyNode, EditableNode };

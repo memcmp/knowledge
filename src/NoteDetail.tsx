@@ -12,7 +12,7 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
 import { useAddBucket, useSelectors } from "./DataContext";
 
-import { ReadonlyNode } from "./ReadonlyNode";
+import { EditableNode, ReadonlyNode } from "./ReadonlyNode";
 
 import { NoteDetailSuggestions } from "./NoteDetailSuggestion";
 
@@ -56,6 +56,8 @@ function SubNode({
   const [showEdit, setShowEdit] = useState<NodeType | undefined>();
   const [comment, setComment] = useState<string>("");
   const [showMenu, setShowMenu] = useState<boolean>(false);
+  const [editing, setEditing] = useState<boolean>(false);
+  const [editingText, setEditingText] = useState<string>("");
   const addBucket = useAddBucket();
   const { getObjects, getSubjects, getNode } = useSelectors();
   const quillRef = useRef<ReactQuill>();
@@ -121,7 +123,7 @@ function SubNode({
         )
     );
 
-  const expandSubNodes = showChildren && showMenu;
+  const expandSubNodes = showChildren && (showMenu || editing);
   const parentNodes = [
     ...getObjects(node, undefined, ["RELEVANT"]),
     ...getSubjects(node, ["VIEW"], ["CONTAINS"])
@@ -157,7 +159,7 @@ function SubNode({
             </Link>
           ))}
         </div>
-        <Collapse in={showMenu} mountOnEnter>
+        <Collapse in={showMenu || editing} mountOnEnter>
           <div>
             <NoteDetailSuggestions
               parentNode={parentNode}
@@ -171,37 +173,96 @@ function SubNode({
         </Collapse>
         <div key={node.id}>
           <div
-            onClick={() => setShowMenu(!showMenu)}
+            onClick={() => {
+              if (!editing) {
+                setShowMenu(!showMenu);
+              }
+            }}
             style={{ cursor: "pointer" }}
           >
-            <ReadonlyNode node={node} />
+            {!editing && <ReadonlyNode node={node} />}
+            {editing && (
+              <EditableNode
+                node={{
+                  ...node,
+                  text: editingText
+                }}
+                onChange={(text: string) => setEditingText(text)}
+              />
+            )}
           </div>
         </div>
         <Collapse in={showMenu} mountOnEnter>
           <div>
-            <div className="justify-content-center nav">
-              <button
-                className={`header-icon btn btn-empty font-size-toolbar text-semi-muted ${
-                  showEdit === "NOTE" ? "text-primary" : ""
-                }`}
-                type="button"
-                onClick={() =>
-                  setShowEdit(showEdit === "NOTE" ? undefined : "NOTE")
-                }
-              >
-                <i className="simple-icon-speech d-block" />
-              </button>
-              {showLink && (
-                <Link to={`/notes/${node.id}`}>
+            {!editing && (
+              <div className="justify-content-center nav">
+                <button
+                  className={`header-icon btn btn-empty font-size-toolbar text-semi-muted ${
+                    showEdit === "NOTE" ? "text-primary" : ""
+                  }`}
+                  type="button"
+                  onClick={() =>
+                    setShowEdit(showEdit === "NOTE" ? undefined : "NOTE")
+                  }
+                >
+                  <i className="simple-icon-speech d-block" />
+                </button>
+                <button
+                  className={`header-icon btn btn-empty font-size-toolbar text-semi-muted ${
+                    editing ? "text-primary" : ""
+                  }`}
+                  type="button"
+                  onClick={() => {
+                    setEditing(!editing);
+                  }}
+                >
+                  <i className="simple-icon-pencil d-block" />
+                </button>
+                {showLink && (
+                  <Link to={`/notes/${node.id}`}>
+                    <button
+                      type="button"
+                      className="header-icon btn btn-empty font-size-toolbar text-semi-muted"
+                    >
+                      <i className="simple-icon-link d-block" />
+                    </button>
+                  </Link>
+                )}
+              </div>
+            )}
+            {editing && (
+              <div className="justify-content-center nav">
+                <button
+                  className="header-icon btn btn-empty font-size-toolbar text-semi-muted"
+                  type="button"
+                  onClick={() => {
+                    setEditing(false);
+                  }}
+                >
+                  <i className="simple-icon-ban d-block" />
+                </button>
+                {!isEmpty(editingText) && (
                   <button
-                    type="button"
                     className="header-icon btn btn-empty font-size-toolbar text-semi-muted"
+                    type="button"
+                    onClick={() => {
+                      addBucket(
+                        Immutable.Map({
+                          [node.id]: {
+                            ...node,
+                            text: editingText
+                          }
+                        })
+                      );
+                      setEditing(false);
+                      setShowMenu(false);
+                    }}
                   >
-                    <i className="simple-icon-link d-block" />
+                    <i className="simple-icon-check d-block" />
                   </button>
-                </Link>
-              )}
-            </div>
+                )}
+              </div>
+            )}
           </div>
         </Collapse>
 
