@@ -8,10 +8,8 @@ import "./editor.css";
 import { Link, useParams } from "react-router-dom";
 
 import { Badge, Collapse } from "react-bootstrap";
-import {
-  SortableContainer,
-  SortableElement
-} from "react-sortable-hoc-fix-touch";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+
 import { useAddBucket, useSelectors } from "./DataContext";
 
 import { ReadonlyNode } from "./ReadonlyNode";
@@ -261,6 +259,7 @@ function SubNode({
   );
 }
 
+/*
 const SortableNodeList = SortableContainer(
   ({ children }: { children: React.ReactNode }) => {
     return <div>{children}</div>;
@@ -289,6 +288,7 @@ const SortableNode = SortableElement(
     );
   }
 );
+   */
 
 type SectionProps = {
   title: string;
@@ -300,6 +300,8 @@ type SortableSectionProps = SectionProps & {
   onSortEnd: (props: { oldIndex: number; newIndex: number }) => void;
 };
 
+/* eslint-disable react/jsx-props-no-spreading */
+/* eslint-disable @typescript-eslint/unbound-method */
 function SortableSection({
   title,
   onSortEnd,
@@ -312,27 +314,55 @@ function SortableSection({
         <Card>
           <Card.Body>
             <Card.Title>{title}</Card.Title>
-            <SortableNodeList
-              pressDelay={200}
-              onSortEnd={onSortEnd}
-              useWindowAsScrollContainer
+            <DragDropContext
+              onDragEnd={result => {
+                if (result.destination) {
+                  onSortEnd({
+                    oldIndex: result.source.index,
+                    newIndex: result.destination.index
+                  });
+                }
+              }}
             >
-              {childNodes.map((childNode, i) => (
-                <SortableNode
-                  index={i}
-                  key={childNode}
-                  nodeID={childNode}
-                  parentNode={parentNode}
-                  borderBottom={i + 1 < childNodes.length}
-                />
-              ))}
-            </SortableNodeList>
+              <Droppable droppableId="droppable">
+                {provided => (
+                  <div {...provided.droppableProps} ref={provided.innerRef}>
+                    {childNodes.map((childNode, i) => (
+                      <Draggable
+                        key={childNode}
+                        draggableId={childNode}
+                        index={i}
+                      >
+                        {providedDraggable => (
+                          <div
+                            ref={providedDraggable.innerRef}
+                            {...providedDraggable.draggableProps}
+                            {...providedDraggable.dragHandleProps}
+                          >
+                            <SubNode
+                              nodeID={childNode}
+                              parentNode={parentNode}
+                              allowAddTopicBelow={false}
+                              showChildren
+                              showLink
+                              borderBottom={i + 1 < childNodes.length}
+                            />
+                          </div>
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            </DragDropContext>
           </Card.Body>
         </Card>
       </div>
     </div>
   );
 }
+/* eslint-enable react/jsx-props-no-spreading */
 
 function Section({ title, childNodes, parentNode }: SectionProps): JSX.Element {
   return (
