@@ -49,7 +49,7 @@ function SubNode({
   nodeID: string;
   parentNode?: KnowNode;
   allowAddTopicBelow?: boolean;
-  showChildren?: boolean;
+  showChildren: boolean;
   showLink?: boolean;
   borderBottom: boolean;
 }): JSX.Element {
@@ -122,7 +122,6 @@ function SubNode({
             0
         )
     );
-
   const expandSubNodes = showChildren && (showMenu || editing);
   const parentNodes = [
     ...getObjects(node, undefined, ["RELEVANT"]),
@@ -408,6 +407,7 @@ function Section({ title, childNodes, parentNode }: SectionProps): JSX.Element {
                 nodeID={childNode}
                 parentNode={parentNode}
                 borderBottom={i + 1 < childNodes.length}
+                showChildren
               />
             ))}
           </Card.Body>
