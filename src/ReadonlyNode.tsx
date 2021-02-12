@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import ReactQuill from "react-quill";
 
 type OnChange = (content: string) => void;
@@ -6,14 +6,17 @@ type OnChange = (content: string) => void;
 function QuillNode({
   node,
   readOnly,
-  onChange
+  onChange,
+  ariaLabel
 }: {
   node: KnowNode;
   readOnly: boolean;
   onChange?: OnChange;
+  ariaLabel?: string;
 }): JSX.Element {
   return (
     <div
+      aria-label={ariaLabel}
       className={`scrolling-container ${
         ["TOPIC", "TITLE"].includes(node.nodeType) ? "lead" : ""
       }
@@ -45,7 +48,31 @@ function EditableNode({
   node: KnowNode;
   onChange: OnChange;
 }): JSX.Element {
-  return <QuillNode node={node} readOnly={false} onChange={onChange} />;
+  const ref = React.createRef<ReactQuill>();
+  useEffect(() => {
+    (ref.current as ReactQuill).focus();
+  }, []);
+  return (
+    <div
+      aria-label="text-editor"
+      className={`scrolling-container ${
+        ["TOPIC", "TITLE"].includes(node.nodeType) ? "lead" : ""
+      }
+            ${node.nodeType === "TOPIC" ? "text-info" : ""}
+            ${node.nodeType === "NOTE" ? "" : ""}
+            ${node.nodeType === "QUOTE" ? "quote" : ""}
+              `}
+    >
+      <ReactQuill
+        theme="bubble"
+        formats={["link", "size"]}
+        modules={{ toolbar: false }}
+        value={node.text}
+        onChange={onChange}
+        ref={ref}
+      />
+    </div>
+  );
 }
 
 export { ReadonlyNode, EditableNode };
