@@ -5,12 +5,17 @@ import Card from "react-bootstrap/Card";
 import "react-quill/dist/quill.bubble.css";
 import "./editor.css";
 
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useHistory } from "react-router-dom";
 
 import { Badge, Collapse } from "react-bootstrap";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
-import { useAddBucket, useSelectors } from "./DataContext";
+import {
+  useUpsertNodes,
+  useSelectors,
+  useDeleteNodes,
+  useNodes
+} from "./DataContext";
 
 import { EditableNode, ReadonlyNode } from "./ReadonlyNode";
 
@@ -20,7 +25,8 @@ import {
   connectRelevantNodes,
   newNode,
   createContext,
-  moveRelations
+  moveRelations,
+  disconnectNode
 } from "./connections";
 
 import { extractPlainText } from "./Searchbox";
@@ -58,9 +64,12 @@ function SubNode({
   const [showMenu, setShowMenu] = useState<boolean>(false);
   const [editing, setEditing] = useState<boolean>(false);
   const [editingText, setEditingText] = useState<string>("");
-  const addBucket = useAddBucket();
+  const upsertNodes = useUpsertNodes();
+  const deleteNodes = useDeleteNodes();
+  const nodes = useNodes();
   const { getObjects, getSubjects, getNode } = useSelectors();
   const quillRef = useRef<ReactQuill>();
+  const history = useHistory();
 
   const node = getNode(nodeID);
 
@@ -81,21 +90,21 @@ function SubNode({
       .set(node)
       .connectRelevant(node.id, above.id);
     if (parentNode) {
-      addBucket(
+      upsertNodes(
         context.set(parentNode).connectRelevant(parentNode.id, above.id).nodes
       );
     } else {
-      addBucket(context.nodes);
+      upsertNodes(context.nodes);
     }
     closeEditMenu();
   };
 
   const createNoteBelow = (): void => {
     const below = newNode(comment, showEdit || "NOTE");
-    const nodes = Immutable.Map<string, KnowNode>()
+    const affectedNodes = Immutable.Map<string, KnowNode>()
       .set(below.id, below)
       .set(node.id, node);
-    addBucket(connectRelevantNodes(below.id, node.id, nodes));
+    upsertNodes(connectRelevantNodes(below.id, node.id, affectedNodes));
     closeEditMenu();
   };
 
@@ -218,6 +227,35 @@ function SubNode({
                 >
                   <i className="simple-icon-pencil d-block" />
                 </button>
+                <button
+                  className="header-icon btn btn-empty font-size-toolbar text-semi-muted"
+                  aria-label="delete"
+                  type="button"
+                  onClick={() => {
+                    const unreferencedQuotes = getObjects(
+                      node,
+                      ["QUOTE"],
+                      ["CONTAINS"]
+                    )
+                      .filter(
+                        quote =>
+                          quote.relationsToSubjects.size === 1 &&
+                          quote.relationsToObjects.size === 0
+                      )
+                      .map(quote => quote.id);
+                    const toUpdate = disconnectNode(nodes, node.id);
+                    deleteNodes(
+                      Immutable.Set([node.id, ...unreferencedQuotes]),
+                      toUpdate
+                    );
+                    // If the nodes we are watching right now, go back to Timeline
+                    if (parentNode === undefined) {
+                      history.push("/");
+                    }
+                  }}
+                >
+                  <i className="simple-icon-trash d-block" />
+                </button>
                 {showLink && (
                   <Link to={`/notes/${node.id}`}>
                     <button
@@ -247,7 +285,7 @@ function SubNode({
                     type="button"
                     aria-label="save"
                     onClick={() => {
-                      addBucket(
+                      upsertNodes(
                         Immutable.Map({
                           [node.id]: {
                             ...node,
@@ -422,7 +460,7 @@ function Section({ title, childNodes, parentNode }: SectionProps): JSX.Element {
 function NoteDetail(): JSX.Element {
   const { id } = useParams<{ id: string }>();
   const { getNode, getSubjects, getObjects } = useSelectors();
-  const addBucket = useAddBucket();
+  const upsertNodes = useUpsertNodes();
   const node = getNode(id);
   const relevantSubjects = Array.from(
     new Set(
@@ -478,7 +516,7 @@ function NoteDetail(): JSX.Element {
             oldIndex: number;
             newIndex: number;
           }) => {
-            addBucket(
+            upsertNodes(
               Immutable.Map({
                 [node.id]: {
                   ...node,

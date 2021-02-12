@@ -26,5 +26,6 @@ declare global {
   };
 
   // eslint-disable-next-line no-unused-vars
-  type AddRelations = (nodes: Immutable.Map<string, KnowNode>) => void;
+  type UpsertNodes = (nodes: Immutable.Map<string, KnowNode>) => void;
+  type DeleteNodes = (toDelete: Immutable.Set<string>, toUpdate: Nodes) => void;
 }

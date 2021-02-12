@@ -1,6 +1,8 @@
 import { v4 } from "uuid";
 import Immutable from "immutable";
 
+import { getNode } from "./DataContext";
+
 export function connectRelevantNodes(
   subjectID: string,
   objectID: string,
@@ -82,6 +84,27 @@ export function connectContainingNodes(
     relationsToObjects: subjectNode.relationsToObjects.insert(0, relation)
   };
   return nodes.set(objectID, updatedObject).set(subjectID, updatedSubject);
+}
+
+export function disconnectNode(nodes: Nodes, nodeID: string): Nodes {
+  const node = getNode(nodes, nodeID);
+  return node.relationsToObjects
+    .concat(node.relationsToSubjects)
+    .reduce((reducer: Nodes, relation: Relation): Nodes => {
+      const relatingNode =
+        relation.a === nodeID
+          ? getNode(nodes, relation.b)
+          : getNode(nodes, relation.a);
+      return reducer.set(relatingNode.id, {
+        ...relatingNode,
+        relationsToSubjects: relatingNode.relationsToSubjects.filter(
+          rel => rel.a !== nodeID && rel.b !== nodeID
+        ),
+        relationsToObjects: relatingNode.relationsToObjects.filter(
+          rel => rel.a !== nodeID && rel.b !== nodeID
+        )
+      });
+    }, nodes);
 }
 
 export function newNode(text: string, nodeType: NodeType): KnowNode {
