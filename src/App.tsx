@@ -20,11 +20,15 @@ import { useQueries } from "./useQueries";
 
 export const TIMELINE = "TIMELINE";
 
-function Main({ userSession }: { userSession: UserSession }): JSX.Element {
-  const queryClient = useQueryClient();
-  const { userQuery, storageQuery } = useQueries({ userSession });
+type AppProps = {
+  userSession: UserSession;
+  createStackStore: (userSession: UserSession) => Storage;
+};
 
-  const storage = new Storage({ userSession });
+export function Main({ userSession, createStackStore }: AppProps): JSX.Element {
+  const queryClient = useQueryClient();
+  const storage = createStackStore(userSession);
+  const { userQuery, storageQuery } = useQueries({ userSession, storage });
 
   const updateStorageMutation = useMutation(
     (newData: Store) => saveDataStore(storage, newData),
@@ -43,13 +47,12 @@ function Main({ userSession }: { userSession: UserSession }): JSX.Element {
       }
     }
   );
-
   if (
     userQuery.isLoading ||
     storageQuery.isLoading ||
     storageQuery.data === undefined
   ) {
-    return <div className="loading" />;
+    return <div className="loading" role="alert" aria-busy="true" />;
   }
 
   const dataStore = storageQuery.data;
@@ -93,11 +96,11 @@ function Main({ userSession }: { userSession: UserSession }): JSX.Element {
   );
 }
 
-function App({ userSession }: { userSession: UserSession }): JSX.Element {
+function App({ userSession, createStackStore }: AppProps): JSX.Element {
   const queryClient = new QueryClient();
   return (
     <QueryClientProvider client={queryClient}>
-      <Main userSession={userSession} />
+      <Main userSession={userSession} createStackStore={createStackStore} />
     </QueryClientProvider>
   );
 }
