@@ -24,3 +24,14 @@ Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
 Launches the test runner in the interactive watch mode.\
 See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+
+## Problems
+
+### Typescript doesn't compile due to `ESLint` and `prettier` errors.
+
+This can be prevented by adding the following lines to `.env`:
+
+```
+ESLINT_NO_DEV_ERRORS=true
+DISABLE_ESLINT_PLUGIN=true
+```
