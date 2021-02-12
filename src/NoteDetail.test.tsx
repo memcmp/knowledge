@@ -2,14 +2,9 @@ import { fireEvent } from "@testing-library/react";
 import Immutable from "immutable";
 import { newNode, createContext } from "./connections";
 
-import {
-  getInHeader,
-  getInBody,
-  getBadge,
-  renderNoteDetail
-} from "./utils.test";
+import { renderNoteDetail, renderApp } from "./utils.test";
 
-test("Display what's relevant for a Topic", () => {
+test("Display what's relevant for a Topic", async () => {
   const flyingCars = newNode("Flying Cars", "TOPIC");
   const notesOnFlyingCars = newNode("Checkout Aerocars near you", "NOTE");
   const aeroCars = newNode("Aerocar", "TOPIC");
@@ -30,19 +25,23 @@ test("Display what's relevant for a Topic", () => {
     .connectRelevant(quote.id, flyingCars.id)
     .connectContains(readingList.id, flyingCars.id);
 
-  const renderResult = renderNoteDetail({
+  const {
+    getByTextInHeader,
+    getByTextInBody,
+    getBadge
+  } = await renderNoteDetail({
     nodes: context.nodes,
     id: flyingCars.id
   });
-  getInHeader(renderResult, "Flying Cars");
-  getInBody(renderResult, "Checkout Aerocars near you");
-  getInBody(renderResult, "Aerocar");
-  getInBody(renderResult, "Where is my flying car?");
-  getInHeader(renderResult, "Reading List");
-  getBadge(renderResult, "Reading List");
+  getByTextInHeader("Flying Cars");
+  getByTextInBody("Checkout Aerocars near you");
+  getByTextInBody("Aerocar");
+  getByTextInBody("Where is my flying car?");
+  getByTextInHeader("Reading List");
+  getBadge("Reading List");
 });
 
-test("Display Notes relevant for Quote", () => {
+test("Display Notes relevant for Quote", async () => {
   const whereisMyFlyingCar = newNode("Where is my flying car?", "TITLE");
   const quote = newNode("The problematic part of flying is landing", "QUOTE");
   const note = newNode("Is landing that difficult?", "NOTE");
@@ -52,10 +51,10 @@ test("Display Notes relevant for Quote", () => {
     .set(quote)
     .connectContains(whereisMyFlyingCar.id, quote.id)
     .connectRelevant(note.id, quote.id);
-  const renderResult = renderNoteDetail({
+  const { getByTextInBody } = await renderApp({
     nodes: context.nodes,
-    id: whereisMyFlyingCar.id
+    path: `/notes/${whereisMyFlyingCar.id}`
   });
-  fireEvent.click(getInBody(renderResult, quote.text));
-  getInBody(renderResult, note.text);
+  fireEvent.click(getByTextInBody(quote.text));
+  getByTextInBody(note.text);
 });

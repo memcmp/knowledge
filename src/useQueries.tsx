@@ -8,6 +8,7 @@ import { getDataStore } from "./storage";
 
 type UseQueryProps = {
   readonly userSession: UserSession;
+  storage: Storage;
 };
 
 type QueryResult = {
@@ -15,14 +16,17 @@ type QueryResult = {
   storageQuery: UseQueryResult<Store>;
 };
 
-export function useQueries({ userSession }: UseQueryProps): QueryResult {
+export function useQueries({
+  userSession,
+  storage
+}: UseQueryProps): QueryResult {
   const userQuery = useQuery({
     queryKey: "user",
     queryFn: () => signInUser(userSession)
   });
   const storageQuery = useQuery({
     queryKey: "store",
-    queryFn: async () => getDataStore(new Storage({ userSession })),
+    queryFn: async () => getDataStore(storage),
     enabled: userQuery.isSuccess
   });
   return {
