@@ -448,6 +448,7 @@ function Section({ title, childNodes, parentNode }: SectionProps): JSX.Element {
                 parentNode={parentNode}
                 borderBottom={i + 1 < childNodes.length}
                 showChildren
+                showLink
               />
             ))}
           </Card.Body>
