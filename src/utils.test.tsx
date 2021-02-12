@@ -9,9 +9,10 @@ import { UserSession } from "blockstack";
 
 import { UserData } from "blockstack/lib/auth/authApp";
 import { Storage } from "@stacks/storage";
+import userEvent from "@testing-library/user-event";
 import App from "./App";
 
-import { saveDataStore } from "./storage";
+import { saveDataStore, getDataStore } from "./storage";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 test.skip("skip", () => {});
@@ -42,6 +43,8 @@ type RenderAppResult = RenderResult & {
   getByTextInHeader: (text: string) => HTMLElement;
   getByTextInBody: (text: string) => HTMLElement;
   getBadge: (text: string) => HTMLElement;
+  getStoredNodes: () => Promise<Nodes>;
+  typeIntoEditor: (text: string) => void;
 };
 
 export async function renderApp({
@@ -81,7 +84,17 @@ export async function renderApp({
     ...renderResult,
     getByTextInHeader: (text: string) => getInHeader(renderResult, text),
     getByTextInBody: (text: string) => getInBody(renderResult, text),
-    getBadge: (text: string) => getBadge(renderResult, text)
+    getBadge: (text: string) => getBadge(renderResult, text),
+    getStoredNodes: async () => {
+      return (await getDataStore(createStackStore())).nodes;
+    },
+    typeIntoEditor: (text: string) => {
+      userEvent.type(
+        ((renderResult.getByLabelText("text-editor").firstChild as HTMLElement)
+          .firstChild as HTMLElement).firstChild as HTMLElement,
+        text
+      );
+    }
   };
 }
 

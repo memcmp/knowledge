@@ -210,6 +210,7 @@ function SubNode({
                   className={`header-icon btn btn-empty font-size-toolbar text-semi-muted ${
                     editing ? "text-primary" : ""
                   }`}
+                  aria-label="edit"
                   type="button"
                   onClick={() => {
                     setEditing(!editing);
@@ -244,6 +245,7 @@ function SubNode({
                   <button
                     className="header-icon btn btn-empty font-size-toolbar text-semi-muted"
                     type="button"
+                    aria-label="save"
                     onClick={() => {
                       addBucket(
                         Immutable.Map({
