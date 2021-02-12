@@ -11,7 +11,7 @@ import {
   useQueryClient
 } from "react-query";
 import { Timeline } from "./Timeline";
-import { NoteDetail } from "./NoteDetail";
+import { NodeView } from "./NodeView";
 import { RelationContext } from "./DataContext";
 
 import { saveDataStore } from "./storage";
@@ -89,7 +89,7 @@ export function Main({ userSession, createStackStore }: AppProps): JSX.Element {
                     />
                   </Route>
                   <Route path="/notes/:id">
-                    <NoteDetail />
+                    <NodeView />
                   </Route>
                 </Switch>
               </RelationContext.Provider>

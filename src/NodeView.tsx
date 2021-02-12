@@ -458,7 +458,7 @@ function Section({ title, childNodes, parentNode }: SectionProps): JSX.Element {
   );
 }
 
-function NoteDetail(): JSX.Element {
+function NodeView(): JSX.Element {
   const { id } = useParams<{ id: string }>();
   const { getNode, getSubjects, getObjects } = useSelectors();
   const upsertNodes = useUpsertNodes();
@@ -551,4 +551,4 @@ function NoteDetail(): JSX.Element {
   );
 }
 
-export { NoteDetail };
+export { NodeView };
