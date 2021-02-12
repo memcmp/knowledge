@@ -10,7 +10,7 @@ import MarkdownIt from "markdown-it";
 import "react-quill/dist/quill.bubble.css";
 import "./editor.css";
 
-import { useAddBucket, useSelectors } from "./DataContext";
+import { useUpsertNodes, useSelectors } from "./DataContext";
 
 import { INTERESTS, TIMELINE } from "./storage";
 
@@ -87,7 +87,7 @@ function createBucket(
 
 function CreateNote(): JSX.Element {
   const [text, setText] = useState<string>("");
-  const addBuckets = useAddBucket();
+  const upsertNodes = useUpsertNodes();
   const { getNode } = useSelectors();
   const { getRootProps, getInputProps } = useDropzone({
     accept: ".md",
@@ -128,7 +128,7 @@ function CreateNote(): JSX.Element {
         },
         Immutable.Map<string, KnowNode>().set("TIMELINE", getNode("TIMELINE"))
       );
-      addBuckets(mdNodes);
+      upsertNodes(mdNodes);
     }
   });
   const onChange = (content: string): void => {
@@ -141,7 +141,7 @@ function CreateNote(): JSX.Element {
     const nodes = Immutable.Map<string, KnowNode>()
       .set(timeline.id, timeline)
       .set(note.id, note);
-    addBuckets(connectContainingNodes(timeline.id, note.id, nodes));
+    upsertNodes(connectContainingNodes(timeline.id, note.id, nodes));
     setText("");
   };
 
@@ -151,7 +151,7 @@ function CreateNote(): JSX.Element {
     const nodes = Immutable.Map<string, KnowNode>()
       .set(interests.id, interests)
       .set(topic.id, topic);
-    addBuckets(connectRelevantNodes(topic.id, interests.id, nodes));
+    upsertNodes(connectRelevantNodes(topic.id, interests.id, nodes));
     setText("");
   };
 

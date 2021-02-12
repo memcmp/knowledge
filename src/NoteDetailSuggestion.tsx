@@ -1,7 +1,7 @@
 import React from "react";
 import { Form, InputGroup } from "react-bootstrap";
 import Immutable from "immutable";
-import { useAddBucket, useSelectors } from "./DataContext";
+import { useUpsertNodes, useSelectors } from "./DataContext";
 import { Suggest } from "./Suggest";
 
 import { connectRelevantNodes } from "./connections";
@@ -17,7 +17,7 @@ function NoteDetailSuggestions({
   allowNodeBelow?: boolean;
   onClose: () => void;
 }): JSX.Element {
-  const addBucket = useAddBucket();
+  const upsertNodes = useUpsertNodes();
   const {
     getAllNodesByType,
     getObjects,
@@ -43,7 +43,7 @@ function NoteDetailSuggestions({
     const connectWithParentIfExists = parentNode
       ? connectRelevantNodes(parentNode.id, insertNode.id, connectWithEachOther)
       : connectWithEachOther;
-    addBucket(connectWithParentIfExists);
+    upsertNodes(connectWithParentIfExists);
     onClose();
   };
 
@@ -56,7 +56,7 @@ function NoteDetailSuggestions({
       [insertNode.id]: insertNode
     }).merge(additionalNodes);
     const connect = connectRelevantNodes(insertNode.id, node.id, nodes);
-    addBucket(connect);
+    upsertNodes(connect);
     onClose();
   };
 

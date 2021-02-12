@@ -57,8 +57,15 @@ export function Main({ userSession, createStackStore }: AppProps): JSX.Element {
 
   const dataStore = storageQuery.data;
 
-  const addBucket = (nodes: Immutable.Map<string, KnowNode>): void => {
+  const upsertNodes = (nodes: Immutable.Map<string, KnowNode>): void => {
     const newStorage = { nodes: dataStore.nodes.merge(nodes) };
+    updateStorageMutation.mutate(newStorage);
+  };
+
+  const deleteNodes = (nodes: Immutable.Set<string>, toUpdate: Nodes): void => {
+    const newStorage = {
+      nodes: dataStore.nodes.merge(toUpdate).removeAll(nodes)
+    };
     updateStorageMutation.mutate(newStorage);
   };
 
@@ -74,7 +81,8 @@ export function Main({ userSession, createStackStore }: AppProps): JSX.Element {
               <RelationContext.Provider
                 value={{
                   nodes: dataStore.nodes,
-                  addBucket
+                  upsertNodes,
+                  deleteNodes
                 }}
               >
                 <Switch>

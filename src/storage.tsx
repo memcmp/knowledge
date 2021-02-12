@@ -17,7 +17,7 @@ export async function saveDataStore(
 
 const EMPTY_RELATIONS = Immutable.List<Relation>();
 
-const DEFAULT_STORE: Store = {
+export const DEFAULT_STORE: Store = {
   nodes: Immutable.Map({
     [TIMELINE]: {
       id: TIMELINE,

@@ -1,20 +1,28 @@
 import React from "react";
 import Immutable from "immutable";
 
-const RelationContext = React.createContext<
-  | {
-      nodes: Immutable.Map<string, KnowNode>;
-      addBucket: AddRelations;
-    }
-  | undefined
->(undefined);
+type Data = {
+  nodes: Immutable.Map<string, KnowNode>;
+  upsertNodes: UpsertNodes;
+  deleteNodes: DeleteNodes;
+};
 
-function useAddBucket(): AddRelations {
+const RelationContext = React.createContext<Data | undefined>(undefined);
+
+function getContextOrThrow(): Data {
   const context = React.useContext(RelationContext);
   if (context === undefined) {
     throw new Error("RelationContext not provided");
   }
-  return context.addBucket;
+  return context;
+}
+
+function useUpsertNodes(): UpsertNodes {
+  return getContextOrThrow().upsertNodes;
+}
+
+function useDeleteNodes(): DeleteNodes {
+  return getContextOrThrow().deleteNodes;
 }
 
 function useNodes(): Nodes {
@@ -114,4 +122,11 @@ function useSelectors(): {
   };
 }
 
-export { useNodes, useAddBucket, RelationContext, useSelectors, getNode };
+export {
+  useNodes,
+  useUpsertNodes,
+  RelationContext,
+  useSelectors,
+  getNode,
+  useDeleteNodes
+};
