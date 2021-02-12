@@ -1,3 +1,4 @@
+import { fireEvent } from "@testing-library/react";
 import Immutable from "immutable";
 import { newNode, createContext } from "./connections";
 
@@ -39,4 +40,22 @@ test("Display what's relevant for a Topic", () => {
   getInBody(renderResult, "Where is my flying car?");
   getInHeader(renderResult, "Reading List");
   getBadge(renderResult, "Reading List");
+});
+
+test("Display Notes relevant for Quote", () => {
+  const whereisMyFlyingCar = newNode("Where is my flying car?", "TITLE");
+  const quote = newNode("The problematic part of flying is landing", "QUOTE");
+  const note = newNode("Is landing that difficult?", "NOTE");
+  const context = createContext(Immutable.Map())
+    .set(whereisMyFlyingCar)
+    .set(note)
+    .set(quote)
+    .connectContains(whereisMyFlyingCar.id, quote.id)
+    .connectRelevant(note.id, quote.id);
+  const renderResult = renderNoteDetail({
+    nodes: context.nodes,
+    id: whereisMyFlyingCar.id
+  });
+  fireEvent.click(getInBody(renderResult, quote.text));
+  getInBody(renderResult, note.text);
 });
