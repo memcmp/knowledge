@@ -41,9 +41,6 @@ export function Main({ userSession, createStackStore }: AppProps): JSX.Element {
       },
       onError: (err, variables, previousValue) => {
         queryClient.setQueryData("store", previousValue);
-      },
-      onSuccess: async () => {
-        await queryClient.invalidateQueries("store");
       }
     }
   );
