@@ -1,12 +1,10 @@
-import { fireEvent, waitFor } from "@testing-library/react";
+import { fireEvent } from "@testing-library/react";
 import Immutable from "immutable";
 import { newNode, createContext } from "./connections";
 
-import { getNode } from "./DataContext";
-
 import { renderNoteDetail, renderApp } from "./utils.test";
 
-test("Display what's relevant for a Topic", async () => {
+test("View relevant Nodes for a Topic", async () => {
   const flyingCars = newNode("Flying Cars", "TOPIC");
   const notesOnFlyingCars = newNode("Checkout Aerocars near you", "NOTE");
   const aeroCars = newNode("Aerocar", "TOPIC");
@@ -43,7 +41,7 @@ test("Display what's relevant for a Topic", async () => {
   getBadge("Reading List");
 });
 
-test("Display Notes relevant for Quote", async () => {
+test("View relevant Nodes for a Quote", async () => {
   const whereisMyFlyingCar = newNode("Where is my flying car?", "TITLE");
   const quote = newNode("The problematic part of flying is landing", "QUOTE");
   const note = newNode("Is landing that difficult?", "NOTE");
@@ -59,28 +57,4 @@ test("Display Notes relevant for Quote", async () => {
   });
   fireEvent.click(getByTextInBody(quote.text));
   getByTextInBody(note.text);
-});
-
-test("Edit Node", async () => {
-  const note = newNode("Shall I hold Bitcoin?", "NOTE");
-  const context = createContext(Immutable.Map()).set(note);
-  const {
-    getByTextInHeader,
-    getByLabelText,
-    findByLabelText,
-    getStoredNodes,
-    typeIntoEditor
-  } = await renderApp({
-    nodes: context.nodes,
-    path: `/notes/${note.id}`
-  });
-  fireEvent.click(getByTextInHeader(note.text));
-  fireEvent.click(getByLabelText("edit"));
-  typeIntoEditor("Shall I hodl Bitcoin?");
-  fireEvent.click(await findByLabelText("save"));
-  await waitFor(async () => {
-    expect(getNode(await getStoredNodes(), note.id).text).toEqual(
-      "<p>Shall I hodl Bitcoin?</p>"
-    );
-  });
 });
