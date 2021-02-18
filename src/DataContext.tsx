@@ -75,12 +75,16 @@ function getSubjects(
     .toArray();
 }
 
-function getAllNodesByType(nodes: Nodes, nodeType: NodeType): Array<KnowNode> {
-  // TODO: reverse or just use a better algorithm to find nodes for the context
-  return Array.from(nodes.filter(node => node.nodeType === nodeType).values());
+function getAllNodesByType(
+  nodes: Nodes,
+  nodeTypes: Array<NodeType>
+): Array<KnowNode> {
+  return Array.from(
+    nodes.filter(node => nodeTypes.includes(node.nodeType)).values()
+  );
 }
 
-function useSelectors(): {
+export type Selectors = {
   getNode: (id: string) => KnowNode;
   getObjects: (
     node: KnowNode,
@@ -92,34 +96,40 @@ function useSelectors(): {
     filter?: Array<NodeType>,
     filterRelations?: Array<RelationType>
   ) => Array<KnowNode>;
-  getAllNodesByType: (nodeType: NodeType) => Array<KnowNode>;
-} {
-  const context = React.useContext(RelationContext);
-  if (context === undefined) {
-    throw new Error("RelationContext not provided");
-  }
+  getAllNodesByType: (nodeTypes: Array<NodeType>) => Array<KnowNode>;
+};
+
+function createSelectors(nodes: Nodes): Selectors {
   return {
     getNode: (id: string): KnowNode => {
-      return getNode(context.nodes, id);
+      return getNode(nodes, id);
     },
     getObjects: (
       node: KnowNode,
       filter?: Array<NodeType>,
       filterRelations?: Array<RelationType>
     ): Array<KnowNode> => {
-      return getObjects(context.nodes, node, filter, filterRelations);
+      return getObjects(nodes, node, filter, filterRelations);
     },
     getSubjects: (
       node: KnowNode,
       filter?: Array<NodeType>,
       filterRelations?: Array<RelationType>
     ): Array<KnowNode> => {
-      return getSubjects(context.nodes, node, filter, filterRelations);
+      return getSubjects(nodes, node, filter, filterRelations);
     },
-    getAllNodesByType: (nodeType: NodeType): Array<KnowNode> => {
-      return getAllNodesByType(context.nodes, nodeType);
+    getAllNodesByType: (nodeTypes: Array<NodeType>): Array<KnowNode> => {
+      return getAllNodesByType(nodes, nodeTypes);
     }
   };
+}
+
+function useSelectors(): Selectors {
+  const context = React.useContext(RelationContext);
+  if (context === undefined) {
+    throw new Error("RelationContext not provided");
+  }
+  return createSelectors(context.nodes);
 }
 
 export {
@@ -128,5 +138,6 @@ export {
   RelationContext,
   useSelectors,
   getNode,
-  useDeleteNodes
+  useDeleteNodes,
+  createSelectors
 };

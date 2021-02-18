@@ -1,10 +1,54 @@
 import React from "react";
 import { Form, InputGroup } from "react-bootstrap";
 import Immutable from "immutable";
-import { useUpsertNodes, useSelectors } from "./DataContext";
+import { useUpsertNodes, useSelectors, Selectors } from "./DataContext";
 import { Suggest } from "./Suggest";
 
 import { connectRelevantNodes } from "./connections";
+
+// memoize
+export function getSuggestions(
+  selectors: Selectors,
+  forNode: KnowNode,
+  parentNode?: KnowNode
+): Array<KnowNode> {
+  const { getObjects, getSubjects, getAllNodesByType, getNode } = {
+    ...selectors
+  };
+  const findSuggestions = (node: KnowNode, levels: number): Array<string> => {
+    if (levels === 0) {
+      return [];
+    }
+    const objects = [
+      ...getObjects(node, ["TOPIC"]),
+      ...getSubjects(node, ["TOPIC", "NOTE"])
+    ];
+    return [
+      ...objects.map(obj => obj.id),
+      ...objects
+        .map((obj: KnowNode) => {
+          return findSuggestions(obj, levels - 1);
+        })
+        .flat()
+    ];
+  };
+
+  const closeSuggestions = findSuggestions(parentNode || forNode, 3);
+  const otherSuggestions = getAllNodesByType(["TOPIC"]).map(topic => topic.id);
+  const existingSuggestions = getObjects(forNode, ["TOPIC"]).map(
+    topic => topic.id
+  );
+  return Array.from(
+    new Set([
+      ...closeSuggestions,
+      ...otherSuggestions,
+      // This can be done more efficient
+      ...getAllNodesByType(["TITLE", "NOTE", "VIEW"]).map(note => note.id)
+    ])
+  )
+    .filter(id => !existingSuggestions.includes(id) && id !== forNode.id)
+    .map(id => getNode(id));
+}
 
 function NoteDetailSuggestions({
   node,
@@ -18,12 +62,7 @@ function NoteDetailSuggestions({
   onClose: () => void;
 }): JSX.Element {
   const upsertNodes = useUpsertNodes();
-  const {
-    getAllNodesByType,
-    getObjects,
-    getSubjects,
-    getNode
-  } = useSelectors();
+  const selectors = useSelectors();
 
   const insertNodeAbove = (
     insertNode: KnowNode,
@@ -60,47 +99,8 @@ function NoteDetailSuggestions({
     onClose();
   };
 
-  // memoize!
-  // TODO: reference counting for better score
-  // TODO: check why I don't find notes of other topics
-  const findSuggestions = (
-    forNode: KnowNode,
-    levels: number
-  ): Array<string> => {
-    if (levels === 0) {
-      return [];
-    }
-    const objects = [
-      ...getObjects(forNode, ["TOPIC"]),
-      ...getSubjects(forNode, ["TOPIC", "NOTE"])
-    ];
-    return [
-      ...objects.map(obj => obj.id),
-      ...objects
-        .map((obj: KnowNode) => {
-          return findSuggestions(obj, levels - 1);
-        })
-        .flat()
-    ];
-  };
-
-  // TODO: Don't show suggestions with existing connections
-  const closeSuggestions = findSuggestions(parentNode || node, 3);
-  const otherSuggestions = getAllNodesByType("TOPIC").map(topic => topic.id);
-  const existingSuggestions = getObjects(node, ["TOPIC"]).map(
-    topic => topic.id
-  );
-  const suggestions = Array.from(
-    new Set([
-      ...closeSuggestions,
-      ...otherSuggestions,
-      // This can be done more efficient
-      ...getAllNodesByType("TITLE").map(note => note.id),
-      ...getAllNodesByType("NOTE").map(note => note.id)
-    ])
-  )
-    .filter(id => !existingSuggestions.includes(id) && id !== node.id)
-    .map(id => getNode(id));
+  // TODO: Memoize ?
+  const suggestions = getSuggestions(selectors, node, parentNode);
 
   return (
     <div>

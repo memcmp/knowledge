@@ -96,7 +96,7 @@ function NewTopicModal({
     );
   };
 
-  const allTopics = [getNode(INTERESTS), ...getAllNodesByType("TOPIC")];
+  const allTopics = [getNode(INTERESTS), ...getAllNodesByType(["TOPIC"])];
   const enableSubmit =
     topNode !== undefined &&
     newTopics.filter(newTopic => newTopic === undefined).size === 0;
