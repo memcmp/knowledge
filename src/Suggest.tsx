@@ -76,7 +76,6 @@ function Suggest({
         onCreateNode={(node: string) =>
           setSelection({ value: node, createNew: true })
         }
-        onClear={() => setSelection(undefined)}
       />
       <InputGroup.Append>
         <Button

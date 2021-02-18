@@ -30,7 +30,7 @@ export type SearchboxProps = {
   suggestions: Array<KnowNode | CustomOption>;
   onSelectNode: (node: KnowNode) => void;
   onCreateNode: (text: string) => void;
-  onClear: () => void;
+  onClear?: () => void;
 };
 
 function isCustomOption(option: CustomOption | KnowNode): boolean {
@@ -57,7 +57,9 @@ function Searchbox({
     newSelection: Array<KnowNodeWithPlainText | CustomOption>
   ): void => {
     if (newSelection.length === 0) {
-      onClear();
+      if (onClear) {
+        onClear();
+      }
       return;
     }
     const selectedNode = newSelection[0];
