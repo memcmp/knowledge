@@ -184,6 +184,7 @@ function SubNode({
             onClick={() => {
               if (!editing) {
                 setShowMenu(!showMenu);
+                setEditingText(node.text);
               }
             }}
             style={{ cursor: "pointer" }}
