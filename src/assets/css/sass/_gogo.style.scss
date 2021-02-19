@@ -64,10 +64,10 @@ $sub-menu-width-lg: 230px;
 $sub-menu-width-md: 230px;
 $sub-menu-width-xs: 230px;
 
-$navbar-height: 64px; // 100
+$navbar-height: 52px; // 100
 $navbar-height-xs: 52px; // 70
-$navbar-height-md: 64px; // 80
-$navbar-height-lg: 64px; // 80
+$navbar-height-md: 52px; // 80
+$navbar-height-lg: 52px; // 80
 
 $sub-header-height: 116px;
 $sub-header-height-xs: 95px;
@@ -103,6 +103,22 @@ $error-color: #c43d4b;
 .dashboard-wrapper {
   @include respond-below(sm) {
     overflow-x: hidden;
+  }
+}
+
+.graph {
+  top: $navbar-height;
+
+  @include respond-below(xl) {
+    top: $navbar-height-lg;
+  }
+
+  @include respond-below(lg) {
+    top: $navbar-height-md;
+  }
+
+  @include respond-below(sm) {
+    top: $navbar-height-xs;
   }
 }
 
