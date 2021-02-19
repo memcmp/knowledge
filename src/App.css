@@ -105,3 +105,9 @@
 .rbt-aux .rbt-close {
   pointer-events: auto;
 }
+
+.graph {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}

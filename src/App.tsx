@@ -18,12 +18,35 @@ import { saveDataStore } from "./storage";
 
 import { useQueries } from "./useQueries";
 
+import { GraphView } from "./GraphView";
+
 export const TIMELINE = "TIMELINE";
 
 type AppProps = {
   userSession: UserSession;
   createStackStore: (userSession: UserSession) => Storage;
 };
+
+function ViewContainer({
+  children
+}: {
+  children: React.ReactNode;
+}): JSX.Element {
+  return (
+    <div className="h-100">
+      <div
+        id="app-container"
+        className="menu-default menu-sub-hidden main-hidden sub-hidden"
+      >
+        <main>
+          <div className="container-fluid">
+            <div className="dashboard-wrapper">{children}</div>
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+}
 
 export function Main({ userSession, createStackStore }: AppProps): JSX.Element {
   const queryClient = useQueryClient();
@@ -67,37 +90,29 @@ export function Main({ userSession, createStackStore }: AppProps): JSX.Element {
   };
 
   return (
-    <div className="h-100">
-      <div
-        id="app-container"
-        className="menu-default menu-sub-hidden main-hidden sub-hidden"
-      >
-        <main>
-          <div className="container-fluid">
-            <div className="dashboard-wrapper">
-              <RelationContext.Provider
-                value={{
-                  nodes: dataStore.nodes,
-                  upsertNodes,
-                  deleteNodes
-                }}
-              >
-                <Switch>
-                  <Route exact path="/">
-                    <Timeline
-                      view={dataStore.nodes.get(TIMELINE) as KnowNode}
-                    />
-                  </Route>
-                  <Route path="/notes/:id">
-                    <NodeView />
-                  </Route>
-                </Switch>
-              </RelationContext.Provider>
-            </div>
-          </div>
-        </main>
-      </div>
-    </div>
+    <RelationContext.Provider
+      value={{
+        nodes: dataStore.nodes,
+        upsertNodes,
+        deleteNodes
+      }}
+    >
+      <Switch>
+        <Route exact path="/">
+          <ViewContainer>
+            <Timeline view={dataStore.nodes.get(TIMELINE) as KnowNode} />
+          </ViewContainer>
+        </Route>
+        <Route path="/notes/:id">
+          <ViewContainer>
+            <NodeView />
+          </ViewContainer>
+        </Route>
+        <Route path="/graph">
+          <GraphView />
+        </Route>
+      </Switch>
+    </RelationContext.Provider>
   );
 }
 
