@@ -61,6 +61,8 @@ function GraphView(): JSX.Element {
                 "background-color": "#555",
                 "text-outline-color": "#555",
                 "text-outline-width": "2px",
+                "text-wrap": "wrap",
+                "text-max-width": "120",
                 color: "#fff",
                 width: "50",
                 height: "50"
