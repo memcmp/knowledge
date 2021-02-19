@@ -1,8 +1,16 @@
 import React, { useState } from "react";
 import cytoscape, { Ext, LayoutOptions, Collection } from "cytoscape";
 import cola from "cytoscape-cola";
-import { useSelectors } from "./DataContext";
+import Immutable from "immutable";
+import { useDeleteNodes, useNodes, useSelectors } from "./DataContext";
 import { extractPlainText } from "./Searchbox";
+
+import {
+  removeRelationToObject,
+  removeRelationToSubject,
+  DeleteNodesContext,
+  planNodeDeletion
+} from "./connections";
 
 const NODE_TYPES: Array<NodeType> = ["TOPIC", "VIEW", "TITLE", "URL"];
 
@@ -11,11 +19,46 @@ function GraphView(): JSX.Element {
   const graph = React.useRef<cytoscape.Core>();
   const layout = React.useRef<cytoscape.Layouts>();
   const { getAllNodesByType, getNode } = useSelectors();
+  const allNodes = useNodes();
+  const deleteNodes = useDeleteNodes();
   const [selection, setSelection] = useState<Collection>();
 
-  const deleteSelection = () => {
+  const deleteSelection = (): void => {
     if (selection) {
-      selection.map(ele => console.log(ele.json()));
+      const nodesWithEdgesRemoved = selection
+        .edges()
+        .reduce((rdx: Nodes, edge): Nodes => {
+          const relationType = edge.data("relationType") as RelationType;
+          const sourceID = edge.data("source") as string;
+          const targetID = edge.data("target") as string;
+          const source = rdx.get(sourceID, getNode(sourceID));
+          const target = rdx.get(targetID, getNode(targetID));
+          return rdx
+            .set(
+              sourceID,
+              removeRelationToObject(source, targetID, relationType)
+            )
+            .set(
+              targetID,
+              removeRelationToSubject(target, sourceID, relationType)
+            );
+        }, Immutable.Map<string, KnowNode>());
+
+      const finalCTX = selection.nodes().reduce(
+        (rdx: DeleteNodesContext, toDelete): DeleteNodesContext => {
+          const nodeID = toDelete.data("id") as string;
+          const node = rdx.toUpdate.get(nodeID, getNode(nodeID));
+          const deleteCTX = planNodeDeletion(allNodes, node);
+          return {
+            toRemove: rdx.toRemove.merge(deleteCTX.toRemove),
+            toUpdate: rdx.toUpdate.merge(deleteCTX.toUpdate)
+          };
+        },
+        { toRemove: Immutable.Set<string>(), toUpdate: nodesWithEdgesRemoved }
+      );
+
+      deleteNodes(finalCTX.toRemove, finalCTX.toUpdate);
+      selection.map(ele => ele.remove());
     }
   };
 
@@ -29,7 +72,8 @@ function GraphView(): JSX.Element {
             data: {
               id: rel.a + rel.b,
               source: rel.a,
-              target: rel.b
+              target: rel.b,
+              relationType: rel.relationType
             }
           };
         })
@@ -73,12 +117,12 @@ function GraphView(): JSX.Element {
                 color: "#fff",
                 width: "70",
                 height: "70",
-                "font-weight": "bold",
+                "font-weight": "bold"
               }
             },
             {
-              "selector": "node:selected",
-              "style": {
+              selector: "node:selected",
+              style: {
                 "border-width": "6px",
                 "border-color": "#AAD8FF",
                 "border-opacity": 0.5,
@@ -91,9 +135,7 @@ function GraphView(): JSX.Element {
               style: {
                 "curve-style": "bezier",
                 "target-arrow-shape": "triangle",
-                'line-color': '#A9A9F5',
-                'target-arrow-color': '#29088A',
-                "opacity": 0.333,
+                opacity: 0.333
               }
             }
           ],
@@ -102,7 +144,7 @@ function GraphView(): JSX.Element {
           wheelSensitivity: 0.2,
           container: container.current
         });
-        graph.current.on("select unselect", event => {
+        graph.current.on("select unselect", () => {
           if (graph.current) {
             setSelection(graph.current.$(":selected"));
           }

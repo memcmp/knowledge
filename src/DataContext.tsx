@@ -41,7 +41,7 @@ function getNode(nodes: Nodes, id: string): KnowNode {
   return node;
 }
 
-function getObjects(
+export function getObjects(
   nodes: Nodes,
   node: KnowNode,
   filter?: Array<NodeType>,

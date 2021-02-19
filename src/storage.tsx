@@ -3,7 +3,7 @@ import Immutable from "immutable";
 
 export const TIMELINE = "TIMELINE";
 export const INTERESTS = "INTERESTS";
-export const STORAGE_FILE = "knowledge_v3.json";
+export const STORAGE_FILE = "knowledge_v2.json";
 
 export async function saveDataStore(
   storage: Storage,
