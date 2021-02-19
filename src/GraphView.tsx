@@ -1,15 +1,29 @@
 import React, { useState } from "react";
-import cytoscape, { Ext, LayoutOptions, Collection } from "cytoscape";
+import cytoscape, {
+  Ext,
+  LayoutOptions,
+  Collection,
+  EdgeSingular,
+  EventObject,
+  EventHandler
+} from "cytoscape";
 import cola from "cytoscape-cola";
 import Immutable from "immutable";
-import { useDeleteNodes, useNodes, useSelectors } from "./DataContext";
+import edgehandles from "cytoscape-edgehandles";
+import {
+  useDeleteNodes,
+  useNodes,
+  useSelectors,
+  useUpsertNodes
+} from "./DataContext";
 import { extractPlainText } from "./Searchbox";
 
 import {
   removeRelationToObject,
   removeRelationToSubject,
   DeleteNodesContext,
-  planNodeDeletion
+  planNodeDeletion,
+  connectRelevantNodes
 } from "./connections";
 
 const NODE_TYPES: Array<NodeType> = ["TOPIC", "VIEW", "TITLE", "URL"];
@@ -21,7 +35,24 @@ function GraphView(): JSX.Element {
   const { getAllNodesByType, getNode } = useSelectors();
   const allNodes = useNodes();
   const deleteNodes = useDeleteNodes();
+  const upsertNodes = useUpsertNodes();
   const [selection, setSelection] = useState<Collection>();
+
+  const onEHComplete: EventHandler = (
+    ev: EventObject,
+    ...extraParams: EdgeSingular[]
+  ): void => {
+    if (extraParams) {
+      const [source, target] = [...extraParams];
+      upsertNodes(
+        connectRelevantNodes(
+          source.data("id") as string,
+          target.data("id") as string,
+          allNodes
+        )
+      );
+    }
+  };
 
   const deleteSelection = (): void => {
     if (selection) {
@@ -100,6 +131,7 @@ function GraphView(): JSX.Element {
     try {
       if (!graph.current) {
         cytoscape.use((cola as unknown) as Ext);
+        cytoscape.use((edgehandles as unknown) as Ext);
         graph.current = cytoscape({
           style: [
             {
@@ -137,6 +169,58 @@ function GraphView(): JSX.Element {
                 "target-arrow-shape": "triangle",
                 opacity: 0.333
               }
+            },
+            {
+              selector: ".eh-handle",
+              style: {
+                "background-color": "red",
+                width: 12,
+                height: 12,
+                shape: "ellipse",
+                "overlay-opacity": 0,
+                "border-width": 12, // makes the handle easier to hit
+                "border-opacity": 0
+              }
+            },
+
+            {
+              selector: ".eh-hover",
+              style: {
+                "background-color": "red"
+              }
+            },
+
+            {
+              selector: ".eh-source",
+              style: {
+                "border-width": 2,
+                "border-color": "red"
+              }
+            },
+
+            {
+              selector: ".eh-target",
+              style: {
+                "border-width": 2,
+                "border-color": "red"
+              }
+            },
+
+            {
+              selector: ".eh-preview, .eh-ghost-edge",
+              style: {
+                "background-color": "red",
+                "line-color": "red",
+                "target-arrow-color": "red",
+                "source-arrow-color": "red"
+              }
+            },
+
+            {
+              selector: ".eh-ghost-edge.eh-preview-active",
+              style: {
+                opacity: 0
+              }
             }
           ],
           elements,
@@ -144,11 +228,14 @@ function GraphView(): JSX.Element {
           wheelSensitivity: 0.2,
           container: container.current
         });
+        graph.current.edgehandles().enable();
+
         graph.current.on("select unselect", () => {
           if (graph.current) {
             setSelection(graph.current.$(":selected"));
           }
         });
+        graph.current.on("ehcomplete", onEHComplete);
         layout.current = graph.current.elements().makeLayout(({
           name: "cola",
           rows: 1,
