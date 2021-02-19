@@ -81,7 +81,7 @@ function GraphView(): JSX.Element {
         });
         layout.current = graph.current.elements().makeLayout(({
           name: "cola",
-          nodeSpacing: 20
+          nodeDimensionsIncludeLabels: true
         } as unknown) as LayoutOptions);
         layout.current.run();
       }
