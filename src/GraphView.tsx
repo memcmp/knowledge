@@ -1,5 +1,5 @@
-import React from "react";
-import cytoscape, { Ext, LayoutOptions } from "cytoscape";
+import React, { useState } from "react";
+import cytoscape, { Ext, LayoutOptions, Collection } from "cytoscape";
 import cola from "cytoscape-cola";
 import { useSelectors } from "./DataContext";
 import { extractPlainText } from "./Searchbox";
@@ -11,6 +11,13 @@ function GraphView(): JSX.Element {
   const graph = React.useRef<cytoscape.Core>();
   const layout = React.useRef<cytoscape.Layouts>();
   const { getAllNodesByType, getNode } = useSelectors();
+  const [selection, setSelection] = useState<Collection>();
+
+  const deleteSelection = () => {
+    if (selection) {
+      selection.map(ele => console.log(ele.json()));
+    }
+  };
 
   const nodes = getAllNodesByType(NODE_TYPES);
   const relations = nodes
@@ -81,6 +88,11 @@ function GraphView(): JSX.Element {
           wheelSensitivity: 0.2,
           container: container.current
         });
+        graph.current.on("select unselect", event => {
+          if (graph.current) {
+            setSelection(graph.current.$(":selected"));
+          }
+        });
         layout.current = graph.current.elements().makeLayout(({
           name: "cola",
           nodeDimensionsIncludeLabels: true
@@ -93,7 +105,27 @@ function GraphView(): JSX.Element {
     }
   }, []);
 
-  return <div className="graph" ref={container} />;
+  return (
+    <>
+      <nav className="navbar fixed-top">
+        <div className="navbar-left d-flex ml-3">
+          <a className="header-icon btn btn-empty d-sm-inline-block" href="/">
+            <i className="simple-icon-home d-block" />
+          </a>
+
+          <button
+            className="header-icon btn btn-empty"
+            onClick={deleteSelection}
+            aria-label="delete selected elements"
+            type="button"
+          >
+            <i className="simple-icon-trash d-block" />
+          </button>
+        </div>
+      </nav>
+      <div className="graph" ref={container} />
+    </>
+  );
 }
 
 export { GraphView };
