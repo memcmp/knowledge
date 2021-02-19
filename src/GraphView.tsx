@@ -65,21 +65,35 @@ function GraphView(): JSX.Element {
                 "font-size": "10px",
                 "text-valign": "center",
                 "text-halign": "center",
-                "background-color": "#555",
+                "background-color": "#666",
                 "text-outline-color": "#555",
                 "text-outline-width": "2px",
                 "text-wrap": "wrap",
-                "text-max-width": "120",
+                "text-max-width": "50",
                 color: "#fff",
-                width: "50",
-                height: "50"
+                width: "70",
+                height: "70",
+                "font-weight": "bold",
+              }
+            },
+            {
+              "selector": "node:selected",
+              "style": {
+                "border-width": "6px",
+                "border-color": "#AAD8FF",
+                "border-opacity": 0.5,
+                "background-color": "#77828C",
+                "text-outline-color": "#77828C"
               }
             },
             {
               selector: "edge",
               style: {
                 "curve-style": "bezier",
-                "target-arrow-shape": "triangle"
+                "target-arrow-shape": "triangle",
+                'line-color': '#A9A9F5',
+                'target-arrow-color': '#29088A',
+                "opacity": 0.333,
               }
             }
           ],
@@ -95,6 +109,7 @@ function GraphView(): JSX.Element {
         });
         layout.current = graph.current.elements().makeLayout(({
           name: "cola",
+          rows: 1,
           nodeDimensionsIncludeLabels: true
         } as unknown) as LayoutOptions);
         layout.current.run();
