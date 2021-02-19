@@ -164,8 +164,11 @@ function removeRelation(
 ): Relations {
   return relations.filter(
     relation =>
-      !(relation.a === a && relation.b === b,
-      relation.relationType === relationType)
+      !(
+        relation.a === a &&
+        relation.b === b &&
+        relation.relationType === relationType
+      )
   );
 }
 
@@ -174,14 +177,15 @@ export function removeRelationToObject(
   objectID: string,
   relationType: RelationType
 ): KnowNode {
+  const newRelations = removeRelation(
+    node.relationsToObjects,
+    node.id,
+    objectID,
+    relationType
+  );
   return {
     ...node,
-    relationsToObjects: removeRelation(
-      node.relationsToObjects,
-      node.id,
-      objectID,
-      relationType
-    )
+    relationsToObjects: newRelations
   };
 }
 
