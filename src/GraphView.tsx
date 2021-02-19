@@ -87,7 +87,6 @@ function GraphView(): JSX.Element {
         },
         { toRemove: Immutable.Set<string>(), toUpdate: nodesWithEdgesRemoved }
       );
-
       deleteNodes(finalCTX.toRemove, finalCTX.toUpdate);
       selection.map(ele => ele.remove());
     }
