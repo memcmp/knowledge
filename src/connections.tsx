@@ -1,7 +1,7 @@
 import { v4 } from "uuid";
 import Immutable from "immutable";
 
-import { getNode } from "./DataContext";
+import { getNode, getObjects } from "./DataContext";
 
 export function connectRelevantNodes(
   subjectID: string,
@@ -156,6 +156,51 @@ export function createContext(nodes: Nodes): DataManipulatingContext {
   };
 }
 
+function removeRelation(
+  relations: Relations,
+  a: string,
+  b: string,
+  relationType: RelationType
+): Relations {
+  return relations.filter(
+    relation =>
+      !(relation.a === a && relation.b === b,
+      relation.relationType === relationType)
+  );
+}
+
+export function removeRelationToObject(
+  node: KnowNode,
+  objectID: string,
+  relationType: RelationType
+): KnowNode {
+  return {
+    ...node,
+    relationsToObjects: removeRelation(
+      node.relationsToObjects,
+      node.id,
+      objectID,
+      relationType
+    )
+  };
+}
+
+export function removeRelationToSubject(
+  node: KnowNode,
+  subjectID: string,
+  relationType: RelationType
+): KnowNode {
+  return {
+    ...node,
+    relationsToSubjects: removeRelation(
+      node.relationsToSubjects,
+      subjectID,
+      node.id,
+      relationType
+    )
+  };
+}
+
 export function moveRelations(
   displayedRelations: Array<string>,
   relations: Relations,
@@ -168,4 +213,27 @@ export function moveRelations(
   const relation = relations.get(oldIdx) as Relation;
   const newIdx = relations.findIndex(rel => rel.a === moveBeforeSubject);
   return relations.remove(oldIdx).insert(newIdx, relation);
+}
+
+export type DeleteNodesContext = {
+  toUpdate: Nodes;
+  toRemove: Immutable.Set<string>;
+};
+
+export function planNodeDeletion(
+  nodes: Nodes,
+  node: KnowNode
+): DeleteNodesContext {
+  const unreferencedQuotes = getObjects(nodes, node, ["QUOTE"], ["CONTAINS"])
+    .filter(
+      quote =>
+        quote.relationsToSubjects.size === 1 &&
+        quote.relationsToObjects.size === 0
+    )
+    .map(quote => quote.id);
+  const toUpdate = disconnectNode(nodes, node.id);
+  return {
+    toUpdate,
+    toRemove: Immutable.Set([node.id, ...unreferencedQuotes])
+  };
 }

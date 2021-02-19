@@ -26,7 +26,8 @@ import {
   newNode,
   createContext,
   moveRelations,
-  disconnectNode
+  disconnectNode,
+  planNodeDeletion
 } from "./connections";
 
 import { extractPlainText } from "./Searchbox";
@@ -233,22 +234,11 @@ function SubNode({
                   aria-label="delete"
                   type="button"
                   onClick={() => {
-                    const unreferencedQuotes = getObjects(
-                      node,
-                      ["QUOTE"],
-                      ["CONTAINS"]
-                    )
-                      .filter(
-                        quote =>
-                          quote.relationsToSubjects.size === 1 &&
-                          quote.relationsToObjects.size === 0
-                      )
-                      .map(quote => quote.id);
-                    const toUpdate = disconnectNode(nodes, node.id);
-                    deleteNodes(
-                      Immutable.Set([node.id, ...unreferencedQuotes]),
-                      toUpdate
+                    const { toUpdate, toRemove } = planNodeDeletion(
+                      nodes,
+                      node
                     );
+                    deleteNodes(toRemove, toUpdate);
                     // If the nodes we are watching right now, go back to Timeline
                     if (parentNode === undefined) {
                       history.push("/");
