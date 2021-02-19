@@ -1,5 +1,5 @@
 import React from "react";
-import cytoscape, { Ext } from "cytoscape";
+import cytoscape, { Ext, LayoutOptions } from "cytoscape";
 import cola from "cytoscape-cola";
 import { useSelectors } from "./DataContext";
 import { extractPlainText } from "./Searchbox";
@@ -79,9 +79,10 @@ function GraphView(): JSX.Element {
           wheelSensitivity: 0.2,
           container: container.current
         });
-        layout.current = graph.current.elements().makeLayout({
-          name: "cola"
-        });
+        layout.current = graph.current.elements().makeLayout(({
+          name: "cola",
+          nodeSpacing: 20
+        } as unknown) as LayoutOptions);
         layout.current.run();
       }
     } catch (error) {
