@@ -18,6 +18,7 @@ import {
 } from "./DataContext";
 import { extractPlainText } from "./Searchbox";
 
+
 import {
   removeRelationToObject,
   removeRelationToSubject,
@@ -141,9 +142,9 @@ function GraphView(): JSX.Element {
                 "font-size": "10px",
                 "text-valign": "center",
                 "text-halign": "center",
-                "background-color": "#666",
+                "background-color": "#999",
                 "text-outline-color": "#555",
-                "text-outline-width": "2px",
+                "text-outline-width": "0.1px",
                 "text-wrap": "wrap",
                 "text-max-width": "50",
                 color: "#fff",
@@ -158,8 +159,9 @@ function GraphView(): JSX.Element {
                 "border-width": "6px",
                 "border-color": "#AAD8FF",
                 "border-opacity": 0.5,
-                "background-color": "#77828C",
-                "text-outline-color": "#77828C"
+                "background-color": "#145388",
+                "text-outline-color": "#77828C",
+                "text-outline-width": "1px",
               }
             },
             {
@@ -167,13 +169,13 @@ function GraphView(): JSX.Element {
               style: {
                 "curve-style": "bezier",
                 "target-arrow-shape": "triangle",
-                opacity: 0.333
+                opacity: 0.5
               }
             },
             {
               selector: ".eh-handle",
               style: {
-                "background-color": "red",
+                "background-color": "green",
                 width: 12,
                 height: 12,
                 shape: "ellipse",
@@ -182,11 +184,10 @@ function GraphView(): JSX.Element {
                 "border-opacity": 0
               }
             },
-
             {
               selector: ".eh-hover",
               style: {
-                "background-color": "red"
+                "background-color": "#145388"
               }
             },
 
@@ -194,7 +195,7 @@ function GraphView(): JSX.Element {
               selector: ".eh-source",
               style: {
                 "border-width": 2,
-                "border-color": "red"
+                "border-color": "#145388"
               }
             },
 
@@ -202,17 +203,17 @@ function GraphView(): JSX.Element {
               selector: ".eh-target",
               style: {
                 "border-width": 2,
-                "border-color": "red"
+                "border-color": "#145388"
               }
             },
 
             {
               selector: ".eh-preview, .eh-ghost-edge",
               style: {
-                "background-color": "red",
-                "line-color": "red",
-                "target-arrow-color": "red",
-                "source-arrow-color": "red"
+                "background-color": "#145388",
+                "line-color": "green",
+                "target-arrow-color": "green",
+                "source-arrow-color": "green"
               }
             },
 
@@ -251,10 +252,10 @@ function GraphView(): JSX.Element {
 
   return (
     <>
-      <nav className="navbar fixed-top">
+      <nav className="navbar fixed-top bg-primary">
         <div className="navbar-left d-flex ml-3">
           <a className="header-icon btn btn-empty d-sm-inline-block" href="/">
-            <i className="simple-icon-home d-block" />
+            <i className="simple-icon-home d-block btn-outline-success" />
           </a>
 
           <button
@@ -263,7 +264,7 @@ function GraphView(): JSX.Element {
             aria-label="delete selected elements"
             type="button"
           >
-            <i className="simple-icon-trash d-block" />
+            <i className="simple-icon-trash d-block btn-outline-danger" />
           </button>
         </div>
       </nav>
