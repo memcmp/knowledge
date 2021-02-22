@@ -18,7 +18,6 @@ import {
 } from "./DataContext";
 import { extractPlainText } from "./Searchbox";
 
-
 import {
   removeRelationToObject,
   removeRelationToSubject,
@@ -45,13 +44,16 @@ function GraphView(): JSX.Element {
   ): void => {
     if (extraParams) {
       const [source, target] = [...extraParams];
-      upsertNodes(
-        connectRelevantNodes(
-          source.data("id") as string,
-          target.data("id") as string,
-          allNodes
-        )
+      const sourceID = source.data("id") as string;
+      const targetID = target.data("id") as string;
+      const connected = connectRelevantNodes(
+        sourceID,
+        targetID,
+        Immutable.Map<string, KnowNode>()
+          .set(sourceID, getNode(sourceID))
+          .set(targetID, getNode(targetID))
       );
+      upsertNodes(connected);
     }
   };
 
@@ -124,9 +126,20 @@ function GraphView(): JSX.Element {
     ...relations
   ];
 
+  const setHandlers = (g: cytoscape.Core): void => {
+    g.removeListener("select unselect ehcomplete");
+    g.on("select unselect", () => {
+      setSelection(g.$(":selected"));
+    });
+    g.on("ehcomplete", onEHComplete);
+  };
+
   React.useEffect(() => {
     if (!container.current) {
       return;
+    }
+    if (graph.current) {
+      setHandlers(graph.current);
     }
     try {
       if (!graph.current) {
@@ -160,7 +173,7 @@ function GraphView(): JSX.Element {
                 "border-opacity": 0.5,
                 "background-color": "#145388",
                 "text-outline-color": "#77828C",
-                "text-outline-width": "1px",
+                "text-outline-width": "1px"
               }
             },
             {
@@ -229,13 +242,8 @@ function GraphView(): JSX.Element {
           container: container.current
         });
         graph.current.edgehandles().enable();
+        setHandlers(graph.current);
 
-        graph.current.on("select unselect", () => {
-          if (graph.current) {
-            setSelection(graph.current.$(":selected"));
-          }
-        });
-        graph.current.on("ehcomplete", onEHComplete);
         layout.current = graph.current.elements().makeLayout(({
           name: "cola",
           rows: 1,
@@ -247,7 +255,7 @@ function GraphView(): JSX.Element {
       // eslint-disable-next-line no-console
       console.error(error);
     }
-  }, []);
+  });
 
   return (
     <>
