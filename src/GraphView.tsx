@@ -300,7 +300,7 @@ function GraphView(): JSX.Element {
         setHandlers(graph.current);
 
         layout.current = graph.current.elements().makeLayout(({
-          name: "cola",
+          name: "cose",
           rows: 1,
           nodeDimensionsIncludeLabels: true
         } as unknown) as LayoutOptions);
