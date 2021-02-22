@@ -13,6 +13,7 @@ import cytoscape, {
 import cola from "cytoscape-cola";
 import Immutable from "immutable";
 import edgehandles from "cytoscape-edgehandles";
+import { style } from "./graphViewStyle";
 import {
   useDeleteNodes,
   useNodes,
@@ -100,12 +101,13 @@ function GraphView(): JSX.Element {
 
   const highlightSelection = (): void => {
     if (graph.current && selection && selection.nodes().length > 0) {
+      const allElements = graph.current.elements();
+      allElements.edges().removeClass("opaque");
       const centerNode = selection.nodes()[0];
       const hood = centerNode.closedNeighborhood();
       const others = graph.current.elements().not(hood);
       others.edges().addClass("opaque");
       const nodePos = centerNode.position();
-      const allElements = graph.current.elements();
 
       const fw = allElements.floydWarshall(
         ({} as unknown) as SearchFloydWarshallOptions
@@ -190,111 +192,11 @@ function GraphView(): JSX.Element {
         cytoscape.use((cola as unknown) as Ext);
         cytoscape.use((edgehandles as unknown) as Ext);
         graph.current = cytoscape({
-          style: [
-            {
-              selector: "node[text]",
-              style: {
-                content: "data(text)",
-                "font-size": "10px",
-                "text-valign": "center",
-                "text-halign": "center",
-                "background-color": "#999",
-                "text-outline-color": "#555",
-                "text-outline-width": "0.1px",
-                "text-wrap": "wrap",
-                "text-max-width": "50",
-                color: "#fff",
-                width: "70",
-                height: "70",
-                "font-weight": "bold"
-              }
-            },
-            {
-              selector: "node:selected",
-              style: {
-                "border-width": "6px",
-                "border-color": "#AAD8FF",
-                "border-opacity": 0.5,
-                "background-color": "#145388",
-                "text-outline-color": "#77828C",
-                "text-outline-width": "1px"
-              }
-            },
-            {
-              selector: "edge",
-              style: {
-                "curve-style": "bezier",
-                "target-arrow-shape": "triangle",
-                opacity: 0.5
-              }
-            },
-            {
-              selector: ".eh-handle",
-              style: {
-                "background-color": "green",
-                width: 12,
-                height: 12,
-                shape: "ellipse",
-                "overlay-opacity": 0,
-                "border-width": 12, // makes the handle easier to hit
-                "border-opacity": 0
-              }
-            },
-            {
-              selector: ".eh-hover",
-              style: {
-                "background-color": "#145388"
-              }
-            },
-
-            {
-              selector: ".eh-source",
-              style: {
-                "border-width": 2,
-                "border-color": "#145388"
-              }
-            },
-
-            {
-              selector: ".eh-target",
-              style: {
-                "border-width": 2,
-                "border-color": "#145388"
-              }
-            },
-
-            {
-              selector: ".eh-preview, .eh-ghost-edge",
-              style: {
-                "background-color": "#145388",
-                "line-color": "green",
-                "target-arrow-color": "green",
-                "source-arrow-color": "green"
-              }
-            },
-            {
-              selector: ".eh-ghost-edge.eh-preview-active",
-              style: {
-                opacity: 0.1
-              }
-            },
-            {
-              selector: ".hidden",
-              style: {
-                display: "none"
-              }
-            },
-            {
-              selector: ".opaque",
-              style: {
-                opacity: 0.1
-              }
-            }
-          ],
           elements,
           // maxZoom: 1,
           wheelSensitivity: 0.2,
-          container: container.current
+          container: container.current,
+          style
         });
         graph.current.edgehandles().enable();
         setHandlers(graph.current);
