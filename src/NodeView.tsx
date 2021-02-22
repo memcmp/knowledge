@@ -26,7 +26,6 @@ import {
   newNode,
   createContext,
   moveRelations,
-  disconnectNode,
   planNodeDeletion
 } from "./connections";
 
@@ -485,6 +484,16 @@ function NodeView(): JSX.Element {
         <div className="mb-4 col-lg-12 col-xl-6 offset-xl-3">
           <Card>
             <Card.Body className="header">
+              <div className="position-absolute card-top-buttons">
+                <Link to={`/graph/${id}`}>
+                  <button
+                    type="button"
+                    className="btn btn-header-light icon-button"
+                  >
+                    <i className="simple-icon-graph" />
+                  </button>
+                </Link>
+              </div>
               <SubNode
                 nodeID={node.id}
                 allowAddTopicBelow
