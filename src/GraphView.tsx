@@ -6,7 +6,9 @@ import cytoscape, {
   Collection,
   EdgeSingular,
   EventObject,
-  EventHandler
+  EventHandler,
+  NodeSingular,
+  SearchFloydWarshallOptions
 } from "cytoscape";
 import cola from "cytoscape-cola";
 import Immutable from "immutable";
@@ -93,6 +95,47 @@ function GraphView(): JSX.Element {
       );
       deleteNodes(finalCTX.toRemove, finalCTX.toUpdate);
       selection.map(ele => ele.remove());
+    }
+  };
+
+  const highlightSelection = (): void => {
+    if (graph.current && selection && selection.nodes().length > 0) {
+      const centerNode = selection.nodes()[0];
+      const hood = centerNode.closedNeighborhood();
+      const others = graph.current.elements().not(hood);
+      others.edges().addClass("opaque");
+      const nodePos = centerNode.position();
+      const allElements = graph.current.elements();
+
+      const fw = allElements.floydWarshall(
+        ({} as unknown) as SearchFloydWarshallOptions
+      );
+      const distances = Immutable.Map<string, number>(
+        allElements.nodes().map(n => [n.data("id"), fw.distance(centerNode, n)])
+      );
+      const maxDistance = distances.filter(d => d !== Infinity).max() as number;
+      const centricLayout = allElements.layout({
+        name: "concentric",
+        fit: true,
+        animate: true,
+        animationDuration: 500,
+        animationEasing: "ease",
+        avoidOverlap: true,
+        boundingBox: {
+          x1: nodePos.x - 1,
+          x2: nodePos.x + 1,
+          y1: nodePos.y - 1,
+          y2: nodePos.y + 1
+        },
+        concentric: node => {
+          const n = (node as unknown) as NodeSingular;
+          return maxDistance + 1 - distances.get(n.data("id"), maxDistance + 1);
+        },
+        levelWidth: () => {
+          return (maxDistance + 1) / 4;
+        }
+      });
+      centricLayout.run();
     }
   };
 
@@ -229,11 +272,22 @@ function GraphView(): JSX.Element {
                 "source-arrow-color": "green"
               }
             },
-
             {
               selector: ".eh-ghost-edge.eh-preview-active",
               style: {
-                opacity: 0
+                opacity: 0.1
+              }
+            },
+            {
+              selector: ".hidden",
+              style: {
+                display: "none"
+              }
+            },
+            {
+              selector: ".opaque",
+              style: {
+                opacity: 0.1
               }
             }
           ],
@@ -279,6 +333,14 @@ function GraphView(): JSX.Element {
             type="button"
           >
             <i className="simple-icon-trash d-block text-white" />
+          </button>
+          <button
+            className="header-icon btn btn-empty page-link p-2"
+            onClick={highlightSelection}
+            aria-label="delete selected elements"
+            type="button"
+          >
+            <i className="iconsminds-magnifi-glass d-block text-white" />
           </button>
         </div>
       </nav>
