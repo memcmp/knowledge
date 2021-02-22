@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import cytoscape, {
   Ext,
   LayoutOptions,
@@ -30,6 +30,9 @@ import {
   connectRelevantNodes
 } from "./connections";
 
+cytoscape.use((cola as unknown) as Ext);
+cytoscape.use((edgehandles as unknown) as Ext);
+
 const NODE_TYPES: Array<NodeType> = ["TOPIC", "VIEW", "TITLE", "URL"];
 
 function GraphView(): JSX.Element {
@@ -41,6 +44,8 @@ function GraphView(): JSX.Element {
   const deleteNodes = useDeleteNodes();
   const upsertNodes = useUpsertNodes();
   const [selection, setSelection] = useState<Collection>();
+  const [highlightMode, setHighlightMode] = useState<boolean>(false);
+  const { id } = useParams<{ id: string }>();
 
   const onEHComplete: EventHandler = (
     ev: EventObject,
@@ -99,11 +104,11 @@ function GraphView(): JSX.Element {
     }
   };
 
-  const highlightSelection = (): void => {
-    if (graph.current && selection && selection.nodes().length > 0) {
+  const highlight = (sel: Collection): void => {
+    if (graph.current) {
       const allElements = graph.current.elements();
       allElements.edges().removeClass("opaque");
-      const centerNode = selection.nodes()[0];
+      const centerNode = sel.nodes()[0];
       const hood = centerNode.closedNeighborhood();
       const others = graph.current.elements().not(hood);
       others.edges().addClass("opaque");
@@ -138,6 +143,23 @@ function GraphView(): JSX.Element {
         }
       });
       centricLayout.run();
+      setHighlightMode(true);
+    }
+  };
+
+  const toggleHighlightMode = (): void => {
+    if (selection && selection.nodes().length > 0) {
+      highlight(selection);
+    } else if (highlightMode && graph.current) {
+      const allElements = graph.current.elements();
+      allElements.edges().removeClass("opaque");
+      layout.current = graph.current.elements().makeLayout(({
+        name: "cose",
+        nodeDimensionsIncludeLabels: true,
+        animate: false
+      } as unknown) as LayoutOptions);
+      layout.current.run();
+      setHighlightMode(false);
     }
   };
 
@@ -165,7 +187,8 @@ function GraphView(): JSX.Element {
       return {
         data: {
           id: node.id,
-          text: extractPlainText(node)
+          text: extractPlainText(node),
+          nodeType: node.nodeType
         }
       };
     }),
@@ -189,11 +212,8 @@ function GraphView(): JSX.Element {
     }
     try {
       if (!graph.current) {
-        cytoscape.use((cola as unknown) as Ext);
-        cytoscape.use((edgehandles as unknown) as Ext);
         graph.current = cytoscape({
           elements,
-          // maxZoom: 1,
           wheelSensitivity: 0.2,
           container: container.current,
           style
@@ -203,10 +223,14 @@ function GraphView(): JSX.Element {
 
         layout.current = graph.current.elements().makeLayout(({
           name: "cose",
-          rows: 1,
-          nodeDimensionsIncludeLabels: true
+          nodeDimensionsIncludeLabels: true,
+          animate: false
         } as unknown) as LayoutOptions);
         layout.current.run();
+        if (id) {
+          const focusOn = graph.current.$(`[id = "${id}"]`);
+          highlight(focusOn);
+        }
       }
     } catch (error) {
       // eslint-disable-next-line no-console
@@ -236,14 +260,16 @@ function GraphView(): JSX.Element {
           >
             <i className="simple-icon-trash d-block text-white" />
           </button>
-          <button
-            className="header-icon btn btn-empty page-link p-2"
-            onClick={highlightSelection}
-            aria-label="delete selected elements"
-            type="button"
-          >
-            <i className="iconsminds-magnifi-glass d-block text-white" />
-          </button>
+          {((selection && selection.nodes().length > 0) || highlightMode) && (
+            <button
+              className="header-icon btn btn-empty page-link p-2"
+              onClick={toggleHighlightMode}
+              aria-label="delete selected elements"
+              type="button"
+            >
+              <i className="iconsminds-magnifi-glass d-block text-white" />
+            </button>
+          )}
         </div>
       </nav>
       <div className="graph" ref={container} />

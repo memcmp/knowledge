@@ -108,7 +108,10 @@ export function Main({ userSession, createStackStore }: AppProps): JSX.Element {
             <NodeView />
           </ViewContainer>
         </Route>
-        <Route path="/graph">
+        <Route path="/graph/:id">
+          <GraphView />
+        </Route>
+        <Route exact path="/graph">
           <GraphView />
         </Route>
       </Switch>

@@ -1,6 +1,6 @@
-import { CssStyleDeclaration } from "cytoscape";
+import { Stylesheet } from "cytoscape";
 
-export const style: CssStyleDeclaration = [
+export const style: Stylesheet[] = [
   {
     selector: "node[text]",
     style: {
@@ -10,13 +10,19 @@ export const style: CssStyleDeclaration = [
       "text-halign": "center",
       "background-color": "#999",
       "text-outline-color": "#555",
-      "text-outline-width": "0.1px",
+      "text-outline-width": "1px",
       "text-wrap": "wrap",
       "text-max-width": "50",
       color: "#fff",
       width: "70",
       height: "70",
       "font-weight": "bold"
+    }
+  },
+  {
+    selector: 'node[nodeType = "VIEW"]',
+    style: {
+      "background-color": "#17a2b8"
     }
   },
   {
