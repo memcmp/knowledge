@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import cytoscape, {
   Ext,
   LayoutOptions,
@@ -261,17 +262,23 @@ function GraphView(): JSX.Element {
     <>
       <nav className="navbar fixed-top bg-primary">
         <div className="navbar-left d-flex ml-3">
-          <a className="header-icon btn btn-empty d-sm-inline-block" href="/">
-            <i className="simple-icon-home d-block btn-outline-success" />
-          </a>
+          <Link to="/">
+            <button
+              className="header-icon btn btn-empty page-link p-2"
+              aria-label="home"
+              type="button"
+            >
+              <i className="simple-icon-home d-block text-white" />
+            </button>
+          </Link>
 
           <button
-            className="header-icon btn btn-empty"
+            className="header-icon btn btn-empty page-link p-2"
             onClick={deleteSelection}
             aria-label="delete selected elements"
             type="button"
           >
-            <i className="simple-icon-trash d-block btn-outline-danger" />
+            <i className="simple-icon-trash d-block text-white" />
           </button>
         </div>
       </nav>
