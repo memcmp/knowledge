@@ -6,9 +6,7 @@ import cytoscape, {
   Collection,
   EdgeSingular,
   EventObject,
-  EventHandler,
-  NodeSingular,
-  SearchFloydWarshallOptions
+  EventHandler
 } from "cytoscape";
 import cola from "cytoscape-cola";
 import Immutable from "immutable";
@@ -108,41 +106,14 @@ function GraphView(): JSX.Element {
     if (graph.current) {
       const allElements = graph.current.elements();
       allElements.edges().removeClass("opaque");
-      const centerNode = sel.nodes()[0];
-      const hood = centerNode.closedNeighborhood();
-      const others = graph.current.elements().not(hood);
-      others.edges().addClass("opaque");
-      const nodePos = centerNode.position();
-
-      const fw = allElements.floydWarshall(
-        ({} as unknown) as SearchFloydWarshallOptions
-      );
-      const distances = Immutable.Map<string, number>(
-        allElements.nodes().map(n => [n.data("id"), fw.distance(centerNode, n)])
-      );
-      const maxDistance = distances.filter(d => d !== Infinity).max() as number;
-      const centricLayout = allElements.layout({
-        name: "concentric",
-        fit: true,
-        animate: true,
-        animationDuration: 500,
-        animationEasing: "ease",
-        avoidOverlap: true,
-        boundingBox: {
-          x1: nodePos.x - 1,
-          x2: nodePos.x + 1,
-          y1: nodePos.y - 1,
-          y2: nodePos.y + 1
+      const centerNode = sel.nodes();
+      graph.current.animate({
+        center: {
+          eles: centerNode
         },
-        concentric: node => {
-          const n = (node as unknown) as NodeSingular;
-          return maxDistance + 1 - distances.get(n.data("id"), maxDistance + 1);
-        },
-        levelWidth: () => {
-          return (maxDistance + 1) / 4;
-        }
+        zoom: 2,
+        duration: 500
       });
-      centricLayout.run();
       setHighlightMode(true);
     }
   };
@@ -153,12 +124,13 @@ function GraphView(): JSX.Element {
     } else if (highlightMode && graph.current) {
       const allElements = graph.current.elements();
       allElements.edges().removeClass("opaque");
-      layout.current = graph.current.elements().makeLayout(({
-        name: "cose",
-        nodeDimensionsIncludeLabels: true,
-        animate: false
-      } as unknown) as LayoutOptions);
-      layout.current.run();
+      graph.current.animate({
+        zoom: 1,
+        center: {
+          eles: allElements
+        },
+        duration: 500
+      });
       setHighlightMode(false);
     }
   };
@@ -229,6 +201,7 @@ function GraphView(): JSX.Element {
         layout.current.run();
         if (id) {
           const focusOn = graph.current.$(`[id = "${id}"]`);
+          focusOn.select();
           highlight(focusOn);
         }
       }
@@ -267,7 +240,7 @@ function GraphView(): JSX.Element {
               aria-label="delete selected elements"
               type="button"
             >
-              <i className="iconsminds-magnifi-glass d-block text-white" />
+              <i className="simple-icon-target d-block text-white" />
             </button>
           )}
         </div>
