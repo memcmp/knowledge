@@ -20,6 +20,8 @@ import { useQueries } from "./useQueries";
 
 import { GraphView } from "./GraphView";
 
+import { Repair } from "./Repair";
+
 export const TIMELINE = "TIMELINE";
 
 type AppProps = {
@@ -113,6 +115,9 @@ export function Main({ userSession, createStackStore }: AppProps): JSX.Element {
         </Route>
         <Route exact path="/graph">
           <GraphView />
+        </Route>
+        <Route exact path="/repair">
+          <Repair />
         </Route>
       </Switch>
     </RelationContext.Provider>
