@@ -33,6 +33,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "test:debug": "react-scripts --inspect-brk test --runInBand --no-cache",
     "eject": "react-scripts eject",
     "lint": "eslint src --ext .js,.jsx,.ts,.tsx",
     "prettier": "prettier -c \"src/**/*.+(ts|tsx|js|jsx|json|md|)\" \"README.md\" \"scripts/*.js\"",
@@ -59,7 +60,7 @@
   "devDependencies": {
     "@testing-library/jest-dom": "^5.11.9",
     "@testing-library/react": "^11.2.3",
-    "@testing-library/user-event": "^12.6.0",
+    "@testing-library/user-event": "^13.0.7",
     "@types/cytoscape": "^3.14.12",
     "@types/cytoscape-edgehandles": "^3.6.0",
     "@types/jest": "^26.0.20",

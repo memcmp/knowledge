@@ -51,6 +51,7 @@ function EditableNode({
   const ref = React.createRef<ReactQuill>();
   useEffect(() => {
     (ref.current as ReactQuill).focus();
+    (ref.current as ReactQuill).getEditor().setSelection(node.text.length, 0);
   }, []);
   return (
     <div

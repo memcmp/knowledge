@@ -183,8 +183,8 @@ function SubNode({
           <div
             onClick={() => {
               if (!editing) {
-                setShowMenu(!showMenu);
                 setEditingText(node.text);
+                setShowMenu(!showMenu);
               }
             }}
             style={{ cursor: "pointer" }}
@@ -196,7 +196,9 @@ function SubNode({
                   ...node,
                   text: editingText
                 }}
-                onChange={(text: string) => setEditingText(text)}
+                onChange={(text: string) => {
+                  setEditingText(text);
+                }}
               />
             )}
           </div>
