@@ -89,11 +89,12 @@ export async function renderApp({
       return (await getDataStore(createStackStore())).nodes;
     },
     typeIntoEditor: (text: string) => {
-      userEvent.type(
-        ((renderResult.getByLabelText("text-editor").firstChild as HTMLElement)
-          .firstChild as HTMLElement).firstChild as HTMLElement,
-        text
-      );
+      const delSequence = new Array(
+        (((renderResult.getByLabelText("text-editor").firstChild as HTMLElement)
+          .firstChild as HTMLElement)
+          .firstChild as HTMLElement).innerHTML.length
+      ).join("{backspace}");
+      userEvent.keyboard(`${delSequence}${text}`);
     }
   };
 }
