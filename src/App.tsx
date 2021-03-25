@@ -10,11 +10,11 @@ import {
   useMutation,
   useQueryClient
 } from "react-query";
-import { Timeline } from "./Timeline";
+import { WorkspaceView } from "./Workspace";
 import { NodeView } from "./NodeView";
 import { RelationContext } from "./DataContext";
 
-import { saveDataStore } from "./storage";
+import { INTERESTS, saveDataStore } from "./storage";
 
 import { useQueries } from "./useQueries";
 
@@ -80,13 +80,17 @@ export function Main({ userSession, createStackStore }: AppProps): JSX.Element {
   const dataStore = storageQuery.data;
 
   const upsertNodes = (nodes: Immutable.Map<string, KnowNode>): void => {
-    const newStorage = { nodes: dataStore.nodes.merge(nodes) };
+    const newStorage = {
+      nodes: dataStore.nodes.merge(nodes),
+      workspaces: Immutable.List<Workspace>()
+    };
     updateStorageMutation.mutate(newStorage);
   };
 
   const deleteNodes = (nodes: Immutable.Set<string>, toUpdate: Nodes): void => {
     const newStorage = {
-      nodes: dataStore.nodes.merge(toUpdate).removeAll(nodes)
+      nodes: dataStore.nodes.merge(toUpdate).removeAll(nodes),
+      workspaces: Immutable.List<Workspace>()
     };
     updateStorageMutation.mutate(newStorage);
   };
@@ -101,9 +105,18 @@ export function Main({ userSession, createStackStore }: AppProps): JSX.Element {
     >
       <Switch>
         <Route exact path="/">
-          <ViewContainer>
-            <Timeline view={dataStore.nodes.get(TIMELINE) as KnowNode} />
-          </ViewContainer>
+          <WorkspaceView
+            workspace={dataStore.workspaces.get(0, {
+              columns: Immutable.List([
+                {
+                  nodeViews: Immutable.List([
+                    { nodeID: INTERESTS },
+                    { nodeID: TIMELINE }
+                  ])
+                }
+              ])
+            })}
+          />
         </Route>
         <Route path="/notes/:id">
           <ViewContainer>

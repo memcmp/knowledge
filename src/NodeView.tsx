@@ -167,18 +167,6 @@ function SubNode({
             </Link>
           ))}
         </div>
-        <Collapse in={showMenu || editing} mountOnEnter>
-          <div>
-            <NoteDetailSuggestions
-              parentNode={parentNode}
-              node={node}
-              allowNodeBelow={
-                allowAddTopicBelow && ["TOPIC", "NOTE"].includes(node.nodeType)
-              }
-              onClose={closeEditMenu}
-            />
-          </div>
-        </Collapse>
         <div key={node.id}>
           <div
             onClick={() => {
@@ -294,6 +282,14 @@ function SubNode({
                 )}
               </div>
             )}
+            <NoteDetailSuggestions
+              parentNode={parentNode}
+              node={node}
+              allowNodeBelow={
+                allowAddTopicBelow && ["TOPIC", "NOTE"].includes(node.nodeType)
+              }
+              onClose={closeEditMenu}
+            />
           </div>
         </Collapse>
 

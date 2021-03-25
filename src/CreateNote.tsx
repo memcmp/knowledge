@@ -81,6 +81,7 @@ function createBucket(
   };
   return {
     nodes: bucket.set(topNode.id, topNode),
+    workspaces: Immutable.List<Workspace>(),
     relationToView
   };
 }

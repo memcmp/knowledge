@@ -15,16 +15,7 @@ function QuillNode({
   ariaLabel?: string;
 }): JSX.Element {
   return (
-    <div
-      aria-label={ariaLabel}
-      className={`scrolling-container ${
-        ["TOPIC", "TITLE"].includes(node.nodeType) ? "lead" : ""
-      }
-            ${node.nodeType === "TOPIC" ? "text-info" : ""}
-            ${node.nodeType === "NOTE" ? "" : ""}
-            ${node.nodeType === "QUOTE" ? "quote" : ""}
-              `}
-    >
+    <div aria-label={ariaLabel}>
       <ReactQuill
         theme="bubble"
         formats={["link", "size"]}

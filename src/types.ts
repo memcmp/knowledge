@@ -12,6 +12,18 @@ declare global {
 
   type Relations = Immutable.List<Relation>;
 
+  type NodeView = {
+    nodeID: string;
+  }
+
+  type WorkspaceColumn = {
+    nodeViews: Immutable.List<NodeView>;
+  }
+
+  type Workspace = {
+    columns: Immutable.List<WorkspaceColumn>;
+  }
+
   type KnowNode = {
     id: string;
     text: string;
@@ -23,6 +35,7 @@ declare global {
   type Nodes = Immutable.Map<string, KnowNode>;
   type Store = {
     nodes: Nodes;
+    workspaces: Immutable.List<Workspace>;
   };
 
   // eslint-disable-next-line no-unused-vars
