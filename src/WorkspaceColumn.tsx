@@ -8,13 +8,14 @@ type WorkspaceColumnProps = {
 
 /* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable @typescript-eslint/unbound-method */
+/* eslint-disable react/no-array-index-key */
 export function WorkspaceColumnView({
   column
 }: WorkspaceColumnProps): JSX.Element {
   return (
     <div className="workspace-column" key={column.columnID}>
       <Droppable
-        droppableId={`column-${column.columnID}`}
+        droppableId={`drop.column.${column.columnID}`}
         key={column.columnID}
       >
         {provided => (
@@ -25,8 +26,8 @@ export function WorkspaceColumnView({
           >
             {column.nodeViews.map((nodeView, i) => (
               <Draggable
-                key={nodeView.nodeID}
-                draggableId={nodeView.nodeID}
+                key={`drag.outer.${nodeView.nodeID}.${column.columnID}.${i}`}
+                draggableId={`drag.outer.${nodeView.nodeID}.${column.columnID}.${i}`}
                 index={i}
               >
                 {providedDraggable => (
@@ -34,9 +35,12 @@ export function WorkspaceColumnView({
                     ref={providedDraggable.innerRef}
                     {...providedDraggable.draggableProps}
                     {...providedDraggable.dragHandleProps}
-                    style={providedDraggable.draggableProps.style}
+                    style={{ ...providedDraggable.draggableProps.style }}
                   >
-                    <OuterNode nodeID={nodeView.nodeID} />
+                    <OuterNode
+                      nodeID={nodeView.nodeID}
+                      dndPostfix={`${column.columnID}.${i}`}
+                    />
                   </div>
                 )}
               </Draggable>

@@ -6,16 +6,24 @@ import { useSelectors } from "./DataContext";
 type InnderNodeProps = {
   nodeID: string;
   index: number;
+  dndPostfix: string;
 };
 
 /* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable @typescript-eslint/unbound-method */
-export function InnerNode({ nodeID, index }: InnderNodeProps): JSX.Element {
+export function InnerNode({
+  nodeID,
+  index,
+  dndPostfix
+}: InnderNodeProps): JSX.Element {
   const { getNode } = useSelectors();
   const node = getNode(nodeID);
-  // TODO: use Quill
   return (
-    <Draggable key={nodeID} draggableId={`${nodeID}`} index={index}>
+    <Draggable
+      key={nodeID}
+      draggableId={`drag.inner.${nodeID}.${dndPostfix}`}
+      index={index}
+    >
       {providedDraggable => (
         <div
           ref={providedDraggable.innerRef}
