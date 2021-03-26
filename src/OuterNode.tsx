@@ -13,20 +13,19 @@ type OuterNodeProps = {
 /* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable @typescript-eslint/unbound-method */
 export function OuterNode({ nodeID }: OuterNodeProps): JSX.Element {
-  console.log(`Render ${nodeID}`);
   const { getNode, getObjects, getSubjects } = useSelectors();
   const node = getNode(nodeID);
   const text = extractPlainText(node);
-  console.log(`Render ${text}`);
 
   const contains = getObjects(node, undefined, ["CONTAINS"]);
   // const relevantObjects = getObjects(node, undefined, ["RELEVANT"]);
   const subjects = getSubjects(node);
   const toDisplay = contains.length > 0 ? contains : subjects;
-  console.log(`have to display: ${text}`);
   return (
-    <div className="outer-node mb-2" key={node.id}>
-      <div className="outer-node-title">{text}</div>
+    <div className="mb-3 outer-node" key={node.id}>
+      <div className="outer-node-title">
+        <div className="p-2">{text}</div>
+      </div>
 
       <div className="inner-nodes">
         <Droppable droppableId={`droppable-outer-${nodeID}`}>

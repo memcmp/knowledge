@@ -15,21 +15,22 @@
 
 .outer-node {
   padding: 10px;
-  color: white;
-  background-color: #145388 !important;
+  background-color: #145388;
   border-radius: 3px;
 }
 
 .outer-node-title {
   font-family: "Nunito", sans-serif;
   font-size: 16px;
+  font-weight: bold;
+  color: white;
 }
 
 .inner-nodes {
   overflow-y: scroll;
   max-height: 90vh;
   font-family: "Nunito", sans-serif;
-  font-size: 14px;
+  font-size: 16px;
 }
 
 .inner-node {
