@@ -1,5 +1,5 @@
 import React from "react";
-import { Droppable, Draggable } from "react-beautiful-dnd";
+import { Droppable } from "react-beautiful-dnd";
 import { OuterNode } from "./OuterNode";
 
 type WorkspaceColumnProps = {
@@ -25,25 +25,11 @@ export function WorkspaceColumnView({
             className="h-100"
           >
             {column.nodeViews.map((nodeView, i) => (
-              <Draggable
+              <OuterNode
                 key={`drag.outer.${nodeView.nodeID}.${column.columnID}.${i}`}
-                draggableId={`drag.outer.${nodeView.nodeID}.${column.columnID}.${i}`}
-                index={i}
-              >
-                {providedDraggable => (
-                  <div
-                    ref={providedDraggable.innerRef}
-                    {...providedDraggable.draggableProps}
-                    {...providedDraggable.dragHandleProps}
-                    style={{ ...providedDraggable.draggableProps.style }}
-                  >
-                    <OuterNode
-                      nodeID={nodeView.nodeID}
-                      dndPostfix={`${column.columnID}.${i}`}
-                    />
-                  </div>
-                )}
-              </Draggable>
+                nodeID={nodeView.nodeID}
+                dndPostfix={`${column.columnID}.${i}`}
+              />
             ))}
             {provided.placeholder}
           </div>

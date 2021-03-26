@@ -24,17 +24,25 @@ export function InnerNode({
       draggableId={`drag.inner.${nodeID}.${dndPostfix}`}
       index={index}
     >
-      {providedDraggable => (
-        <div
-          ref={providedDraggable.innerRef}
-          {...providedDraggable.draggableProps}
-          {...providedDraggable.dragHandleProps}
-          style={providedDraggable.draggableProps.style}
-        >
-          <Card className="inner-node">
-            <Card.Body className="p-3">{node.text}</Card.Body>
-          </Card>
-        </div>
+      {(providedDraggable, snapshot) => (
+        <>
+          <div
+            ref={providedDraggable.innerRef}
+            {...providedDraggable.draggableProps}
+            {...providedDraggable.dragHandleProps}
+            style={providedDraggable.draggableProps.style}
+          >
+            <Card className="inner-node">
+              <Card.Body className="p-3">{node.text}</Card.Body>
+            </Card>
+          </div>
+          {snapshot.isDragging &&
+            snapshot.draggingOver !== `drop.outer.${dndPostfix}` && (
+              <Card className="inner-node">
+                <Card.Body className="p-3">{node.text}</Card.Body>
+              </Card>
+            )}
+        </>
       )}
     </Draggable>
   );

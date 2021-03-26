@@ -21,8 +21,12 @@ export function OuterNode({ nodeID, dndPostfix }: OuterNodeProps): JSX.Element {
   const toDisplay = contains.length > 0 ? contains : subjects;
   return (
     <div className="mb-3 outer-node" key={`outer.${node.id}.${dndPostfix}`}>
-      <div className="outer-node-title">
-        <div className="p-2">{node.text}</div>
+      <div className="outer-node-title border-bottom mb-1">
+        <InnerNode
+          nodeID={node.id}
+          index={0}
+          dndPostfix={`title.${nodeID}.${dndPostfix}`}
+        />
       </div>
 
       <div className="inner-nodes">
@@ -39,7 +43,6 @@ export function OuterNode({ nodeID, dndPostfix }: OuterNodeProps): JSX.Element {
                   />
                 );
               })}
-
               {provided.placeholder}
             </div>
           )}
