@@ -27,7 +27,9 @@ export function useQueries({
   const storageQuery = useQuery({
     queryKey: "store",
     queryFn: async () => getDataStore(storage),
-    enabled: userQuery.isSuccess
+    enabled: userQuery.isSuccess,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false
   });
   return {
     userQuery,

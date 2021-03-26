@@ -14,15 +14,16 @@ declare global {
 
   type NodeView = {
     nodeID: string;
-  }
+  };
 
   type WorkspaceColumn = {
     nodeViews: Immutable.List<NodeView>;
-  }
+    columnID: string;
+  };
 
   type Workspace = {
     columns: Immutable.List<WorkspaceColumn>;
-  }
+  };
 
   type KnowNode = {
     id: string;
@@ -41,4 +42,5 @@ declare global {
   // eslint-disable-next-line no-unused-vars
   type UpsertNodes = (nodes: Immutable.Map<string, KnowNode>) => void;
   type DeleteNodes = (toDelete: Immutable.Set<string>, toUpdate: Nodes) => void;
+  type UpdateWorkspace = (workspace: Workspace) => void;
 }

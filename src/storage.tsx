@@ -1,6 +1,8 @@
 import { Storage } from "@stacks/storage";
 import Immutable from "immutable";
 
+import { extractPlainText } from "./Searchbox";
+
 export const TIMELINE = "TIMELINE";
 export const INTERESTS = "INTERESTS";
 export const STORAGE_FILE = "knowledge_v2.json";
@@ -65,6 +67,7 @@ export async function getDataStore(storage: Storage): Promise<Store> {
     const nodes = Immutable.Map(rawStore.nodes).map(node => {
       return {
         ...node,
+        text: extractPlainText((node as unknown) as KnowNode),
         relationsToObjects: Immutable.List(node.relationsToObjects),
         relationsToSubjects: Immutable.List(node.relationsToSubjects)
       };

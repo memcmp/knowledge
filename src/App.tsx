@@ -1,4 +1,5 @@
 import React from "react";
+import { v4 } from "uuid";
 import { Route, Switch } from "react-router-dom";
 import "./App.css";
 import Immutable from "immutable";
@@ -82,7 +83,7 @@ export function Main({ userSession, createStackStore }: AppProps): JSX.Element {
   const upsertNodes = (nodes: Immutable.Map<string, KnowNode>): void => {
     const newStorage = {
       nodes: dataStore.nodes.merge(nodes),
-      workspaces: Immutable.List<Workspace>()
+      workspaces: dataStore.workspaces
     };
     updateStorageMutation.mutate(newStorage);
   };
@@ -90,7 +91,15 @@ export function Main({ userSession, createStackStore }: AppProps): JSX.Element {
   const deleteNodes = (nodes: Immutable.Set<string>, toUpdate: Nodes): void => {
     const newStorage = {
       nodes: dataStore.nodes.merge(toUpdate).removeAll(nodes),
-      workspaces: Immutable.List<Workspace>()
+      workspaces: dataStore.workspaces
+    };
+    updateStorageMutation.mutate(newStorage);
+  };
+
+  const updateWorkspace = (workspace: Workspace): void => {
+    const newStorage = {
+      nodes: dataStore.nodes,
+      workspaces: Immutable.List<Workspace>([workspace])
     };
     updateStorageMutation.mutate(newStorage);
   };
@@ -100,7 +109,8 @@ export function Main({ userSession, createStackStore }: AppProps): JSX.Element {
       value={{
         nodes: dataStore.nodes,
         upsertNodes,
-        deleteNodes
+        deleteNodes,
+        updateWorkspace
       }}
     >
       <Switch>
@@ -109,6 +119,7 @@ export function Main({ userSession, createStackStore }: AppProps): JSX.Element {
             workspace={dataStore.workspaces.get(0, {
               columns: Immutable.List([
                 {
+                  columnID: v4(),
                   nodeViews: Immutable.List([
                     { nodeID: INTERESTS },
                     { nodeID: TIMELINE }

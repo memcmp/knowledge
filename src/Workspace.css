@@ -3,7 +3,8 @@
   grid-auto-columns: 375px;
   grid-auto-flow: column;
   grid-gap: 8px;
-  overflow: scroll;
+  overflow-x: scroll;
+  overflow-y: scroll;
 }
 
 .workspace-column {
@@ -22,6 +23,13 @@
 .outer-node-title {
   font-family: "Nunito", sans-serif;
   font-size: 16px;
+}
+
+.inner-nodes {
+  overflow-y: scroll;
+  max-height: 90vh;
+  font-family: "Nunito", sans-serif;
+  font-size: 14px;
 }
 
 .inner-node {

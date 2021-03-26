@@ -5,6 +5,7 @@ type Data = {
   nodes: Immutable.Map<string, KnowNode>;
   upsertNodes: UpsertNodes;
   deleteNodes: DeleteNodes;
+  updateWorkspace: UpdateWorkspace;
 };
 
 const RelationContext = React.createContext<Data | undefined>(undefined);
@@ -23,6 +24,10 @@ function useUpsertNodes(): UpsertNodes {
 
 function useDeleteNodes(): DeleteNodes {
   return getContextOrThrow().deleteNodes;
+}
+
+function useUpdateWorkspace(): UpdateWorkspace {
+  return getContextOrThrow().updateWorkspace;
 }
 
 function useNodes(): Nodes {
@@ -135,6 +140,7 @@ function useSelectors(): Selectors {
 export {
   useNodes,
   useUpsertNodes,
+  useUpdateWorkspace,
   RelationContext,
   useSelectors,
   getNode,
