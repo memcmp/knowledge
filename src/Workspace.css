@@ -8,9 +8,17 @@
 }
 
 .workspace-column {
+  height: 100vh;
+}
+
+.workspace-droppable {
   background-color: rgb(235, 236, 240);
   border-radius: 3px;
-  height: 100vh;
+  height: 112px;
+}
+
+.workspace-droppable.dragging-over {
+  background-color: #145388;
 }
 
 .outer-node {

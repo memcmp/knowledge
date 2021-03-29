@@ -34,16 +34,24 @@ function parseID(dndID: string): string | undefined {
   return undefined;
 }
 
+function isEmptyColumn(column: WorkspaceColumn | undefined): boolean {
+  if (!column) {
+    return true;
+  }
+  return column.nodeViews.isEmpty();
+}
+
 export function WorkspaceView({ workspace }: WorkspaceViewProps): JSX.Element {
   const updateWorkspace = useUpdateWorkspace();
 
   const workspaceWithNewCol = {
     ...workspace,
-    // TODO: only do that if last column is not empty
-    columns: workspace.columns.push({
-      columnID: v4(),
-      nodeViews: Immutable.List<NodeView>([])
-    })
+    columns: !isEmptyColumn(workspace.columns.last())
+      ? workspace.columns.push({
+          columnID: v4(),
+          nodeViews: Immutable.List<NodeView>([])
+        })
+      : workspace.columns
   };
 
   const onDragEnd = (result: DropResult): void => {

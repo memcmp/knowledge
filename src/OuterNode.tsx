@@ -22,16 +22,28 @@ export function OuterNode({ nodeID, dndPostfix }: OuterNodeProps): JSX.Element {
   return (
     <div className="mb-3 outer-node" key={`outer.${node.id}.${dndPostfix}`}>
       <div className="outer-node-title border-bottom mb-1">
-        <InnerNode
-          nodeID={node.id}
-          index={0}
-          dndPostfix={`title.${nodeID}.${dndPostfix}`}
-        />
+        <Droppable
+          droppableId={`drop.title.${nodeID}.${dndPostfix}`}
+          key={`drop.title.${nodeID}.${dndPostfix}`}
+          isDropDisabled
+        >
+          {provided => (
+            <>
+              <div {...provided.droppableProps} ref={provided.innerRef}>
+                <InnerNode
+                  nodeID={node.id}
+                  index={0}
+                  dndPostfix={`title.${nodeID}.${dndPostfix}`}
+                />
+              </div>
+            </>
+          )}
+        </Droppable>
       </div>
 
       <div className="inner-nodes">
         <Droppable droppableId={`drop.outer.${nodeID}.${dndPostfix}`}>
-          {provided => (
+          {(provided, snapshot) => (
             <div {...provided.droppableProps} ref={provided.innerRef}>
               {toDisplay.map((subj, i) => {
                 return (
@@ -43,7 +55,7 @@ export function OuterNode({ nodeID, dndPostfix }: OuterNodeProps): JSX.Element {
                   />
                 );
               })}
-              {provided.placeholder}
+              {snapshot.isDraggingOver && provided.placeholder}
             </div>
           )}
         </Droppable>

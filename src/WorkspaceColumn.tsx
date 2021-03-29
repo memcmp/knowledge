@@ -14,23 +14,25 @@ export function WorkspaceColumnView({
 }: WorkspaceColumnProps): JSX.Element {
   return (
     <div className="workspace-column" key={column.columnID}>
+      {column.nodeViews.map((nodeView, i) => (
+        <OuterNode
+          key={`drag.outer.${nodeView.nodeID}.${column.columnID}.${i}`}
+          nodeID={nodeView.nodeID}
+          dndPostfix={`${column.columnID}.${i}`}
+        />
+      ))}
       <Droppable
         droppableId={`drop.column.${column.columnID}`}
         key={column.columnID}
       >
-        {provided => (
+        {(provided, snapshot) => (
           <div
             {...provided.droppableProps}
             ref={provided.innerRef}
-            className="h-100"
+            className={`workspace-droppable ${
+              snapshot.isDraggingOver ? "dragging-over" : ""
+            }`}
           >
-            {column.nodeViews.map((nodeView, i) => (
-              <OuterNode
-                key={`drag.outer.${nodeView.nodeID}.${column.columnID}.${i}`}
-                nodeID={nodeView.nodeID}
-                dndPostfix={`${column.columnID}.${i}`}
-              />
-            ))}
             {provided.placeholder}
           </div>
         )}
