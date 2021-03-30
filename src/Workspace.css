@@ -12,13 +12,38 @@
 }
 
 .workspace-droppable {
-  background-color: rgb(235, 236, 240);
+  background-color: white;
   border-radius: 3px;
-  height: 112px;
+  height: 48px;
+  padding: 10px;
+  color: gray;
+  font-size: 20px;
+  border: 0px;
+  width: 100%;
+  text-align: left;
 }
 
-.workspace-droppable.dragging-over {
+.workspace-droppable:hover {
   background-color: #145388;
+  color: white;
+}
+
+.editor {
+  background-color: white;
+  border-radius: 3px;
+  padding: 10px;
+  font-family: "Nunito", sans-serif;
+  font-size: 16px;
+}
+
+.editor .ql-container {
+  font-size: 16px;
+  font-family: "Nunito", sans-serif;
+}
+
+.dragging-over {
+  background-color: #145388;
+  height: 64px;
 }
 
 .outer-node {

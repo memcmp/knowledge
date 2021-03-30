@@ -1,5 +1,6 @@
 import React from "react";
 import { Droppable } from "react-beautiful-dnd";
+import { AddNode } from "./AddNode";
 import { OuterNode } from "./OuterNode";
 
 type WorkspaceColumnProps = {
@@ -29,11 +30,14 @@ export function WorkspaceColumnView({
           <div
             {...provided.droppableProps}
             ref={provided.innerRef}
-            className={`workspace-droppable ${
-              snapshot.isDraggingOver ? "dragging-over" : ""
-            }`}
+            className={`${snapshot.isDraggingOver ? "dragging-over" : ""}`}
           >
             {provided.placeholder}
+            {!snapshot.isDraggingOver && (
+              <div className="outer-node">
+                <AddNode />
+              </div>
+            )}
           </div>
         )}
       </Droppable>

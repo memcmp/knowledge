@@ -995,6 +995,7 @@ button {
   color: $foreground-color;
 }
 
+/*
 .btn-group > .btn:not(:last-child):not(.dropdown-toggle),
 .btn-group > .btn-group:not(:last-child) > .btn {
   border-top-left-radius: 0 !important;
@@ -1002,7 +1003,9 @@ button {
   border-top-right-radius: 0 !important;
   border-bottom-right-radius: 0 !important;
 }
+*/
 
+/*
 .btn-group > .btn:not(:first-child),
 .btn-group > .btn-group:not(:first-child) > .btn {
   border-top-left-radius: 0 !important;
@@ -1010,6 +1013,7 @@ button {
   border-top-right-radius: 0 !important;
   border-bottom-right-radius: 0 !important;
 }
+*/
 
 .btn-link {
   color: $theme-color-1;
