@@ -75,3 +75,11 @@
   font-family: "Nunito", sans-serif;
   font-size: 16px;
 }
+
+.hover-black {
+  color: #757575;
+}
+
+.hover-black:hover {
+  color: black;
+}

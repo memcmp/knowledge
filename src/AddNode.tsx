@@ -57,12 +57,30 @@ function SaveButton({ onSave }: SaveButtonProps): JSX.Element {
   );
 }
 
+function CloseButton({ onClose }: { onClose: () => void }): JSX.Element {
+  return (
+    <button
+      className="btn btn-empty text-large p-1 hover-black"
+      type="button"
+      onClick={onClose}
+    >
+      <span aria-hidden="true">×</span>
+      <span className="sr-only">Close</span>
+    </button>
+  );
+}
+
 type EditorProps = {
   initialValue: string;
   onCreateNode: (text: string, nodeType: NodeType) => void;
+  onClose: () => void;
 };
 
-function Editor({ initialValue, onCreateNode }: EditorProps): JSX.Element {
+function Editor({
+  initialValue,
+  onCreateNode,
+  onClose
+}: EditorProps): JSX.Element {
   const ref = React.createRef<ReactQuill>();
   useEffect(() => {
     (ref.current as ReactQuill).getEditor().setText(initialValue);
@@ -91,6 +109,7 @@ function Editor({ initialValue, onCreateNode }: EditorProps): JSX.Element {
       </div>
       <div className="mt-4">
         <SaveButton onSave={onSave} />
+        <CloseButton onClose={onClose} />
       </div>
     </div>
   );
@@ -107,10 +126,11 @@ const NODE_TYPE_SORTING: Array<NodeType> = [
 type SearchProps = {
   switchToNew: (initial: string) => void;
   onSave: (node: KnowNode) => void;
+  onClose: () => void;
 };
 
 /* eslint-disable react/jsx-props-no-spreading */
-function Search({ switchToNew, onSave }: SearchProps): JSX.Element {
+function Search({ switchToNew, onSave, onClose }: SearchProps): JSX.Element {
   const [selectedValue, setSelectedValue] = useState<KnowNode | undefined>();
   const ref = React.createRef<Typeahead<KnowNode>>();
   const menuEnd = React.createRef<HTMLDivElement>();
@@ -200,6 +220,15 @@ function Search({ switchToNew, onSave }: SearchProps): JSX.Element {
         >
           Add
         </Button>
+        <CloseButton
+          onClose={() => {
+            if (ref.current) {
+              ref.current.clear();
+            }
+            setSelectedValue(undefined);
+            onClose();
+          }}
+        />
       </div>
     </div>
   );
@@ -264,10 +293,15 @@ export function AddNode({ column }: AddNodeProps): JSX.Element {
           switchToNew={(initialValue: string) => {
             setIsCreatingNode(initialValue);
           }}
+          onClose={reset}
         />
       )}
       {isActive && isCreatingNode !== undefined && (
-        <Editor initialValue={isCreatingNode} onCreateNode={onCreateNewNode} />
+        <Editor
+          initialValue={isCreatingNode}
+          onCreateNode={onCreateNewNode}
+          onClose={reset}
+        />
       )}
     </div>
   );
