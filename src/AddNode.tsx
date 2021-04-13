@@ -139,6 +139,10 @@ function Search({ switchToNew, onSave }: SearchProps): JSX.Element {
   const onAdd = (): void => {
     if (selectedValue) {
       onSave(selectedValue);
+      if (ref.current) {
+        ref.current.clear();
+      }
+      setSelectedValue(undefined);
     }
   };
 
@@ -214,6 +218,11 @@ export function AddNode({ column }: AddNodeProps): JSX.Element {
   const workspace = useWorkspace();
   const updateWorkspace = useUpdateWorkspace();
 
+  const reset = (): void => {
+    setActive(false);
+    setIsCreatingNode(undefined);
+  };
+
   const onCreateNewNode = (text: string, nodeType: NodeType): void => {
     const node = newNode(text, nodeType);
     const nodes = Immutable.Map<string, KnowNode>().set(node.id, node);
@@ -228,6 +237,7 @@ export function AddNode({ column }: AddNodeProps): JSX.Element {
       },
       nodes
     );
+    reset();
   };
 
   const onAddExistingNode = (node: KnowNode): void => {
@@ -242,6 +252,7 @@ export function AddNode({ column }: AddNodeProps): JSX.Element {
       },
       Immutable.Map<string, KnowNode>()
     );
+    reset();
   };
 
   return (

@@ -61,7 +61,7 @@
 
 .inner-nodes {
   overflow-y: scroll;
-  max-height: 90vh;
+  max-height: 80vh;
   font-family: "Nunito", sans-serif;
   font-size: 16px;
 }
