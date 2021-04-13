@@ -5,12 +5,20 @@ type Data = {
   nodes: Immutable.Map<string, KnowNode>;
   upsertNodes: UpsertNodes;
   deleteNodes: DeleteNodes;
+};
+
+type WorkspaceData = {
   updateWorkspace: UpdateWorkspace;
+  workspace: Workspace;
 };
 
 const RelationContext = React.createContext<Data | undefined>(undefined);
 
-function getContextOrThrow(): Data {
+const WorkspaceContext = React.createContext<WorkspaceData | undefined>(
+  undefined
+);
+
+function getDataContextOrThrow(): Data {
   const context = React.useContext(RelationContext);
   if (context === undefined) {
     throw new Error("RelationContext not provided");
@@ -18,16 +26,28 @@ function getContextOrThrow(): Data {
   return context;
 }
 
+function getWorkspaceContextOrThrow(): WorkspaceData {
+  const context = React.useContext(WorkspaceContext);
+  if (context === undefined) {
+    throw new Error("WorkspaceContext not provided");
+  }
+  return context;
+}
+
 function useUpsertNodes(): UpsertNodes {
-  return getContextOrThrow().upsertNodes;
+  return getDataContextOrThrow().upsertNodes;
 }
 
 function useDeleteNodes(): DeleteNodes {
-  return getContextOrThrow().deleteNodes;
+  return getDataContextOrThrow().deleteNodes;
 }
 
 function useUpdateWorkspace(): UpdateWorkspace {
-  return getContextOrThrow().updateWorkspace;
+  return getWorkspaceContextOrThrow().updateWorkspace;
+}
+
+function useWorkspace(): Workspace {
+  return getWorkspaceContextOrThrow().workspace;
 }
 
 function useNodes(): Nodes {
@@ -141,7 +161,9 @@ export {
   useNodes,
   useUpsertNodes,
   useUpdateWorkspace,
+  useWorkspace,
   RelationContext,
+  WorkspaceContext,
   useSelectors,
   getNode,
   useDeleteNodes,

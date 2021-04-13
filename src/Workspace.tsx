@@ -6,11 +6,7 @@ import "./Workspace.css";
 
 import { WorkspaceColumnView } from "./WorkspaceColumn";
 
-import { useUpdateWorkspace } from "./DataContext";
-
-type WorkspaceViewProps = {
-  workspace: Workspace;
-};
+import { useUpdateWorkspace, useWorkspace } from "./DataContext";
 
 /*
  * drop-column-columnID
@@ -41,16 +37,25 @@ function isEmptyColumn(column: WorkspaceColumn | undefined): boolean {
   return column.nodeViews.isEmpty();
 }
 
-export function WorkspaceView({ workspace }: WorkspaceViewProps): JSX.Element {
+function addEmptyColumn(workspace: Workspace): Workspace {
+  const columnID = v4();
+  return {
+    ...workspace,
+    columns: workspace.columns.set(columnID, {
+      columnID,
+      nodeViews: Immutable.List<NodeView>([])
+    })
+  };
+}
+
+export function WorkspaceView(): JSX.Element {
+  const workspace = useWorkspace();
   const updateWorkspace = useUpdateWorkspace();
 
   const workspaceWithNewCol = {
     ...workspace,
     columns: !isEmptyColumn(workspace.columns.last())
-      ? workspace.columns.push({
-          columnID: v4(),
-          nodeViews: Immutable.List<NodeView>([])
-        })
+      ? addEmptyColumn(workspace).columns
       : workspace.columns
   };
 
@@ -75,19 +80,24 @@ export function WorkspaceView({ workspace }: WorkspaceViewProps): JSX.Element {
           }
           return column;
         });
-        updateWorkspace({
-          ...workspaceWithNewCol,
-          columns: updatedColumns
-        });
+        updateWorkspace(
+          {
+            ...workspaceWithNewCol,
+            columns: updatedColumns
+          },
+          Immutable.Map<string, KnowNode>()
+        );
       }
     }
   };
+
+  const columns = Array.from(workspaceWithNewCol.columns.values());
 
   return (
     <div className="h-100 w-100">
       <div className="workspace-columns">
         <DragDropContext onDragEnd={onDragEnd}>
-          {workspaceWithNewCol.columns.map(column => {
+          {columns.map(column => {
             return (
               <WorkspaceColumnView key={column.columnID} column={column} />
             );

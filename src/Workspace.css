@@ -69,3 +69,9 @@
 .inner-node {
   color: black;
 }
+
+.search-result {
+  white-space: normal;
+  font-family: "Nunito", sans-serif;
+  font-size: 16px;
+}

@@ -13,7 +13,7 @@ import {
 } from "react-query";
 import { WorkspaceView } from "./Workspace";
 import { NodeView } from "./NodeView";
-import { RelationContext } from "./DataContext";
+import { RelationContext, WorkspaceContext } from "./DataContext";
 
 import { INTERESTS, saveDataStore } from "./storage";
 
@@ -49,6 +49,16 @@ function ViewContainer({
       </div>
     </div>
   );
+}
+
+function newDefaultWorkspace(): Workspace {
+  const columnID: string = v4();
+  return {
+    columns: Immutable.OrderedMap<string, WorkspaceColumn>().set(columnID, {
+      columnID,
+      nodeViews: Immutable.List([{ nodeID: INTERESTS }, { nodeID: TIMELINE }])
+    })
+  };
 }
 
 export function Main({ userSession, createStackStore }: AppProps): JSX.Element {
@@ -96,54 +106,50 @@ export function Main({ userSession, createStackStore }: AppProps): JSX.Element {
     updateStorageMutation.mutate(newStorage);
   };
 
-  const updateWorkspace = (workspace: Workspace): void => {
+  const updateWorkspace = (workspace: Workspace, nodes: Nodes): void => {
     const newStorage = {
-      nodes: dataStore.nodes,
+      nodes: dataStore.nodes.merge(nodes),
       workspaces: Immutable.List<Workspace>([workspace])
     };
     updateStorageMutation.mutate(newStorage);
   };
+
+  const workspace = dataStore.workspaces.get(0, newDefaultWorkspace());
 
   return (
     <RelationContext.Provider
       value={{
         nodes: dataStore.nodes,
         upsertNodes,
-        deleteNodes,
-        updateWorkspace
+        deleteNodes
       }}
     >
-      <Switch>
-        <Route exact path="/">
-          <WorkspaceView
-            workspace={dataStore.workspaces.get(0, {
-              columns: Immutable.List([
-                {
-                  columnID: v4(),
-                  nodeViews: Immutable.List([
-                    { nodeID: INTERESTS },
-                    { nodeID: TIMELINE }
-                  ])
-                }
-              ])
-            })}
-          />
-        </Route>
-        <Route path="/notes/:id">
-          <ViewContainer>
-            <NodeView />
-          </ViewContainer>
-        </Route>
-        <Route path="/graph/:id">
-          <GraphView />
-        </Route>
-        <Route exact path="/graph">
-          <GraphView />
-        </Route>
-        <Route exact path="/repair">
-          <Repair />
-        </Route>
-      </Switch>
+      <WorkspaceContext.Provider
+        value={{
+          workspace,
+          updateWorkspace
+        }}
+      >
+        <Switch>
+          <Route exact path="/">
+            <WorkspaceView />
+          </Route>
+          <Route path="/notes/:id">
+            <ViewContainer>
+              <NodeView />
+            </ViewContainer>
+          </Route>
+          <Route path="/graph/:id">
+            <GraphView />
+          </Route>
+          <Route exact path="/graph">
+            <GraphView />
+          </Route>
+          <Route exact path="/repair">
+            <Repair />
+          </Route>
+        </Switch>
+      </WorkspaceContext.Provider>
     </RelationContext.Provider>
   );
 }

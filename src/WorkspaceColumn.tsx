@@ -35,7 +35,7 @@ export function WorkspaceColumnView({
             {provided.placeholder}
             {!snapshot.isDraggingOver && (
               <div className="outer-node">
-                <AddNode />
+                <AddNode column={column} />
               </div>
             )}
           </div>

@@ -22,7 +22,7 @@ declare global {
   };
 
   type Workspace = {
-    columns: Immutable.List<WorkspaceColumn>;
+    columns: Immutable.OrderedMap<string, WorkspaceColumn>;
   };
 
   type KnowNode = {
@@ -42,5 +42,5 @@ declare global {
   // eslint-disable-next-line no-unused-vars
   type UpsertNodes = (nodes: Immutable.Map<string, KnowNode>) => void;
   type DeleteNodes = (toDelete: Immutable.Set<string>, toUpdate: Nodes) => void;
-  type UpdateWorkspace = (workspace: Workspace) => void;
+  type UpdateWorkspace = (workspace: Workspace, nodes: Nodes) => void;
 }
