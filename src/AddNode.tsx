@@ -106,10 +106,12 @@ const NODE_TYPE_SORTING: Array<NodeType> = [
 
 type SearchProps = {
   switchToNew: (initial: string) => void;
+  onSave: (node: KnowNode) => void;
 };
 
 /* eslint-disable react/jsx-props-no-spreading */
-function Search({ switchToNew }: SearchProps): JSX.Element {
+function Search({ switchToNew, onSave }: SearchProps): JSX.Element {
+  const [selectedValue, setSelectedValue] = useState<KnowNode | undefined>();
   const ref = React.createRef<Typeahead<KnowNode>>();
   const menuEnd = React.createRef<HTMLDivElement>();
   const nodes = useNodes();
@@ -125,12 +127,28 @@ function Search({ switchToNew }: SearchProps): JSX.Element {
       return idxA - idxB;
     })
     .toArray();
+
+  const onChange = (newSelection: Array<KnowNode>): void => {
+    if (newSelection.length === 0) {
+      setSelectedValue(undefined);
+      return;
+    }
+    setSelectedValue(newSelection[0]);
+  };
+
+  const onAdd = (): void => {
+    if (selectedValue) {
+      onSave(selectedValue);
+    }
+  };
+
   return (
     <div className="editor">
       <Typeahead
         ref={ref}
         autoFocus
         clearButton
+        onChange={onChange}
         id="suggest"
         options={options}
         labelKey="text"
@@ -171,7 +189,13 @@ function Search({ switchToNew }: SearchProps): JSX.Element {
         )}
       />
       <div className="mt-4">
-        <Button variant="success">Add</Button>
+        <Button
+          variant="success"
+          onClick={onAdd}
+          disabled={selectedValue === undefined}
+        >
+          Add
+        </Button>
       </div>
     </div>
   );
@@ -205,11 +229,27 @@ export function AddNode({ column }: AddNodeProps): JSX.Element {
       nodes
     );
   };
+
+  const onAddExistingNode = (node: KnowNode): void => {
+    updateWorkspace(
+      {
+        columns: workspace.columns.set(column.columnID, {
+          ...column,
+          nodeViews: column.nodeViews.push({
+            nodeID: node.id
+          })
+        })
+      },
+      Immutable.Map<string, KnowNode>()
+    );
+  };
+
   return (
     <div>
       {!isActive && <AddNodeButton setIsWriting={() => setActive(true)} />}
       {isActive && isCreatingNode === undefined && (
         <Search
+          onSave={onAddExistingNode}
           switchToNew={(initialValue: string) => {
             setIsCreatingNode(initialValue);
           }}
