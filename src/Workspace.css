@@ -52,20 +52,20 @@
   border-radius: 3px;
 }
 
-.outer-node-title {
-  font-family: "Nunito", sans-serif;
-  font-size: 16px;
-}
-
 .inner-nodes {
   overflow-y: scroll;
   max-height: 80vh;
-  font-family: "Nunito", sans-serif;
-  font-size: 16px;
 }
 
 .inner-node {
   color: black;
+  /* font-family: "Noto Serif", serif;*/
+  /*font-size: 0.9rem;*/
+  font-size: 16px;
+  line-height: 1.5rem;
+  font-weight: 400;
+  font-family: "Nunito", sans-serif;
+  font-size: 16px;
 }
 
 .search-result {
@@ -110,4 +110,8 @@
 
 .outer-node-title .dropdown-toggle::after {
   display: none;
+}
+
+.dropdown-menu {
+  border-radius: 3px;
 }
