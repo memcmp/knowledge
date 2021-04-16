@@ -54,7 +54,7 @@ function ViewContainer({
 function newDefaultWorkspace(): Workspace {
   const columnID: string = v4();
   const defaultViews: Array<NodeView> = [
-    { nodeID: INTERESTS, displayConnections: "CONTAINS_OBJECTS" },
+    { nodeID: INTERESTS, displayConnections: "RELEVANT_SUBJECTS" },
     { nodeID: TIMELINE, displayConnections: "CONTAINS_OBJECTS" }
   ];
   return {

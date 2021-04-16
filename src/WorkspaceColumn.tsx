@@ -1,4 +1,3 @@
-import { Map } from "immutable";
 import React from "react";
 import { Droppable } from "react-beautiful-dnd";
 import { AddNode } from "./AddNode";
@@ -22,7 +21,7 @@ export function WorkspaceColumnView({
     const nodeViews: Array<NodeView> = topNodes.map(nodeID => {
       return {
         nodeID,
-        displayConnections: "CONTAINS_OBJECTS"
+        displayConnections: "NONE"
       };
     });
     updateWorkspace(
@@ -43,7 +42,7 @@ export function WorkspaceColumnView({
           key={`drag.outer.${nodeView.nodeID}.${column.columnID}.${i}`}
           nodeView={nodeView}
           dndPostfix={`${column.columnID}.${i}`}
-          onNodeViewChange={(newView: NodeView): void => {
+          onNodeViewChange={(newView: NodeView, nodes: Nodes): void => {
             updateWorkspace(
               {
                 columns: workspace.columns.set(column.columnID, {
@@ -51,7 +50,7 @@ export function WorkspaceColumnView({
                   nodeViews: column.nodeViews.set(i, newView)
                 })
               },
-              Map<string, KnowNode>()
+              nodes
             );
           }}
         />

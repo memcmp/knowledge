@@ -15,7 +15,8 @@ declare global {
   type DisplayConnections =
     | "RELEVANT_SUBJECTS"
     | "RELEVANT_OBJECTS"
-    | "CONTAINS_OBJECTS";
+    | "CONTAINS_OBJECTS"
+    | "NONE";
 
   type NodeView = {
     nodeID: string;

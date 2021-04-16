@@ -2,7 +2,7 @@ import React from "react";
 import { Map } from "immutable";
 import { Droppable } from "react-beautiful-dnd";
 import { bulkConnectRelevantNodes } from "./connections";
-import { useSelectors, useUpsertNodes, Selectors } from "./DataContext";
+import { useSelectors, Selectors } from "./DataContext";
 
 import { FileDropZone } from "./FileDropZone";
 
@@ -21,13 +21,16 @@ function getChildNodes(
   if (displayConnections === "RELEVANT_OBJECTS") {
     return selectors.getObjects(node, undefined, ["RELEVANT"]);
   }
+  if (displayConnections === "NONE") {
+    return [];
+  }
   return selectors.getSubjects(node);
 }
 
 type OuterNodeProps = {
   nodeView: NodeView;
   dndPostfix: string;
-  onNodeViewChange: (nodeView: NodeView) => void;
+  onNodeViewChange: (nodeView: NodeView, nodes: Nodes) => void;
 };
 
 /* eslint-disable react/jsx-props-no-spreading */
@@ -39,11 +42,15 @@ export function OuterNode({
 }: OuterNodeProps): JSX.Element {
   const selectors = useSelectors();
   const { nodeID } = nodeView;
-  const upsertNodes = useUpsertNodes();
   const node = selectors.getNode(nodeID);
   const toDisplay = getChildNodes(node, selectors, nodeView.displayConnections);
   const onDropFiles = (topNodes: Array<string>, nodes: Nodes): void => {
-    upsertNodes(
+    onNodeViewChange(
+      {
+        ...nodeView,
+        // TODO: Find a better solution than switching subjects
+        displayConnections: "RELEVANT_SUBJECTS"
+      },
       bulkConnectRelevantNodes(
         topNodes,
         nodeID,
@@ -57,10 +64,13 @@ export function OuterNode({
   const onConnectionsChange = (
     displayConnections: DisplayConnections
   ): void => {
-    onNodeViewChange({
-      ...nodeView,
-      displayConnections
-    });
+    onNodeViewChange(
+      {
+        ...nodeView,
+        displayConnections
+      },
+      Map<string, KnowNode>()
+    );
   };
 
   return (
