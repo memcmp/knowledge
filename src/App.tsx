@@ -13,7 +13,12 @@ import {
 } from "react-query";
 import { WorkspaceView } from "./Workspace";
 import { NodeView } from "./NodeView";
-import { RelationContext, WorkspaceContext } from "./DataContext";
+import {
+  RelationContext,
+  WorkspaceContext,
+  getObjects,
+  getSubjects
+} from "./DataContext";
 
 import { INTERESTS, saveDataStore } from "./storage";
 
@@ -51,17 +56,37 @@ function ViewContainer({
   );
 }
 
-function newDefaultWorkspace(): Workspace {
-  const columnID: string = v4();
-  const defaultViews: Array<NodeView> = [
-    { nodeID: INTERESTS, displayConnections: "RELEVANT_SUBJECTS" },
-    { nodeID: TIMELINE, displayConnections: "CONTAINS_OBJECTS" }
-  ];
+function newDefaultWorkspace(nodes: Nodes): Workspace {
+  const timelineID = v4();
+  const topicsID = v4();
+
+  const timeline = nodes.get(TIMELINE);
+  const timelineNodes = timeline ? getObjects(nodes, timeline) : [];
+  const timelineViews: Array<NodeView> = timelineNodes.map(node => {
+    return {
+      nodeID: node.id,
+      displayConnections: "NONE"
+    };
+  });
+
+  const topics = nodes.get(INTERESTS);
+  const topicsNodes = topics ? getSubjects(nodes, topics) : [];
+  const topicsViews: Array<NodeView> = topicsNodes.map(node => {
+    return {
+      nodeID: node.id,
+      displayConnections: "NONE"
+    };
+  });
   return {
-    columns: Immutable.OrderedMap<string, WorkspaceColumn>().set(columnID, {
-      columnID,
-      nodeViews: Immutable.List<NodeView>(defaultViews)
-    })
+    columns: Immutable.OrderedMap<string, WorkspaceColumn>()
+      .set(timelineID, {
+        columnID: timelineID,
+        nodeViews: Immutable.List<NodeView>(timelineViews)
+      })
+      .set(topicsID, {
+        columnID: topicsID,
+        nodeViews: Immutable.List<NodeView>(topicsViews)
+      })
   };
 }
 
@@ -118,7 +143,10 @@ export function Main({ userSession, createStackStore }: AppProps): JSX.Element {
     updateStorageMutation.mutate(newStorage);
   };
 
-  const workspace = dataStore.workspaces.get(0, newDefaultWorkspace());
+  const workspace = dataStore.workspaces.get(
+    0,
+    newDefaultWorkspace(dataStore.nodes)
+  );
 
   return (
     <RelationContext.Provider

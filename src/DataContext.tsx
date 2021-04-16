@@ -83,7 +83,7 @@ export function getObjects(
     .toArray();
 }
 
-function getSubjects(
+export function getSubjects(
   nodes: Nodes,
   node: KnowNode,
   filter?: Array<NodeType>,
