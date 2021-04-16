@@ -74,7 +74,7 @@ export function OuterNode({
   };
 
   return (
-    <div className="mb-3 outer-node" key={`outer.${node.id}.${dndPostfix}`}>
+    <div className="mb-2 outer-node" key={`outer.${node.id}.${dndPostfix}`}>
       <FileDropZone onDrop={onDropFiles}>
         <div className="outer-node-title border-bottom mb-1">
           <OuterNodeExtras
