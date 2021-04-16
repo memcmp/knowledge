@@ -5,6 +5,7 @@
   grid-gap: 8px;
   overflow-x: scroll;
   overflow-y: scroll;
+  background-color: #dddddd;
 }
 
 .workspace-column {
