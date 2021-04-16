@@ -64,7 +64,6 @@ export function WorkspaceView(): JSX.Element {
 
   const onDragEnd = (result: DropResult): void => {
     if (result.destination) {
-      const { index } = result.destination;
       const droppableID = result.destination.droppableId;
       const destID = parseID(droppableID);
       const sourceID = parseID(result.draggableId);
@@ -76,7 +75,7 @@ export function WorkspaceView(): JSX.Element {
           if (column.columnID === destID) {
             return {
               ...column,
-              nodeViews: column.nodeViews.insert(index, {
+              nodeViews: column.nodeViews.push({
                 nodeID: sourceID,
                 displayConnections: defaultDisplayConnection(
                   getNode(sourceID).nodeType
