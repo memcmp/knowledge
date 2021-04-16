@@ -25,8 +25,7 @@
 }
 
 .workspace-droppable:hover {
-  background-color: #145388;
-  color: white;
+  background-color: #ebecf0;
 }
 
 .editor {
@@ -43,13 +42,13 @@
 }
 
 .dragging-over {
-  background-color: #145388;
+  background-color: #ebecf0;
   height: 64px;
 }
 
 .outer-node {
-  padding: 4px;
-  background-color: #145388;
+  padding: 6px;
+  background-color: #ebecf0;
   border-radius: 3px;
 }
 
