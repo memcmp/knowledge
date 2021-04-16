@@ -484,10 +484,7 @@ function NodeView(): JSX.Element {
             <Card.Body className="header">
               <div className="position-absolute card-top-buttons">
                 <Link to={`/graph/${id}`}>
-                  <button
-                    type="button"
-                    className="btn btn-header-light icon-button"
-                  >
+                  <button type="button" className="workspace-droppable">
                     <i className="simple-icon-graph" />
                   </button>
                 </Link>

@@ -40,21 +40,24 @@ export function OuterNode({ nodeID, dndPostfix }: OuterNodeProps): JSX.Element {
     <div className="mb-3 outer-node" key={`outer.${node.id}.${dndPostfix}`}>
       <FileDropZone onDrop={onDropFiles}>
         <div className="outer-node-title border-bottom mb-1">
+          <div className="position-relative">
+            <button type="button" className="btn header-extras-btn hover-black">
+              <span className="simple-icon-options" />
+            </button>
+          </div>
           <Droppable
             droppableId={`drop.title.${nodeID}.${dndPostfix}`}
             key={`drop.title.${nodeID}.${dndPostfix}`}
             isDropDisabled
           >
             {provided => (
-              <>
-                <div {...provided.droppableProps} ref={provided.innerRef}>
-                  <InnerNode
-                    nodeID={node.id}
-                    index={0}
-                    dndPostfix={`title.${nodeID}.${dndPostfix}`}
-                  />
-                </div>
-              </>
+              <div {...provided.droppableProps} ref={provided.innerRef}>
+                <InnerNode
+                  nodeID={node.id}
+                  index={0}
+                  dndPostfix={`title.${nodeID}.${dndPostfix}`}
+                />
+              </div>
             )}
           </Droppable>
         </div>

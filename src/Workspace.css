@@ -56,7 +56,6 @@
   font-family: "Nunito", sans-serif;
   font-size: 16px;
   font-weight: bold;
-  color: white;
 }
 
 .inner-nodes {
@@ -98,4 +97,14 @@
   left: 0;
   right: 0;
   background: rgba(0, 0, 0, 0.2);
+}
+
+.header-extras-btn {
+  z-index: 2;
+  position: absolute;
+  top: 12px;
+  right: 6px;
+  border-radius: 3px;
+  padding: 2px;
+  font-size: 1.2rem;
 }
