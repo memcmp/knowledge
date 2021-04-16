@@ -19,6 +19,12 @@ export function extractPlainText(node: KnowNode): string {
   return div.textContent as string;
 }
 
+export function convertToPlainText(html: string): string {
+  const div = document.createElement("div");
+  div.innerHTML = html;
+  return div.textContent as string;
+}
+
 function addPlainText(node: KnowNode): KnowNodeWithPlainText {
   return {
     ...node,

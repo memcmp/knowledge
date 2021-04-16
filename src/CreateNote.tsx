@@ -2,10 +2,7 @@ import React, { useState } from "react";
 import { Button, Nav, Tab } from "react-bootstrap";
 import ReactQuill from "react-quill";
 import Card from "react-bootstrap/Card";
-import { v4 } from "uuid";
 import Immutable from "immutable";
-import { useDropzone } from "react-dropzone";
-import MarkdownIt from "markdown-it";
 
 import "react-quill/dist/quill.bubble.css";
 import "./editor.css";
@@ -26,112 +23,10 @@ export function isEmpty(text: string): boolean {
   return text === PARAGRAPH || text === "";
 }
 
-function createBucket(
-  paragraphs: Array<string>
-): Store & {
-  relationToView: Relation;
-} {
-  const topParagraph = paragraphs[0];
-  const furtherParagraphs = paragraphs.slice(1);
-
-  const topId = v4();
-
-  const relationToView: Relation = {
-    relationType: "CONTAINS",
-    a: "TIMELINE",
-    b: topId
-  };
-
-  const bucket: Nodes = Immutable.OrderedMap(
-    furtherParagraphs.map((text: string): [string, KnowNode] => {
-      const id = v4();
-      const relation: Relation = {
-        relationType: "CONTAINS",
-        a: topId,
-        b: id
-      };
-      return [
-        id,
-        {
-          text,
-          nodeType: "QUOTE",
-          id,
-          relationsToObjects: Immutable.List<Relation>(),
-          relationsToSubjects: Immutable.List<Relation>([relation])
-        }
-      ];
-    })
-  );
-
-  const relationsToObjects: Relations = Immutable.List<Relation>(
-    bucket
-      .map(
-        (node: KnowNode): Relation => {
-          return node.relationsToSubjects.get(0) as Relation;
-        }
-      )
-      .values()
-  );
-  const topNode: KnowNode = {
-    id: topId,
-    text: topParagraph,
-    nodeType: "TITLE",
-    relationsToSubjects: Immutable.List<Relation>([relationToView]),
-    relationsToObjects
-  };
-  return {
-    nodes: bucket.set(topNode.id, topNode),
-    workspaces: Immutable.List<Workspace>(),
-    relationToView
-  };
-}
-
 function CreateNote(): JSX.Element {
   const [text, setText] = useState<string>("");
   const upsertNodes = useUpsertNodes();
   const { getNode } = useSelectors();
-  const { getRootProps, getInputProps } = useDropzone({
-    accept: ".md",
-    onDrop: async (acceptedFiles: Array<File>) => {
-      const markdowns = await Promise.all(
-        acceptedFiles.map(
-          (file: File): Promise<string> => {
-            return new Promise((resolve, reject) => {
-              const reader = new FileReader();
-              reader.onload = () => {
-                resolve(reader.result as string);
-              };
-              reader.onerror = reject;
-              reader.readAsText(file);
-            });
-          }
-        )
-      );
-      const mdNodes = markdowns.reduce(
-        (rdx: Immutable.Map<string, KnowNode>, markdown: string) => {
-          const timeline = rdx.get("TIMELINE") as KnowNode;
-          const paragraphs = markdown.split("\n\n");
-          const { nodes, relationToView } = createBucket(
-            paragraphs.map((paragraph: string) => {
-              const md = new MarkdownIt();
-              return md.render(paragraph);
-            })
-          );
-          return rdx
-            .set(timeline.id, {
-              ...timeline,
-              relationsToObjects: timeline.relationsToObjects.insert(
-                0,
-                relationToView
-              )
-            })
-            .merge(nodes);
-        },
-        Immutable.Map<string, KnowNode>().set("TIMELINE", getNode("TIMELINE"))
-      );
-      upsertNodes(mdNodes);
-    }
-  });
   const onChange = (content: string): void => {
     setText(content);
   };
@@ -182,18 +77,6 @@ function CreateNote(): JSX.Element {
           </Card.Header>
           <Card.Body className="pl-2">
             <Tab.Content>
-              <Tab.Pane key="upload" eventKey="upload">
-                <div
-                  {...getRootProps({
-                    className: "dropzone filepicker dz-clickable"
-                  })}
-                >
-                  <div className="dz-default dz-message">
-                    <span>Drop Files here to upload</span>
-                  </div>
-                  <input {...getInputProps()} />
-                </div>
-              </Tab.Pane>
               <Tab.Pane eventKey="createNote" key="createNote">
                 <div className="scrolling-container">
                   <ReactQuill

@@ -1,6 +1,8 @@
 import React from "react";
 import { Droppable } from "react-beautiful-dnd";
 import { AddNode } from "./AddNode";
+import { useUpdateWorkspace, useWorkspace } from "./DataContext";
+import { FileDropZone } from "./FileDropZone";
 import { OuterNode } from "./OuterNode";
 
 type WorkspaceColumnProps = {
@@ -13,6 +15,25 @@ type WorkspaceColumnProps = {
 export function WorkspaceColumnView({
   column
 }: WorkspaceColumnProps): JSX.Element {
+  const workspace = useWorkspace();
+  const updateWorkspace = useUpdateWorkspace();
+  const onDropFiles = (topNodes: Array<string>, nodes: Nodes): void => {
+    const nodeViews = topNodes.map(nodeID => {
+      return {
+        nodeID
+      };
+    });
+    updateWorkspace(
+      {
+        columns: workspace.columns.set(column.columnID, {
+          ...column,
+          nodeViews: column.nodeViews.push(...nodeViews)
+        })
+      },
+      nodes
+    );
+  };
+
   return (
     <div className="workspace-column" key={column.columnID}>
       {column.nodeViews.map((nodeView, i) => (
@@ -35,7 +56,9 @@ export function WorkspaceColumnView({
             {provided.placeholder}
             {!snapshot.isDraggingOver && (
               <div className="outer-node">
-                <AddNode column={column} />
+                <FileDropZone onDrop={onDropFiles}>
+                  <AddNode column={column} />
+                </FileDropZone>
               </div>
             )}
           </div>

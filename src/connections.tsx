@@ -46,6 +46,18 @@ export function connectRelevantNodes(
   return nodes.set(objectID, updatedObject).set(subjectID, updatedSubject);
 }
 
+export function bulkConnectRelevantNodes(
+  subjectIDs: Array<string>,
+  objectID: string,
+  nodes: Nodes
+): Nodes {
+  return subjectIDs.reduce(
+    (reducer: Nodes, subjectID: string) =>
+      connectRelevantNodes(subjectID, objectID, reducer),
+    nodes
+  );
+}
+
 export function connectContainingNodes(
   subjectID: string,
   objectID: string,

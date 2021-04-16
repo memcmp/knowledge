@@ -1,5 +1,10 @@
 import Immutable from "immutable";
-import { newNode, connectRelevantNodes, moveRelations } from "./connections";
+import {
+  newNode,
+  connectRelevantNodes,
+  moveRelations,
+  bulkConnectRelevantNodes
+} from "./connections";
 import { getNode } from "./DataContext";
 
 test("Don't duplicate connections", () => {
@@ -30,4 +35,24 @@ test("Move Relations", () => {
   // only 0 and 3 are displayed, and the user moves 3 before 0
   const sorted = moveRelations(["0", "3"], relations, 1, 0);
   expect(sorted.toArray()).toEqual([rel3, rel0, rel1, rel2]);
+});
+
+test("Bulk Connect relevant Nodes", () => {
+  const technology = newNode("Technolgy", "TOPIC");
+  const flyingCars = newNode("Where is my Flying Car?", "TITLE");
+  const aeroCars = newNode("Aerocar", "TOPIC");
+  const allNodes = Immutable.Map({
+    [technology.id]: technology,
+    [flyingCars.id]: flyingCars,
+    [aeroCars.id]: aeroCars
+  });
+
+  const connections = bulkConnectRelevantNodes(
+    [flyingCars.id, aeroCars.id],
+    technology.id,
+    allNodes
+  );
+  expect(getNode(connections, flyingCars.id).relationsToObjects.size).toBe(1);
+  expect(getNode(connections, aeroCars.id).relationsToObjects.size).toBe(1);
+  expect(getNode(connections, technology.id).relationsToSubjects.size).toBe(2);
 });
