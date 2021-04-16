@@ -253,3 +253,15 @@ export function planNodeDeletion(
     toRemove: Immutable.Set([node.id, ...unreferencedQuotes])
   };
 }
+
+export function defaultDisplayConnection(
+  nodeType: NodeType
+): DisplayConnections {
+  if (["TITLE", "URL", "VIEW"].includes(nodeType)) {
+    return "CONTAINS_OBJECTS";
+  }
+  if (["QUOTE"].includes(nodeType)) {
+    return "RELEVANT_OBJECTS";
+  }
+  return "RELEVANT_SUBJECTS";
+}

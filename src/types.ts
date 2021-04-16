@@ -12,8 +12,14 @@ declare global {
 
   type Relations = Immutable.List<Relation>;
 
+  type DisplayConnections =
+    | "RELEVANT_SUBJECTS"
+    | "RELEVANT_OBJECTS"
+    | "CONTAINS_OBJECTS";
+
   type NodeView = {
     nodeID: string;
+    displayConnections: DisplayConnections;
   };
 
   type WorkspaceColumn = {

@@ -99,12 +99,16 @@
   background: rgba(0, 0, 0, 0.2);
 }
 
-.header-extras-btn {
+.outer-node-extras-btn {
   z-index: 2;
   position: absolute;
   top: 12px;
-  right: 6px;
+  right: 0px;
   border-radius: 3px;
   padding: 2px;
   font-size: 1.2rem;
+}
+
+.outer-node-title .dropdown-toggle::after {
+  display: none;
 }

@@ -6,7 +6,7 @@ import { Typeahead, Menu, MenuItem } from "react-bootstrap-typeahead";
 
 import { useNodes, useUpdateWorkspace, useWorkspace } from "./DataContext";
 
-import { newNode } from "./connections";
+import { defaultDisplayConnection, newNode } from "./connections";
 
 function AddNodeButton({
   setIsWriting
@@ -260,7 +260,8 @@ export function AddNode({ column }: AddNodeProps): JSX.Element {
         columns: workspace.columns.set(column.columnID, {
           ...column,
           nodeViews: column.nodeViews.push({
-            nodeID: node.id
+            nodeID: node.id,
+            displayConnections: defaultDisplayConnection(nodeType)
           })
         })
       },
@@ -275,7 +276,8 @@ export function AddNode({ column }: AddNodeProps): JSX.Element {
         columns: workspace.columns.set(column.columnID, {
           ...column,
           nodeViews: column.nodeViews.push({
-            nodeID: node.id
+            nodeID: node.id,
+            displayConnections: defaultDisplayConnection(node.nodeType)
           })
         })
       },

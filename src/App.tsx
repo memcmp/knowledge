@@ -53,10 +53,14 @@ function ViewContainer({
 
 function newDefaultWorkspace(): Workspace {
   const columnID: string = v4();
+  const defaultViews: Array<NodeView> = [
+    { nodeID: INTERESTS, displayConnections: "CONTAINS_OBJECTS" },
+    { nodeID: TIMELINE, displayConnections: "CONTAINS_OBJECTS" }
+  ];
   return {
     columns: Immutable.OrderedMap<string, WorkspaceColumn>().set(columnID, {
       columnID,
-      nodeViews: Immutable.List([{ nodeID: INTERESTS }, { nodeID: TIMELINE }])
+      nodeViews: Immutable.List<NodeView>(defaultViews)
     })
   };
 }

@@ -1,29 +1,47 @@
-import { Map } from "immutable";
 import React from "react";
+import { Map } from "immutable";
 import { Droppable } from "react-beautiful-dnd";
 import { bulkConnectRelevantNodes } from "./connections";
-import { useSelectors, useUpsertNodes } from "./DataContext";
+import { useSelectors, useUpsertNodes, Selectors } from "./DataContext";
 
 import { FileDropZone } from "./FileDropZone";
 
 import { InnerNode } from "./InnerNode";
 
+import { OuterNodeExtras } from "./OuterNodeExtras";
+
+function getChildNodes(
+  node: KnowNode,
+  selectors: Selectors,
+  displayConnections: DisplayConnections
+): Array<KnowNode> {
+  if (displayConnections === "CONTAINS_OBJECTS") {
+    return selectors.getObjects(node, undefined, ["CONTAINS"]);
+  }
+  if (displayConnections === "RELEVANT_OBJECTS") {
+    return selectors.getObjects(node, undefined, ["RELEVANT"]);
+  }
+  return selectors.getSubjects(node);
+}
+
 type OuterNodeProps = {
-  nodeID: string;
+  nodeView: NodeView;
   dndPostfix: string;
+  onNodeViewChange: (nodeView: NodeView) => void;
 };
 
 /* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable @typescript-eslint/unbound-method */
-export function OuterNode({ nodeID, dndPostfix }: OuterNodeProps): JSX.Element {
-  const { getNode, getObjects, getSubjects } = useSelectors();
+export function OuterNode({
+  nodeView,
+  dndPostfix,
+  onNodeViewChange
+}: OuterNodeProps): JSX.Element {
+  const selectors = useSelectors();
+  const { nodeID } = nodeView;
   const upsertNodes = useUpsertNodes();
-  const node = getNode(nodeID);
-
-  const contains = getObjects(node, undefined, ["CONTAINS"]);
-  // const relevantObjects = getObjects(node, undefined, ["RELEVANT"]);
-  const subjects = getSubjects(node);
-  const toDisplay = contains.length > 0 ? contains : subjects;
+  const node = selectors.getNode(nodeID);
+  const toDisplay = getChildNodes(node, selectors, nodeView.displayConnections);
   const onDropFiles = (topNodes: Array<string>, nodes: Nodes): void => {
     upsertNodes(
       bulkConnectRelevantNodes(
@@ -36,15 +54,23 @@ export function OuterNode({ nodeID, dndPostfix }: OuterNodeProps): JSX.Element {
     );
   };
 
+  const onConnectionsChange = (
+    displayConnections: DisplayConnections
+  ): void => {
+    onNodeViewChange({
+      ...nodeView,
+      displayConnections
+    });
+  };
+
   return (
     <div className="mb-3 outer-node" key={`outer.${node.id}.${dndPostfix}`}>
       <FileDropZone onDrop={onDropFiles}>
         <div className="outer-node-title border-bottom mb-1">
-          <div className="position-relative">
-            <button type="button" className="btn header-extras-btn hover-black">
-              <span className="simple-icon-options" />
-            </button>
-          </div>
+          <OuterNodeExtras
+            displayConnections={nodeView.displayConnections}
+            onConnectionsChange={onConnectionsChange}
+          />
           <Droppable
             droppableId={`drop.title.${nodeID}.${dndPostfix}`}
             key={`drop.title.${nodeID}.${dndPostfix}`}

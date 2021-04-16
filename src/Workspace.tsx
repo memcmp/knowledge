@@ -6,7 +6,9 @@ import "./Workspace.css";
 
 import { WorkspaceColumnView } from "./WorkspaceColumn";
 
-import { useUpdateWorkspace, useWorkspace } from "./DataContext";
+import { useSelectors, useUpdateWorkspace, useWorkspace } from "./DataContext";
+
+import { defaultDisplayConnection } from "./connections";
 
 /*
  * drop-column-columnID
@@ -51,6 +53,7 @@ function addEmptyColumn(workspace: Workspace): Workspace {
 export function WorkspaceView(): JSX.Element {
   const workspace = useWorkspace();
   const updateWorkspace = useUpdateWorkspace();
+  const { getNode } = useSelectors();
 
   const workspaceWithNewCol = {
     ...workspace,
@@ -74,7 +77,10 @@ export function WorkspaceView(): JSX.Element {
             return {
               ...column,
               nodeViews: column.nodeViews.insert(index, {
-                nodeID: sourceID
+                nodeID: sourceID,
+                displayConnections: defaultDisplayConnection(
+                  getNode(sourceID).nodeType
+                )
               })
             };
           }
