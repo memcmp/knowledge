@@ -24,7 +24,7 @@ function getChildNodes(
   if (displayConnections === "NONE") {
     return [];
   }
-  return selectors.getSubjects(node);
+  return selectors.getSubjects(node, undefined, ["RELEVANT"]);
 }
 
 type OuterNodeProps = {
