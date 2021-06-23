@@ -10,6 +10,8 @@ import { InnerNode } from "./InnerNode";
 
 import { OuterNodeExtras } from "./OuterNodeExtras";
 
+import { AddNodeToNode } from "./AddNode";
+
 function getChildNodes(
   node: KnowNode,
   selectors: Selectors,
@@ -117,6 +119,11 @@ export function OuterNode({
             )}
           </Droppable>
         </div>
+        {nodeView.displayConnections !== "NONE" && (
+          <div className="add-to-node">
+            <AddNodeToNode parentNodeView={nodeView} />
+          </div>
+        )}
       </FileDropZone>
     </div>
   );

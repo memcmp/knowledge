@@ -28,6 +28,27 @@
   background-color: #ebecf0;
 }
 
+.add-to-node .workspace-droppable {
+  background-color: #ebecf0;
+  color: gray;
+  height: 38px;
+  margin-top: 6px;
+  padding: 3px;
+  font-size: 16px;
+}
+
+.add-to-node {
+  margin-top: 1px;
+}
+
+.add-to-node .workspace-droppable:hover {
+  color: black;
+}
+
+.add-to-node .ql-editor {
+  padding-left: 3px;
+}
+
 .editor {
   background-color: white;
   border-radius: 3px;

@@ -1,6 +1,6 @@
 import React from "react";
 import { Droppable } from "react-beautiful-dnd";
-import { AddNode } from "./AddNode";
+import { AddNodeToColumn } from "./AddNode";
 import { useUpdateWorkspace, useWorkspace } from "./DataContext";
 import { FileDropZone } from "./FileDropZone";
 import { OuterNode } from "./OuterNode";
@@ -69,7 +69,7 @@ export function WorkspaceColumnView({
             {!snapshot.isDraggingOver && (
               <div className="outer-node">
                 <FileDropZone onDrop={onDropFiles}>
-                  <AddNode column={column} />
+                  <AddNodeToColumn column={column} />
                 </FileDropZone>
               </div>
             )}

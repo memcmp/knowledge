@@ -4,9 +4,20 @@ import { Button, Dropdown, ButtonGroup } from "react-bootstrap";
 import ReactQuill from "react-quill";
 import { Typeahead, Menu, MenuItem } from "react-bootstrap-typeahead";
 
-import { useNodes, useUpdateWorkspace, useWorkspace } from "./DataContext";
+import {
+  useNodes,
+  useUpdateWorkspace,
+  useWorkspace,
+  useUpsertNodes,
+  useSelectors
+} from "./DataContext";
 
-import { defaultDisplayConnection, newNode } from "./connections";
+import {
+  connectRelevantNodes,
+  defaultDisplayConnection,
+  newNode,
+  connectContainingNodes
+} from "./connections";
 
 function AddNodeButton({
   setIsWriting
@@ -232,25 +243,67 @@ function Search({ switchToNew, onSave, onClose }: SearchProps): JSX.Element {
       </div>
     </div>
   );
+  /* eslint-enable react/jsx-props-no-spreading */
 }
 
 type AddNodeProps = {
-  column: WorkspaceColumn;
+  onCreateNewNode: (text: string, nodeType: NodeType) => void;
+  onAddExistingNode: (node: KnowNode) => void;
 };
 
-/* eslint-enable react/jsx-props-no-spreading */
-export function AddNode({ column }: AddNodeProps): JSX.Element {
+function AddNode({
+  onCreateNewNode,
+  onAddExistingNode
+}: AddNodeProps): JSX.Element {
   const [isActive, setActive] = useState<boolean>(false);
   const [isCreatingNode, setIsCreatingNode] = useState<string | undefined>(
     undefined
   );
-  const workspace = useWorkspace();
-  const updateWorkspace = useUpdateWorkspace();
-
   const reset = (): void => {
     setActive(false);
     setIsCreatingNode(undefined);
   };
+
+  const createNewNode = (text: string, nodeType: NodeType): void => {
+    onCreateNewNode(text, nodeType);
+    reset();
+  };
+
+  const addExistingNode = (node: KnowNode): void => {
+    onAddExistingNode(node);
+    reset();
+  };
+
+  return (
+    <div>
+      {!isActive && <AddNodeButton setIsWriting={() => setActive(true)} />}
+      {isActive && isCreatingNode === undefined && (
+        <Search
+          onSave={addExistingNode}
+          switchToNew={(initialValue: string) => {
+            setIsCreatingNode(initialValue);
+          }}
+          onClose={reset}
+        />
+      )}
+      {isActive && isCreatingNode !== undefined && (
+        <Editor
+          initialValue={isCreatingNode}
+          onCreateNode={createNewNode}
+          onClose={reset}
+        />
+      )}
+    </div>
+  );
+}
+
+type AddNodeToColumnProps = {
+  column: WorkspaceColumn;
+};
+
+export function AddNodeToColumn({ column }: AddNodeToColumnProps): JSX.Element {
+  const workspace = useWorkspace();
+  const updateWorkspace = useUpdateWorkspace();
 
   const onCreateNewNode = (text: string, nodeType: NodeType): void => {
     const node = newNode(text, nodeType);
@@ -267,7 +320,6 @@ export function AddNode({ column }: AddNodeProps): JSX.Element {
       },
       nodes
     );
-    reset();
   };
 
   const onAddExistingNode = (node: KnowNode): void => {
@@ -283,28 +335,63 @@ export function AddNode({ column }: AddNodeProps): JSX.Element {
       },
       Immutable.Map<string, KnowNode>()
     );
-    reset();
+  };
+  return (
+    <AddNode
+      onCreateNewNode={onCreateNewNode}
+      onAddExistingNode={onAddExistingNode}
+    />
+  );
+}
+
+function connectNodes(
+  parentNode: KnowNode,
+  child: KnowNode,
+  display: DisplayConnections
+): Immutable.Map<string, KnowNode> {
+  const nodes = Immutable.Map<string, KnowNode>()
+    .set(parentNode.id, parentNode)
+    .set(child.id, child);
+  if (display === "NONE" || display === "RELEVANT_SUBJECTS") {
+    return connectRelevantNodes(child.id, parentNode.id, nodes);
+  }
+  if (display === "RELEVANT_OBJECTS") {
+    return connectRelevantNodes(parentNode.id, child.id, nodes);
+  }
+  if (display === "CONTAINS_OBJECTS") {
+    return connectContainingNodes(parentNode.id, child.id, nodes);
+  }
+  // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+  throw new Error(`Unhandled connection type ${display}`);
+}
+
+type AddNodeToNodeProps = {
+  parentNodeView: NodeView;
+};
+
+export function AddNodeToNode({
+  parentNodeView
+}: AddNodeToNodeProps): JSX.Element {
+  const { getNode } = useSelectors();
+  const upsertNodes = useUpsertNodes();
+  const parentId = parentNodeView.nodeID;
+  const connectionType = parentNodeView.displayConnections;
+
+  const onCreateNewNode = (text: string, nodeType: NodeType): void => {
+    const parentNode = getNode(parentId);
+    const node = newNode(text, nodeType);
+    upsertNodes(connectNodes(parentNode, node, connectionType));
+  };
+
+  const onAddExistingNode = (node: KnowNode): void => {
+    const parentNode = getNode(parentId);
+    upsertNodes(connectNodes(parentNode, node, connectionType));
   };
 
   return (
-    <div>
-      {!isActive && <AddNodeButton setIsWriting={() => setActive(true)} />}
-      {isActive && isCreatingNode === undefined && (
-        <Search
-          onSave={onAddExistingNode}
-          switchToNew={(initialValue: string) => {
-            setIsCreatingNode(initialValue);
-          }}
-          onClose={reset}
-        />
-      )}
-      {isActive && isCreatingNode !== undefined && (
-        <Editor
-          initialValue={isCreatingNode}
-          onCreateNode={onCreateNewNode}
-          onClose={reset}
-        />
-      )}
-    </div>
+    <AddNode
+      onCreateNewNode={onCreateNewNode}
+      onAddExistingNode={onAddExistingNode}
+    />
   );
 }
