@@ -344,7 +344,7 @@ export function AddNodeToColumn({ column }: AddNodeToColumnProps): JSX.Element {
   );
 }
 
-function connectNodes(
+export function connectNodes(
   parentNode: KnowNode,
   child: KnowNode,
   display: DisplayConnections

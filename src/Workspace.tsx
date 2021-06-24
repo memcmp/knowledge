@@ -6,9 +6,16 @@ import "./Workspace.css";
 
 import { WorkspaceColumnView } from "./WorkspaceColumn";
 
-import { useSelectors, useUpdateWorkspace, useWorkspace } from "./DataContext";
+import {
+  useSelectors,
+  useUpdateWorkspace,
+  useUpsertNodes,
+  useWorkspace
+} from "./DataContext";
 
 import { defaultDisplayConnection } from "./connections";
+
+import { connectNodes } from "./AddNode";
 
 /*
  * drop-column-columnID
@@ -53,6 +60,7 @@ function addEmptyColumn(workspace: Workspace): Workspace {
 export function WorkspaceView(): JSX.Element {
   const workspace = useWorkspace();
   const updateWorkspace = useUpdateWorkspace();
+  const upsertNodes = useUpsertNodes();
   const { getNode } = useSelectors();
 
   const workspaceWithNewCol = {
@@ -91,6 +99,18 @@ export function WorkspaceView(): JSX.Element {
             columns: updatedColumns
           },
           Immutable.Map<string, KnowNode>()
+        );
+      } else if (droppableID.startsWith("drop.outer")) {
+        const [outerNodeID, column, n] = droppableID
+          .replace("drop.outer.", "")
+          .split(".");
+        const view = (workspaceWithNewCol.columns.get(
+          column
+        ) as WorkspaceColumn).nodeViews.get(parseInt(n, 10)) as NodeView;
+        const outerNode = getNode(outerNodeID);
+        const innerNode = getNode(sourceID);
+        upsertNodes(
+          connectNodes(outerNode, innerNode, view.displayConnections)
         );
       }
     }
