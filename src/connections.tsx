@@ -6,7 +6,9 @@ import { getNode, getObjects } from "./DataContext";
 export function connectRelevantNodes(
   subjectID: string,
   objectID: string,
-  nodes: Nodes
+  nodes: Nodes,
+  relToSubjPos?: number,
+  relToObjPos?: number
 ): Nodes {
   const objectNode = nodes.get(objectID);
   const subjectNode = nodes.get(subjectID);
@@ -21,28 +23,67 @@ export function connectRelevantNodes(
     a: subjectNode.id,
     b: objectNode.id
   };
-  // check if the relationship doesn't exist yet
-  if (
-    subjectNode.relationsToSubjects
-      .concat(subjectNode.relationsToObjects)
-      .filter(
-        rel =>
-          rel.relationType === relation.relationType &&
-          rel.a === relation.a &&
-          rel.b === relation.b
-      ).size > 0
-  ) {
-    return nodes;
+  const existingRelationToSubject = objectNode.relationsToSubjects.findIndex(
+    rel =>
+      rel.relationType === relation.relationType &&
+      rel.a === relation.a &&
+      rel.b === relation.b
+  );
+
+  const existingRelationToObject = subjectNode.relationsToObjects.findIndex(
+    rel =>
+      rel.relationType === relation.relationType &&
+      rel.a === relation.a &&
+      rel.b === relation.b
+  );
+  if (existingRelationToSubject !== -1 || existingRelationToObject !== -1) {
+    const withUpdatedObject =
+      relToSubjPos !== undefined
+        ? nodes.set(objectID, {
+            ...objectNode,
+            relationsToSubjects: objectNode.relationsToSubjects
+              .remove(existingRelationToSubject)
+              .insert(relToSubjPos, relation)
+          })
+        : nodes;
+    const withUpdatedSubj =
+      relToObjPos !== undefined
+        ? withUpdatedObject.set(subjectID, {
+            ...subjectNode,
+            relationsToObjects: subjectNode.relationsToObjects
+              .remove(existingRelationToObject)
+              .insert(relToObjPos, relation)
+          })
+        : withUpdatedObject;
+    return withUpdatedSubj;
   }
 
-  const updatedObject = {
-    ...objectNode,
-    relationsToSubjects: objectNode.relationsToSubjects.push(relation)
-  };
-  const updatedSubject = {
-    ...subjectNode,
-    relationsToObjects: subjectNode.relationsToObjects.push(relation)
-  };
+  const updatedObject =
+    relToSubjPos !== undefined
+      ? {
+          ...objectNode,
+          relationsToSubjects: objectNode.relationsToSubjects.insert(
+            relToSubjPos,
+            relation
+          )
+        }
+      : {
+          ...objectNode,
+          relationsToSubjects: objectNode.relationsToSubjects.push(relation)
+        };
+  const updatedSubject =
+    relToObjPos !== undefined
+      ? {
+          ...subjectNode,
+          relationsToObjects: subjectNode.relationsToObjects.insert(
+            relToObjPos,
+            relation
+          )
+        }
+      : {
+          ...subjectNode,
+          relationsToObjects: subjectNode.relationsToObjects.push(relation)
+        };
   return nodes.set(objectID, updatedObject).set(subjectID, updatedSubject);
 }
 

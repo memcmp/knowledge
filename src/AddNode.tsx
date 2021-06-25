@@ -347,16 +347,29 @@ export function AddNodeToColumn({ column }: AddNodeToColumnProps): JSX.Element {
 export function connectNodes(
   parentNode: KnowNode,
   child: KnowNode,
-  display: DisplayConnections
+  display: DisplayConnections,
+  index?: number
 ): Immutable.Map<string, KnowNode> {
   const nodes = Immutable.Map<string, KnowNode>()
     .set(parentNode.id, parentNode)
     .set(child.id, child);
   if (display === "NONE" || display === "RELEVANT_SUBJECTS") {
-    return connectRelevantNodes(child.id, parentNode.id, nodes);
+    return connectRelevantNodes(
+      child.id,
+      parentNode.id,
+      nodes,
+      index,
+      undefined
+    );
   }
   if (display === "RELEVANT_OBJECTS") {
-    return connectRelevantNodes(parentNode.id, child.id, nodes);
+    return connectRelevantNodes(
+      parentNode.id,
+      child.id,
+      nodes,
+      undefined,
+      index
+    );
   }
   if (display === "CONTAINS_OBJECTS") {
     return connectContainingNodes(parentNode.id, child.id, nodes);

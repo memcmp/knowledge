@@ -101,6 +101,7 @@ export function WorkspaceView(): JSX.Element {
           Immutable.Map<string, KnowNode>()
         );
       } else if (droppableID.startsWith("drop.outer")) {
+        const { index } = result.destination;
         const [outerNodeID, column, n] = droppableID
           .replace("drop.outer.", "")
           .split(".");
@@ -110,7 +111,7 @@ export function WorkspaceView(): JSX.Element {
         const outerNode = getNode(outerNodeID);
         const innerNode = getNode(sourceID);
         upsertNodes(
-          connectNodes(outerNode, innerNode, view.displayConnections)
+          connectNodes(outerNode, innerNode, view.displayConnections, index)
         );
       }
     }
