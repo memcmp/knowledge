@@ -3,7 +3,8 @@ import Immutable from "immutable";
 
 import { getNode, getObjects } from "./DataContext";
 
-export function connectRelevantNodes(
+function connectNodes(
+  relationType: RelationType,
   subjectID: string,
   objectID: string,
   nodes: Nodes,
@@ -19,7 +20,7 @@ export function connectRelevantNodes(
     throw new Error(`Can't find parentNode with ID${objectID}`);
   }
   const relation: Relation = {
-    relationType: "RELEVANT",
+    relationType,
     a: subjectNode.id,
     b: objectNode.id
   };
@@ -87,6 +88,23 @@ export function connectRelevantNodes(
   return nodes.set(objectID, updatedObject).set(subjectID, updatedSubject);
 }
 
+export function connectRelevantNodes(
+  subjectID: string,
+  objectID: string,
+  nodes: Nodes,
+  relToSubjPos?: number,
+  relToObjPos?: number
+): Nodes {
+  return connectNodes(
+    "RELEVANT",
+    subjectID,
+    objectID,
+    nodes,
+    relToSubjPos,
+    relToObjPos
+  );
+}
+
 export function bulkConnectRelevantNodes(
   subjectIDs: Array<string>,
   objectID: string,
@@ -102,41 +120,18 @@ export function bulkConnectRelevantNodes(
 export function connectContainingNodes(
   subjectID: string,
   objectID: string,
-  nodes: Nodes
+  nodes: Nodes,
+  relToSubjPos?: number,
+  relToObjPos?: number
 ): Nodes {
-  const objectNode = nodes.get(objectID);
-  const subjectNode = nodes.get(subjectID);
-  if (!objectNode) {
-    throw new Error(`Can't find childNode with ID${objectID}`);
-  }
-  if (!subjectNode) {
-    throw new Error(`Can't find parentNode with ID${objectID}`);
-  }
-  const relation: Relation = {
-    relationType: "CONTAINS",
-    a: subjectNode.id,
-    b: objectNode.id
-  };
-  // check if the relationship doesn't exist yet
-  if (
-    subjectNode.relationsToSubjects.filter(
-      rel =>
-        rel.relationType === relation.relationType &&
-        rel.a === relation.a &&
-        rel.b === relation.b
-    ).size > 0
-  ) {
-    return nodes;
-  }
-  const updatedObject = {
-    ...objectNode,
-    relationsToSubjects: objectNode.relationsToSubjects.push(relation)
-  };
-  const updatedSubject = {
-    ...subjectNode,
-    relationsToObjects: subjectNode.relationsToObjects.insert(0, relation)
-  };
-  return nodes.set(objectID, updatedObject).set(subjectID, updatedSubject);
+  return connectNodes(
+    "CONTAINS",
+    subjectID,
+    objectID,
+    nodes,
+    relToSubjPos,
+    relToObjPos
+  );
 }
 
 export function disconnectNode(nodes: Nodes, nodeID: string): Nodes {

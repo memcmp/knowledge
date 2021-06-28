@@ -372,7 +372,13 @@ export function connectNodes(
     );
   }
   if (display === "CONTAINS_OBJECTS") {
-    return connectContainingNodes(parentNode.id, child.id, nodes);
+    return connectContainingNodes(
+      parentNode.id,
+      child.id,
+      nodes,
+      undefined,
+      index
+    );
   }
   // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
   throw new Error(`Unhandled connection type ${display}`);
