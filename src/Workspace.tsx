@@ -33,6 +33,9 @@ function parseID(dndID: string): string | undefined {
   if (dndID.startsWith("drop.outer.")) {
     return dndID.replace("drop.outer.", "").split(".")[0];
   }
+  if (dndID.startsWith("drop.addtonode.")) {
+    return dndID.replace("drop.addtonode.", "").split(".")[0];
+  }
   if (dndID.startsWith("drag.inner.")) {
     return dndID.replace("drag.inner.", "").split(".")[0];
   }
@@ -112,6 +115,18 @@ export function WorkspaceView(): JSX.Element {
         const innerNode = getNode(sourceID);
         upsertNodes(
           connectNodes(outerNode, innerNode, view.displayConnections, index)
+        );
+      } else if (droppableID.startsWith("drop.addtonode")) {
+        const [outerNodeID, column, n] = droppableID
+          .replace("drop.addtonode.", "")
+          .split(".");
+        const view = (workspaceWithNewCol.columns.get(
+          column
+        ) as WorkspaceColumn).nodeViews.get(parseInt(n, 10)) as NodeView;
+        const outerNode = getNode(outerNodeID);
+        const innerNode = getNode(sourceID);
+        upsertNodes(
+          connectNodes(outerNode, innerNode, view.displayConnections)
         );
       }
     }

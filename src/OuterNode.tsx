@@ -125,9 +125,25 @@ export function OuterNode({
           </Droppable>
         </div>
         {nodeView.displayConnections !== "NONE" && (
-          <div className="add-to-node">
-            <AddNodeToNode parentNodeView={nodeView} />
-          </div>
+          <Droppable
+            droppableId={`drop.addtonode.${nodeID}.${dndPostfix}`}
+            key={`drop.addtonode.${nodeID}.${dndPostfix}`}
+          >
+            {(provided, snapshot) => (
+              <div
+                {...provided.droppableProps}
+                ref={provided.innerRef}
+                className={`${snapshot.isDraggingOver ? "dragging-over" : ""}`}
+              >
+                {provided.placeholder}
+                {!snapshot.isDraggingOver && (
+                  <div className="add-to-node">
+                    <AddNodeToNode parentNodeView={nodeView} />
+                  </div>
+                )}
+              </div>
+            )}
+          </Droppable>
         )}
       </FileDropZone>
     </div>
