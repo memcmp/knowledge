@@ -33,6 +33,7 @@ type OuterNodeProps = {
   nodeView: NodeView;
   dndPostfix: string;
   onNodeViewChange: (nodeView: NodeView, nodes: Nodes) => void;
+  onRemove: () => void;
 };
 
 /* eslint-disable react/jsx-props-no-spreading */
@@ -40,7 +41,8 @@ type OuterNodeProps = {
 export function OuterNode({
   nodeView,
   dndPostfix,
-  onNodeViewChange
+  onNodeViewChange,
+  onRemove
 }: OuterNodeProps): JSX.Element {
   const selectors = useSelectors();
   const { nodeID } = nodeView;
@@ -87,6 +89,7 @@ export function OuterNode({
           <OuterNodeExtras
             displayConnections={nodeView.displayConnections}
             onConnectionsChange={onConnectionsChange}
+            onRemove={onRemove}
           />
           <Droppable
             droppableId={`drop.title.${nodeID}.${dndPostfix}`}

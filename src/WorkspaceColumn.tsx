@@ -1,5 +1,6 @@
 import React from "react";
 import { Droppable } from "react-beautiful-dnd";
+import { Map } from "immutable";
 import { AddNodeToColumn } from "./AddNode";
 import { useUpdateWorkspace, useWorkspace } from "./DataContext";
 import { FileDropZone } from "./FileDropZone";
@@ -51,6 +52,17 @@ export function WorkspaceColumnView({
                 })
               },
               nodes
+            );
+          }}
+          onRemove={(): void => {
+            updateWorkspace(
+              {
+                columns: workspace.columns.set(column.columnID, {
+                  ...column,
+                  nodeViews: column.nodeViews.remove(i)
+                })
+              },
+              Map<string, KnowNode>()
             );
           }}
         />

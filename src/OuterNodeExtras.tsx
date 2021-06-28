@@ -5,11 +5,13 @@ import { Dropdown } from "react-bootstrap";
 type OuterNodeExtrasProps = {
   displayConnections: DisplayConnections;
   onConnectionsChange: (displayConnections: DisplayConnections) => void;
+  onRemove: () => void;
 };
 
 export function OuterNodeExtras({
   displayConnections,
-  onConnectionsChange
+  onConnectionsChange,
+  onRemove
 }: OuterNodeExtrasProps): JSX.Element {
   return (
     <div className="position-relative">
@@ -44,6 +46,10 @@ export function OuterNodeExtras({
             onSelect={() => onConnectionsChange("CONTAINS_OBJECTS")}
           >
             Contains
+          </Dropdown.Item>
+          <Dropdown.Divider />
+          <Dropdown.Item onSelect={onRemove}>
+            Remove from Dashboard
           </Dropdown.Item>
         </Dropdown.Menu>
       </Dropdown>
