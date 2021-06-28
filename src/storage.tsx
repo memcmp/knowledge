@@ -12,13 +12,10 @@ export async function saveDataStore(
   storage: Storage,
   store: Store
 ): Promise<void> {
-  /*
   await storage.putFile(STORAGE_FILE, JSON.stringify(store), {
     encrypt: false,
     dangerouslyIgnoreEtag: true
   });
-   */
-  return Promise.resolve();
 }
 /* eslint-enable @typescript-eslint/no-unused-vars */
 
@@ -77,7 +74,20 @@ export async function getDataStore(storage: Storage): Promise<Store> {
       workspaces:
         rawStore.workspaces === undefined
           ? Immutable.List<Workspace>()
-          : Immutable.List<Workspace>(rawStore.workspaces)
+          : Immutable.List<Workspace>(
+              rawStore.workspaces.map(rawWorkspace => {
+                return {
+                  columns: Immutable.OrderedMap(rawWorkspace.columns).map(
+                    rawColumn => {
+                      return {
+                        columnID: rawColumn.columnID,
+                        nodeViews: Immutable.List(rawColumn.nodeViews)
+                      };
+                    }
+                  )
+                };
+              })
+            )
     };
     return {
       nodes: DEFAULT_STORE.nodes.merge(Immutable.Map(store.nodes)),
