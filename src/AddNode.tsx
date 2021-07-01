@@ -2,7 +2,12 @@ import React, { useEffect, useState } from "react";
 import Immutable from "immutable";
 import { Button, Dropdown, ButtonGroup } from "react-bootstrap";
 import ReactQuill from "react-quill";
-import { Typeahead, Menu, MenuItem } from "react-bootstrap-typeahead";
+import {
+  Typeahead,
+  Menu,
+  MenuItem,
+  TypeaheadInputSingle
+} from "react-bootstrap-typeahead";
 
 import {
   useNodes,
@@ -192,6 +197,14 @@ function Search({ switchToNew, onSave, onClose }: SearchProps): JSX.Element {
           if (menu) {
             menu.scrollIntoView({ behavior: "smooth", block: "end" });
           }
+        }}
+        renderInput={inputProps => {
+          // This is a hack, when the value is too long, a blur event is triggered when clicking outside the box
+          const modifiedProps = {
+            ...inputProps,
+            value: inputProps.value.substr(0, 500)
+          };
+          return <TypeaheadInputSingle {...modifiedProps} />;
         }}
         renderMenu={(results, menuProps) => (
           <>
