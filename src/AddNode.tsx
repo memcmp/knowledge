@@ -200,10 +200,9 @@ function Search({ switchToNew, onSave, onClose }: SearchProps): JSX.Element {
           }
         }}
         renderInput={inputProps => {
-          // This is a hack, when the value is too long, a blur event is triggered when clicking outside the box
           const modifiedProps = {
             ...inputProps,
-            value: inputProps.value.substr(0, 51)
+            value: inputProps.value.replace("\n", "")
           };
           return <TypeaheadInputSingle {...modifiedProps} />;
         }}
