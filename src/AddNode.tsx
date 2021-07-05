@@ -14,7 +14,8 @@ import {
   useUpdateWorkspace,
   useWorkspace,
   useUpsertNodes,
-  useSelectors
+  useSelectors,
+  GetSubjects
 } from "./DataContext";
 
 import {
@@ -202,7 +203,7 @@ function Search({ switchToNew, onSave, onClose }: SearchProps): JSX.Element {
           // This is a hack, when the value is too long, a blur event is triggered when clicking outside the box
           const modifiedProps = {
             ...inputProps,
-            value: inputProps.value.substr(0, 500)
+            value: inputProps.value.substr(0, 51)
           };
           return <TypeaheadInputSingle {...modifiedProps} />;
         }}
@@ -361,12 +362,32 @@ export function connectNodes(
   parentNode: KnowNode,
   child: KnowNode,
   display: DisplayConnections,
+  getSubjects: GetSubjects,
   index?: number
 ): Immutable.Map<string, KnowNode> {
   const nodes = Immutable.Map<string, KnowNode>()
     .set(parentNode.id, parentNode)
     .set(child.id, child);
   if (display === "NONE" || display === "RELEVANT_SUBJECTS") {
+    const inherit =
+      child.nodeType === "QUOTE"
+        ? getSubjects(child, ["TITLE", "URL"], ["CONTAINS"])[0]
+        : undefined;
+    if (inherit !== undefined) {
+      return connectRelevantNodes(
+        child.id,
+        parentNode.id,
+        connectRelevantNodes(
+          inherit.id,
+          parentNode.id,
+          nodes.set(inherit.id, inherit),
+          undefined,
+          undefined
+        ),
+        index,
+        undefined
+      );
+    }
     return connectRelevantNodes(
       child.id,
       parentNode.id,
@@ -404,7 +425,7 @@ type AddNodeToNodeProps = {
 export function AddNodeToNode({
   parentNodeView
 }: AddNodeToNodeProps): JSX.Element {
-  const { getNode } = useSelectors();
+  const { getNode, getSubjects } = useSelectors();
   const upsertNodes = useUpsertNodes();
   const parentId = parentNodeView.nodeID;
   const connectionType = parentNodeView.displayConnections;
@@ -412,12 +433,12 @@ export function AddNodeToNode({
   const onCreateNewNode = (text: string, nodeType: NodeType): void => {
     const parentNode = getNode(parentId);
     const node = newNode(text, nodeType);
-    upsertNodes(connectNodes(parentNode, node, connectionType));
+    upsertNodes(connectNodes(parentNode, node, connectionType, getSubjects));
   };
 
   const onAddExistingNode = (node: KnowNode): void => {
     const parentNode = getNode(parentId);
-    upsertNodes(connectNodes(parentNode, node, connectionType));
+    upsertNodes(connectNodes(parentNode, node, connectionType, getSubjects));
   };
 
   return (

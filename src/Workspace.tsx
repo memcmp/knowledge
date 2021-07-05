@@ -64,7 +64,7 @@ export function WorkspaceView(): JSX.Element {
   const workspace = useWorkspace();
   const updateWorkspace = useUpdateWorkspace();
   const upsertNodes = useUpsertNodes();
-  const { getNode } = useSelectors();
+  const { getNode, getSubjects } = useSelectors();
 
   const workspaceWithNewCol = {
     ...workspace,
@@ -114,7 +114,13 @@ export function WorkspaceView(): JSX.Element {
         const outerNode = getNode(outerNodeID);
         const innerNode = getNode(sourceID);
         upsertNodes(
-          connectNodes(outerNode, innerNode, view.displayConnections, index)
+          connectNodes(
+            outerNode,
+            innerNode,
+            view.displayConnections,
+            getSubjects,
+            index
+          )
         );
       } else if (droppableID.startsWith("drop.addtonode")) {
         const [outerNodeID, column, n] = droppableID
@@ -126,7 +132,12 @@ export function WorkspaceView(): JSX.Element {
         const outerNode = getNode(outerNodeID);
         const innerNode = getNode(sourceID);
         upsertNodes(
-          connectNodes(outerNode, innerNode, view.displayConnections)
+          connectNodes(
+            outerNode,
+            innerNode,
+            view.displayConnections,
+            getSubjects
+          )
         );
       }
     }

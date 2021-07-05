@@ -109,18 +109,22 @@ function getAllNodesByType(
   );
 }
 
+export type GetObjects = (
+  node: KnowNode,
+  filter?: Array<NodeType>,
+  filterRelations?: Array<RelationType>
+) => Array<KnowNode>;
+
+export type GetSubjects = (
+  node: KnowNode,
+  filter?: Array<NodeType>,
+  filterRelations?: Array<RelationType>
+) => Array<KnowNode>;
+
 export type Selectors = {
   getNode: (id: string) => KnowNode;
-  getObjects: (
-    node: KnowNode,
-    filter?: Array<NodeType>,
-    filterRelations?: Array<RelationType>
-  ) => Array<KnowNode>;
-  getSubjects: (
-    node: KnowNode,
-    filter?: Array<NodeType>,
-    filterRelations?: Array<RelationType>
-  ) => Array<KnowNode>;
+  getObjects: GetObjects;
+  getSubjects: GetSubjects;
   getAllNodesByType: (nodeTypes: Array<NodeType>) => Array<KnowNode>;
 };
 
