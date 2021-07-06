@@ -3,6 +3,26 @@ import Immutable from "immutable";
 
 import { getNode, getObjects } from "./DataContext";
 
+function mapIndex(
+  relations: Relations,
+  relationType: RelationType,
+  index: number | undefined
+): number | undefined {
+  if (index === undefined) {
+    return undefined;
+  }
+  return relations
+    .map((rel, i) => {
+      return {
+        ...rel,
+        index: i
+      };
+    })
+    .filter(rel => rel.relationType === relationType)
+    .map(rel => rel.index)
+    .get(index, relations.size);
+}
+
 function connectNodes(
   relationType: RelationType,
   subjectID: string,
@@ -37,34 +57,44 @@ function connectNodes(
       rel.a === relation.a &&
       rel.b === relation.b
   );
+  const mappedRelToSubjPos = mapIndex(
+    objectNode.relationsToSubjects,
+    relationType,
+    relToSubjPos
+  );
+  const mappedRelToObjPos = mapIndex(
+    subjectNode.relationsToObjects,
+    relationType,
+    relToObjPos
+  );
   if (existingRelationToSubject !== -1 || existingRelationToObject !== -1) {
     const withUpdatedObject =
-      relToSubjPos !== undefined
+      mappedRelToSubjPos !== undefined
         ? nodes.set(objectID, {
             ...objectNode,
             relationsToSubjects: objectNode.relationsToSubjects
               .remove(existingRelationToSubject)
-              .insert(relToSubjPos, relation)
+              .insert(mappedRelToSubjPos, relation)
           })
         : nodes;
     const withUpdatedSubj =
-      relToObjPos !== undefined
+      mappedRelToObjPos !== undefined
         ? withUpdatedObject.set(subjectID, {
             ...subjectNode,
             relationsToObjects: subjectNode.relationsToObjects
               .remove(existingRelationToObject)
-              .insert(relToObjPos, relation)
+              .insert(mappedRelToObjPos, relation)
           })
         : withUpdatedObject;
     return withUpdatedSubj;
   }
 
   const updatedObject =
-    relToSubjPos !== undefined
+    mappedRelToSubjPos !== undefined
       ? {
           ...objectNode,
           relationsToSubjects: objectNode.relationsToSubjects.insert(
-            relToSubjPos,
+            mappedRelToSubjPos,
             relation
           )
         }
@@ -73,11 +103,11 @@ function connectNodes(
           relationsToSubjects: objectNode.relationsToSubjects.push(relation)
         };
   const updatedSubject =
-    relToObjPos !== undefined
+    mappedRelToObjPos !== undefined
       ? {
           ...subjectNode,
           relationsToObjects: subjectNode.relationsToObjects.insert(
-            relToObjPos,
+            mappedRelToObjPos,
             relation
           )
         }
