@@ -87,6 +87,7 @@ export function WorkspaceView(): JSX.Element {
             return {
               ...column,
               nodeViews: column.nodeViews.push({
+                expanded: true,
                 nodeID: sourceID,
                 displayConnections: defaultDisplayConnection(
                   getNode(sourceID).nodeType

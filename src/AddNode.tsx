@@ -327,7 +327,8 @@ export function AddNodeToColumn({ column }: AddNodeToColumnProps): JSX.Element {
           ...column,
           nodeViews: column.nodeViews.push({
             nodeID: node.id,
-            displayConnections: defaultDisplayConnection(nodeType)
+            displayConnections: defaultDisplayConnection(nodeType),
+            expanded: true
           })
         })
       },
@@ -342,7 +343,8 @@ export function AddNodeToColumn({ column }: AddNodeToColumnProps): JSX.Element {
           ...column,
           nodeViews: column.nodeViews.push({
             nodeID: node.id,
-            displayConnections: defaultDisplayConnection(node.nodeType)
+            displayConnections: defaultDisplayConnection(node.nodeType),
+            expanded: true
           })
         })
       },
@@ -367,7 +369,7 @@ export function connectNodes(
   const nodes = Immutable.Map<string, KnowNode>()
     .set(parentNode.id, parentNode)
     .set(child.id, child);
-  if (display === "NONE" || display === "RELEVANT_SUBJECTS") {
+  if (display === "RELEVANT_SUBJECTS") {
     const inherit =
       child.nodeType === "QUOTE"
         ? getSubjects(child, ["TITLE", "URL"], ["CONTAINS"])[0]

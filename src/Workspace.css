@@ -146,10 +146,46 @@
   font-size: 1.2rem;
 }
 
+.outer-node-extras-btn {
+  z-index: 2;
+  position: absolute;
+  top: 12px;
+  right: 0px;
+  border-radius: 3px;
+  padding: 2px;
+  font-size: 1.2rem;
+}
+
+.outer-node-toggle-btn {
+  z-index: 2;
+  position: absolute;
+  top: 12px;
+  left: 0px;
+  border-radius: 3px;
+  padding: 2px;
+  font-size: 1.2rem;
+  background-color: transparent;
+  border: 0px;
+}
+
 .outer-node-title .dropdown-toggle::after {
   display: none;
 }
 
 .dropdown-menu {
   border-radius: 3px;
+}
+
+.toggle-button {
+  border: 0px;
+  background-color: transparent;
+  color: gray;
+  margin: 0 5px 0 -5px;
+  padding: 0px;
+}
+
+.toggle-button:hover {
+  color: black;
+  border: 1px black;
+  border-radius: 50%;
 }

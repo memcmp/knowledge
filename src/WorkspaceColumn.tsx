@@ -22,7 +22,8 @@ export function WorkspaceColumnView({
     const nodeViews: Array<NodeView> = topNodes.map(nodeID => {
       return {
         nodeID,
-        displayConnections: "NONE"
+        displayConnections: "CONTAINS_OBJECTS",
+        expanded: false
       };
     });
     updateWorkspace(

@@ -15,12 +15,12 @@ declare global {
   type DisplayConnections =
     | "RELEVANT_SUBJECTS"
     | "RELEVANT_OBJECTS"
-    | "CONTAINS_OBJECTS"
-    | "NONE";
+    | "CONTAINS_OBJECTS";
 
   type NodeView = {
     nodeID: string;
     displayConnections: DisplayConnections;
+    expanded: boolean;
   };
 
   type WorkspaceColumn = {

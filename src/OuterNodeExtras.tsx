@@ -24,12 +24,6 @@ export function OuterNodeExtras({
         </Dropdown.Toggle>
         <Dropdown.Menu>
           <Dropdown.Item
-            active={displayConnections === "NONE"}
-            onSelect={() => onConnectionsChange("NONE")}
-          >
-            Hide Connections
-          </Dropdown.Item>
-          <Dropdown.Item
             active={displayConnections === "RELEVANT_SUBJECTS"}
             onSelect={() => onConnectionsChange("RELEVANT_SUBJECTS")}
           >

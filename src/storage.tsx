@@ -81,7 +81,23 @@ export async function getDataStore(storage: Storage): Promise<Store> {
                     rawColumn => {
                       return {
                         columnID: rawColumn.columnID,
-                        nodeViews: Immutable.List(rawColumn.nodeViews)
+                        nodeViews: Immutable.List(
+                          rawColumn.nodeViews.map(nodeView => {
+                            return {
+                              nodeID: nodeView.nodeID,
+                              displayConnections:
+                                (nodeView.displayConnections as string) ===
+                                "NONE"
+                                  ? "RELEVANT_SUBJECTS"
+                                  : nodeView.displayConnections,
+                              expanded:
+                                nodeView.expanded === undefined
+                                  ? (nodeView.displayConnections as string) !==
+                                    "NONE"
+                                  : nodeView.expanded
+                            };
+                          })
+                        )
                       };
                     }
                   )

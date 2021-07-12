@@ -65,7 +65,8 @@ function newDefaultWorkspace(nodes: Nodes): Workspace {
   const timelineViews: Array<NodeView> = timelineNodes.map(node => {
     return {
       nodeID: node.id,
-      displayConnections: "NONE"
+      displayConnections: "RELEVANT_SUBJECTS",
+      expanded: false
     };
   });
 
@@ -74,7 +75,8 @@ function newDefaultWorkspace(nodes: Nodes): Workspace {
   const topicsViews: Array<NodeView> = topicsNodes.map(node => {
     return {
       nodeID: node.id,
-      displayConnections: "NONE"
+      displayConnections: "RELEVANT_SUBJECTS",
+      expanded: false
     };
   });
   return {

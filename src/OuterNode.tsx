@@ -9,7 +9,6 @@ import { FileDropZone } from "./FileDropZone";
 import { InnerNode } from "./InnerNode";
 
 import { OuterNodeExtras } from "./OuterNodeExtras";
-
 import { AddNodeToNode } from "./AddNode";
 
 function getChildNodes(
@@ -22,9 +21,6 @@ function getChildNodes(
   }
   if (displayConnections === "RELEVANT_OBJECTS") {
     return selectors.getObjects(node, undefined, ["RELEVANT"]);
-  }
-  if (displayConnections === "NONE") {
-    return [];
   }
   return selectors.getSubjects(node, undefined, ["RELEVANT"]);
 }
@@ -47,7 +43,9 @@ export function OuterNode({
   const selectors = useSelectors();
   const { nodeID } = nodeView;
   const node = selectors.getNode(nodeID);
-  const toDisplay = getChildNodes(node, selectors, nodeView.displayConnections);
+  const toDisplay = nodeView.expanded
+    ? getChildNodes(node, selectors, nodeView.displayConnections)
+    : [];
   const onDropFiles = (topNodes: Array<string>, nodes: Nodes): void => {
     onNodeViewChange(
       {
@@ -71,7 +69,18 @@ export function OuterNode({
     onNodeViewChange(
       {
         ...nodeView,
+        expanded: true,
         displayConnections
+      },
+      Map<string, KnowNode>()
+    );
+  };
+
+  const toggleView = (): void => {
+    onNodeViewChange(
+      {
+        ...nodeView,
+        expanded: !nodeView.expanded
       },
       Map<string, KnowNode>()
     );
@@ -102,7 +111,21 @@ export function OuterNode({
                   nodeID={node.id}
                   index={0}
                   dndPostfix={`title.${nodeID}.${dndPostfix}`}
-                />
+                >
+                  <button
+                    type="button"
+                    className="toggle-button"
+                    onClick={toggleView}
+                  >
+                    {!nodeView.expanded && (
+                      <span className="simple-icon-arrow-right" />
+                    )}
+                    {nodeView.expanded && (
+                      <span className="simple-icon-arrow-down" />
+                    )}
+                  </button>
+                  {node.text}
+                </InnerNode>
               </div>
             )}
           </Droppable>
@@ -119,7 +142,9 @@ export function OuterNode({
                       nodeID={subj.id}
                       index={i}
                       dndPostfix={`${nodeID}.${dndPostfix}`}
-                    />
+                    >
+                      {subj.text}
+                    </InnerNode>
                   );
                 })}
                 {snapshot.isDraggingOver && provided.placeholder}
@@ -127,7 +152,7 @@ export function OuterNode({
             )}
           </Droppable>
         </div>
-        {nodeView.displayConnections !== "NONE" && (
+        {nodeView.expanded && (
           <Droppable
             droppableId={`drop.addtonode.${nodeID}.${dndPostfix}`}
             key={`drop.addtonode.${nodeID}.${dndPostfix}`}
