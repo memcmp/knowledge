@@ -136,36 +136,35 @@
   background: rgba(0, 0, 0, 0.2);
 }
 
-.outer-node-extras-btn {
-  z-index: 2;
-  position: absolute;
-  top: 12px;
-  right: 0px;
-  border-radius: 3px;
-  padding: 2px;
+.outer-node-menu {
+  background-color: transparent;
   font-size: 1.2rem;
+  height: 58px;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
 }
 
-.outer-node-extras-btn {
-  z-index: 2;
-  position: absolute;
-  top: 12px;
-  right: 0px;
-  border-radius: 3px;
-  padding: 2px;
-  font-size: 1.2rem;
-}
-
-.outer-node-toggle-btn {
-  z-index: 2;
-  position: absolute;
-  top: 12px;
-  left: 0px;
-  border-radius: 3px;
-  padding: 2px;
-  font-size: 1.2rem;
+.outer-node-menu-btn {
+  font-size: 1.3rem !important;
   background-color: transparent;
   border: 0px;
+  z-index: 1;
+  padding: 0.75rem 0.4rem 0.75rem 0.4rem;
+  line-height: 31px;
+}
+
+.outer-node-extras-btn {
+  position: absolute;
+  top: 12px;
+  right: 0px;
+  border-radius: 3px;
+  padding: 2px;
+  font-size: 1.2rem;
+}
+
+.danger {
+  color: red;
 }
 
 .outer-node-title .dropdown-toggle::after {

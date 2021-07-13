@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 import { Dropdown } from "react-bootstrap";
 
@@ -8,19 +8,26 @@ type OuterNodeExtrasProps = {
   onRemove: () => void;
 };
 
-export function OuterNodeExtras({
+export function OuterNodeMenu({
   displayConnections,
   onConnectionsChange,
   onRemove
 }: OuterNodeExtrasProps): JSX.Element {
   return (
-    <div className="position-relative">
+    <div className="outer-node-menu">
+      <button
+        type="button"
+        className="btn outer-node-menu-btn hover-black"
+        onClick={onRemove}
+      >
+        <span className="iconsminds-remove danger" />
+      </button>
       <Dropdown>
         <Dropdown.Toggle
           as="button"
-          className="btn outer-node-extras-btn hover-black"
+          className="btn outer-node-menu-btn hover-black outer-node-menu-dropdown"
         >
-          <span className="simple-icon-options-vertical" />
+          <span className="iconsminds-arrow-inside-gap" />
         </Dropdown.Toggle>
         <Dropdown.Menu>
           <Dropdown.Item
@@ -40,10 +47,6 @@ export function OuterNodeExtras({
             onSelect={() => onConnectionsChange("CONTAINS_OBJECTS")}
           >
             Contains
-          </Dropdown.Item>
-          <Dropdown.Divider />
-          <Dropdown.Item onSelect={onRemove}>
-            Remove from Dashboard
           </Dropdown.Item>
         </Dropdown.Menu>
       </Dropdown>
