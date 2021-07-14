@@ -98,46 +98,6 @@ export function OuterNode({
     >
       <FileDropZone onDrop={onDropFiles}>
         <div className="outer-node-title border-bottom mb-1">
-          <div className="position-relative">
-            <button
-              type="button"
-              className="btn outer-node-extras-btn outer-node-menu-btn hover-black"
-              onClick={() => setShowMenu(!showMenu)}
-            >
-              <span className="simple-icon-options-vertical" />
-            </button>
-          </div>
-          {!showMenu && (
-            <Droppable
-              droppableId={`drop.title.${nodeID}.${dndPostfix}`}
-              key={`drop.title.${nodeID}.${dndPostfix}`}
-              isDropDisabled
-            >
-              {provided => (
-                <div {...provided.droppableProps} ref={provided.innerRef}>
-                  <InnerNode
-                    nodeID={node.id}
-                    index={0}
-                    dndPostfix={`title.${nodeID}.${dndPostfix}`}
-                  >
-                    <button
-                      type="button"
-                      className="toggle-button"
-                      onClick={toggleView}
-                    >
-                      {!nodeView.expanded && (
-                        <span className="simple-icon-arrow-right" />
-                      )}
-                      {nodeView.expanded && (
-                        <span className="simple-icon-arrow-down" />
-                      )}
-                    </button>
-                    {node.text}
-                  </InnerNode>
-                </div>
-              )}
-            </Droppable>
-          )}
           {showMenu && (
             <Card className="inner-node">
               <Card.Body className="p-0">
@@ -149,6 +109,44 @@ export function OuterNode({
               </Card.Body>
             </Card>
           )}
+          <div className="position-relative">
+            <button
+              type="button"
+              className="btn outer-node-extras-btn outer-node-menu-btn hover-black"
+              onClick={() => setShowMenu(!showMenu)}
+            >
+              <span className="simple-icon-options-vertical" />
+            </button>
+          </div>
+          <Droppable
+            droppableId={`drop.title.${nodeID}.${dndPostfix}`}
+            key={`drop.title.${nodeID}.${dndPostfix}`}
+            isDropDisabled
+          >
+            {provided => (
+              <div {...provided.droppableProps} ref={provided.innerRef}>
+                <InnerNode
+                  nodeID={node.id}
+                  index={0}
+                  dndPostfix={`title.${nodeID}.${dndPostfix}`}
+                >
+                  <button
+                    type="button"
+                    className="toggle-button"
+                    onClick={toggleView}
+                  >
+                    {!nodeView.expanded && (
+                      <span className="simple-icon-arrow-right" />
+                    )}
+                    {nodeView.expanded && (
+                      <span className="simple-icon-arrow-down" />
+                    )}
+                  </button>
+                  {node.text}
+                </InnerNode>
+              </div>
+            )}
+          </Droppable>
         </div>
 
         <div className="inner-nodes">
