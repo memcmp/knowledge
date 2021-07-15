@@ -1,5 +1,5 @@
-import React from "react";
-import Immutable from "immutable";
+import React, { useState } from "react";
+import Immutable, { Set } from "immutable";
 import { v4 } from "uuid";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import "./Workspace.css";
@@ -7,15 +7,22 @@ import "./Workspace.css";
 import { WorkspaceColumnView } from "./WorkspaceColumn";
 
 import {
+  useNodes,
   useSelectors,
   useUpdateWorkspace,
   useUpsertNodes,
-  useWorkspace
+  useWorkspace,
+  getNode
 } from "./DataContext";
 
 import { defaultDisplayConnection } from "./connections";
 
 import { connectNodes } from "./AddNode";
+
+import {
+  findSelectedByPostfix,
+  MultiSelectionContext
+} from "./MultiSelectContext";
 
 /*
  * drop-column-columnID
@@ -42,6 +49,13 @@ function parseID(dndID: string): string | undefined {
   return undefined;
 }
 
+function parsePostfix(dndID: string): string | undefined {
+  return dndID
+    .split(".")
+    .slice(3)
+    .join(".");
+}
+
 function isEmptyColumn(column: WorkspaceColumn | undefined): boolean {
   if (!column) {
     return true;
@@ -64,7 +78,9 @@ export function WorkspaceView(): JSX.Element {
   const workspace = useWorkspace();
   const updateWorkspace = useUpdateWorkspace();
   const upsertNodes = useUpsertNodes();
-  const { getNode, getSubjects } = useSelectors();
+  const { getSubjects } = useSelectors();
+  const nodes = useNodes();
+  const [selection, setSelection] = useState<Set<string>>(Set<string>());
 
   const workspaceWithNewCol = {
     ...workspace,
@@ -81,18 +97,30 @@ export function WorkspaceView(): JSX.Element {
       if (!destID || !sourceID) {
         return;
       }
+      const sourcePostfix = parsePostfix(result.draggableId);
+      const selectedSources =
+        sourcePostfix === undefined
+          ? Set([sourceID])
+          : findSelectedByPostfix(selection, sourcePostfix);
+      const sourceIDs = selectedSources.contains(sourceID)
+        ? selectedSources
+        : Set([sourceID]);
       if (droppableID.startsWith("drop.column.")) {
         const updatedColumns = workspaceWithNewCol.columns.map(column => {
           if (column.columnID === destID) {
             return {
               ...column,
-              nodeViews: column.nodeViews.push({
-                expanded: true,
-                nodeID: sourceID,
-                displayConnections: defaultDisplayConnection(
-                  getNode(sourceID).nodeType
-                )
-              })
+              nodeViews: column.nodeViews.push(
+                ...sourceIDs.toArray().map(id => {
+                  return {
+                    expanded: true,
+                    nodeID: id,
+                    displayConnections: defaultDisplayConnection(
+                      getNode(nodes, sourceID).nodeType
+                    )
+                  };
+                })
+              )
             };
           }
           return column;
@@ -112,17 +140,20 @@ export function WorkspaceView(): JSX.Element {
         const view = (workspaceWithNewCol.columns.get(
           column
         ) as WorkspaceColumn).nodeViews.get(parseInt(n, 10)) as NodeView;
-        const outerNode = getNode(outerNodeID);
-        const innerNode = getNode(sourceID);
-        upsertNodes(
-          connectNodes(
-            outerNode,
-            innerNode,
-            view.displayConnections,
-            getSubjects,
-            index
-          )
-        );
+        const updatedNodes = sourceIDs.toArray().reduceRight((rdx, id) => {
+          const outerNode = getNode(rdx, outerNodeID);
+          const innerNode = getNode(rdx, id);
+          return rdx.merge(
+            connectNodes(
+              outerNode,
+              innerNode,
+              view.displayConnections,
+              getSubjects,
+              index
+            )
+          );
+        }, nodes);
+        upsertNodes(updatedNodes);
       } else if (droppableID.startsWith("drop.addtonode")) {
         const [outerNodeID, column, n] = droppableID
           .replace("drop.addtonode.", "")
@@ -130,16 +161,19 @@ export function WorkspaceView(): JSX.Element {
         const view = (workspaceWithNewCol.columns.get(
           column
         ) as WorkspaceColumn).nodeViews.get(parseInt(n, 10)) as NodeView;
-        const outerNode = getNode(outerNodeID);
-        const innerNode = getNode(sourceID);
-        upsertNodes(
-          connectNodes(
-            outerNode,
-            innerNode,
-            view.displayConnections,
-            getSubjects
-          )
-        );
+        const updatedNodes = sourceIDs.toArray().reduceRight((rdx, id) => {
+          const outerNode = getNode(rdx, outerNodeID);
+          const innerNode = getNode(rdx, id);
+          return rdx.merge(
+            connectNodes(
+              outerNode,
+              innerNode,
+              view.displayConnections,
+              getSubjects
+            )
+          );
+        }, nodes);
+        upsertNodes(updatedNodes);
       }
     }
   };
@@ -147,16 +181,18 @@ export function WorkspaceView(): JSX.Element {
   const columns = Array.from(workspaceWithNewCol.columns.values());
 
   return (
-    <div className="h-100 w-100">
-      <div className="workspace-columns">
-        <DragDropContext onDragEnd={onDragEnd}>
-          {columns.map(column => {
-            return (
-              <WorkspaceColumnView key={column.columnID} column={column} />
-            );
-          })}
-        </DragDropContext>
+    <MultiSelectionContext.Provider value={{ selection, setSelection }}>
+      <div className="h-100 w-100">
+        <div className="workspace-columns">
+          <DragDropContext onDragEnd={onDragEnd}>
+            {columns.map(column => {
+              return (
+                <WorkspaceColumnView key={column.columnID} column={column} />
+              );
+            })}
+          </DragDropContext>
+        </div>
       </div>
-    </div>
+    </MultiSelectionContext.Provider>
   );
 }

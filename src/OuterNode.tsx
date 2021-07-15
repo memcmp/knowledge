@@ -98,17 +98,6 @@ export function OuterNode({
     >
       <FileDropZone onDrop={onDropFiles}>
         <div className="outer-node-title border-bottom mb-1">
-          {showMenu && (
-            <Card className="inner-node">
-              <Card.Body className="p-0">
-                <OuterNodeMenu
-                  displayConnections={nodeView.displayConnections}
-                  onRemove={onRemove}
-                  onConnectionsChange={onConnectionsChange}
-                />
-              </Card.Body>
-            </Card>
-          )}
           <div className="position-relative">
             <button
               type="button"
@@ -129,6 +118,7 @@ export function OuterNode({
                   nodeID={node.id}
                   index={0}
                   dndPostfix={`title.${nodeID}.${dndPostfix}`}
+                  enableSelecting={false}
                 >
                   <button
                     type="button"
@@ -147,6 +137,17 @@ export function OuterNode({
               </div>
             )}
           </Droppable>
+          {showMenu && (
+            <Card className="inner-node">
+              <Card.Body className="p-0">
+                <OuterNodeMenu
+                  displayConnections={nodeView.displayConnections}
+                  onRemove={onRemove}
+                  onConnectionsChange={onConnectionsChange}
+                />
+              </Card.Body>
+            </Card>
+          )}
         </div>
 
         <div className="inner-nodes">
@@ -160,6 +161,7 @@ export function OuterNode({
                       nodeID={subj.id}
                       index={i}
                       dndPostfix={`${nodeID}.${dndPostfix}`}
+                      enableSelecting={showMenu}
                     >
                       {subj.text}
                     </InnerNode>

@@ -118,7 +118,6 @@ export function Main({ userSession, createStackStore }: AppProps): JSX.Element {
   ) {
     return <div className="loading" role="alert" aria-busy="true" />;
   }
-
   const dataStore = storageQuery.data;
 
   const upsertNodes = (nodes: Immutable.Map<string, KnowNode>): void => {
