@@ -129,9 +129,22 @@ export function Main({ userSession, createStackStore }: AppProps): JSX.Element {
   };
 
   const deleteNodes = (nodes: Immutable.Set<string>, toUpdate: Nodes): void => {
+    const newWorkspaces = dataStore.workspaces.map(workspace => {
+      return {
+        ...workspace,
+        columns: workspace.columns.map(workspaceColumn => {
+          return {
+            ...workspaceColumn,
+            nodeViews: workspaceColumn.nodeViews.filterNot(view =>
+              nodes.contains(view.nodeID)
+            )
+          };
+        })
+      };
+    });
     const newStorage = {
       nodes: dataStore.nodes.merge(toUpdate).removeAll(nodes),
-      workspaces: dataStore.workspaces
+      workspaces: newWorkspaces
     };
     updateStorageMutation.mutate(newStorage);
   };

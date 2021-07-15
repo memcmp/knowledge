@@ -141,6 +141,18 @@
   font-size: 1.2rem;
   display: flex;
   flex-direction: row;
+  justify-content: space-between;
+}
+
+.outer-node-menu-inner-nodes {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+.outer-node-menu-outer-node {
+  display: flex;
+  flex-direction: row;
   justify-content: flex-start;
 }
 

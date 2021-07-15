@@ -13,7 +13,10 @@ import { AddNodeToNode } from "./AddNode";
 
 import { OuterNodeMenu } from "./OuterNodeExtras";
 
-import { useDeselectByPostfix } from "./MultiSelectContext";
+import {
+  useDeselectByPostfix,
+  useFindSelectedByPostfix
+} from "./MultiSelectContext";
 
 function getChildNodes(
   node: KnowNode,
@@ -47,12 +50,14 @@ export function OuterNode({
   const selectors = useSelectors();
   const [multiSelect, setMultiSelect] = useState<boolean>(false);
   const deselectByPostfix = useDeselectByPostfix();
+  const findSelectedByPostfix = useFindSelectedByPostfix();
   const { nodeID } = nodeView;
   const node = selectors.getNode(nodeID);
   const toDisplay = nodeView.expanded
     ? getChildNodes(node, selectors, nodeView.displayConnections)
     : [];
   const postfix = `${nodeID}.${dndPostfix}`;
+  const selected = findSelectedByPostfix(postfix);
   const onDropFiles = (topNodes: Array<string>, nodes: Nodes): void => {
     onNodeViewChange(
       {
@@ -157,6 +162,7 @@ export function OuterNode({
                     setMultiSelect(!multiSelect);
                   }}
                   onConnectionsChange={onConnectionsChange}
+                  selectedItems={selected}
                 />
               </Card.Body>
             </Card>
