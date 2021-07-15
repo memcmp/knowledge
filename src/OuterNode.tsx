@@ -13,6 +13,8 @@ import { AddNodeToNode } from "./AddNode";
 
 import { OuterNodeMenu } from "./OuterNodeExtras";
 
+import { useDeselectByPostfix } from "./MultiSelectContext";
+
 function getChildNodes(
   node: KnowNode,
   selectors: Selectors,
@@ -43,12 +45,14 @@ export function OuterNode({
   onRemove
 }: OuterNodeProps): JSX.Element {
   const selectors = useSelectors();
-  const [showMenu, setShowMenu] = useState<boolean>(false);
+  const [multiSelect, setMultiSelect] = useState<boolean>(false);
+  const deselectByPostfix = useDeselectByPostfix();
   const { nodeID } = nodeView;
   const node = selectors.getNode(nodeID);
   const toDisplay = nodeView.expanded
     ? getChildNodes(node, selectors, nodeView.displayConnections)
     : [];
+  const postfix = `${nodeID}.${dndPostfix}`;
   const onDropFiles = (topNodes: Array<string>, nodes: Nodes): void => {
     onNodeViewChange(
       {
@@ -64,6 +68,7 @@ export function OuterNode({
           .merge(nodes)
       )
     );
+    deselectByPostfix(postfix);
   };
 
   const onConnectionsChange = (
@@ -77,6 +82,7 @@ export function OuterNode({
       },
       Map<string, KnowNode>()
     );
+    deselectByPostfix(postfix);
   };
 
   const toggleView = (): void => {
@@ -87,6 +93,7 @@ export function OuterNode({
       },
       Map<string, KnowNode>()
     );
+    deselectByPostfix(postfix);
   };
 
   return (
@@ -102,9 +109,12 @@ export function OuterNode({
             <button
               type="button"
               className="btn outer-node-extras-btn outer-node-menu-btn hover-black"
-              onClick={() => setShowMenu(!showMenu)}
+              onClick={() => {
+                onRemove();
+                deselectByPostfix(postfix);
+              }}
             >
-              <span className="simple-icon-options-vertical" />
+              <span>×</span>
             </button>
           </div>
           <Droppable
@@ -137,12 +147,15 @@ export function OuterNode({
               </div>
             )}
           </Droppable>
-          {showMenu && (
+          {nodeView.expanded && (
             <Card className="inner-node">
               <Card.Body className="p-0">
                 <OuterNodeMenu
                   displayConnections={nodeView.displayConnections}
-                  onRemove={onRemove}
+                  onToggleMultiSelect={() => {
+                    deselectByPostfix(postfix);
+                    setMultiSelect(!multiSelect);
+                  }}
                   onConnectionsChange={onConnectionsChange}
                 />
               </Card.Body>
@@ -160,8 +173,8 @@ export function OuterNode({
                       key={subj.id}
                       nodeID={subj.id}
                       index={i}
-                      dndPostfix={`${nodeID}.${dndPostfix}`}
-                      enableSelecting={showMenu}
+                      dndPostfix={postfix}
+                      enableSelecting={multiSelect}
                     >
                       {subj.text}
                     </InnerNode>

@@ -20,6 +20,7 @@ import { defaultDisplayConnection } from "./connections";
 import { connectNodes } from "./AddNode";
 
 import {
+  deselectByPostfix,
   findSelectedByPostfix,
   MultiSelectionContext
 } from "./MultiSelectContext";
@@ -116,7 +117,7 @@ export function WorkspaceView(): JSX.Element {
                     expanded: true,
                     nodeID: id,
                     displayConnections: defaultDisplayConnection(
-                      getNode(nodes, sourceID).nodeType
+                      getNode(nodes, id).nodeType
                     )
                   };
                 })
@@ -174,6 +175,9 @@ export function WorkspaceView(): JSX.Element {
           );
         }, nodes);
         upsertNodes(updatedNodes);
+      }
+      if (sourcePostfix) {
+        setSelection(deselectByPostfix(selection, sourcePostfix));
       }
     }
   };

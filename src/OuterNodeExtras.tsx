@@ -1,26 +1,26 @@
-import React, { useState } from "react";
+import React from "react";
 
 import { Dropdown } from "react-bootstrap";
 
 type OuterNodeExtrasProps = {
   displayConnections: DisplayConnections;
   onConnectionsChange: (displayConnections: DisplayConnections) => void;
-  onRemove: () => void;
+  onToggleMultiSelect: () => void;
 };
 
 export function OuterNodeMenu({
   displayConnections,
   onConnectionsChange,
-  onRemove
+  onToggleMultiSelect
 }: OuterNodeExtrasProps): JSX.Element {
   return (
     <div className="outer-node-menu">
       <button
         type="button"
         className="btn outer-node-menu-btn hover-black"
-        onClick={onRemove}
+        onClick={onToggleMultiSelect}
       >
-        <span className="iconsminds-remove danger" />
+        <span className="iconsminds-check" />
       </button>
       <Dropdown>
         <Dropdown.Toggle

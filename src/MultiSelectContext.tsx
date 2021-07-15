@@ -9,6 +9,7 @@ type MultiSelection = {
 type SetSelected = (id: string, selected: boolean) => void;
 type IsSelected = (id: string) => boolean;
 type FindSelectedByPostfix = (postfix: string) => Set<string>;
+type DeselectByPostfix = (postfix: string) => void;
 
 export const MultiSelectionContext = React.createContext<
   MultiSelection | undefined
@@ -56,4 +57,16 @@ export function findSelectedByPostfix(
 export function useFindSelectedByPostfix(): FindSelectedByPostfix {
   const { selection } = useMultiSelection();
   return postfix => findSelectedByPostfix(selection, postfix);
+}
+
+export function deselectByPostfix(
+  selection: Set<string>,
+  postfix: string
+): Set<string> {
+  return selection.filterNot(sel => sel.endsWith(postfix));
+}
+
+export function useDeselectByPostfix(): DeselectByPostfix {
+  const { selection, setSelection } = useMultiSelection();
+  return postfix => setSelection(deselectByPostfix(selection, postfix));
 }
