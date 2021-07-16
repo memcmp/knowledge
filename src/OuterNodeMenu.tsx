@@ -75,7 +75,7 @@ export function OuterNodeMenu({
   const deleteSelectedNodes = (): void => {
     const deletePlan = selectedItems.reduce(
       (plan: DeleteNodesContext, id: string) => {
-        return planNodeDeletion(plan.toUpdate, getNode(nodes, id));
+        return planNodeDeletion(plan.toUpdate, getNode(plan.toUpdate, id));
       },
       { toUpdate: nodes, toRemove: Set<string>() }
     );
