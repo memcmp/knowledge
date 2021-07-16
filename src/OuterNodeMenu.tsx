@@ -3,35 +3,94 @@ import { Set } from "immutable";
 
 import { Dropdown } from "react-bootstrap";
 
-import { useNodes, useSelectors, useDeleteNodes } from "./DataContext";
+import {
+  useNodes,
+  useDeleteNodes,
+  getNode,
+  useUpsertNodes
+} from "./DataContext";
 
-import { DeleteNodesContext, planNodeDeletion } from "./connections";
+import {
+  DeleteNodesContext,
+  planNodeDeletion,
+  removeRelationToObject,
+  removeRelationToSubject
+} from "./connections";
 
 type OuterNodeMenuProps = {
   displayConnections: DisplayConnections;
   onConnectionsChange: (displayConnections: DisplayConnections) => void;
   onToggleMultiSelect: () => void;
   selectedItems: Set<string>;
+  nodeID: string;
 };
 
+function disconnectNodes(
+  nodes: Nodes,
+  parentNode: string,
+  children: Set<string>,
+  displayConnections: DisplayConnections
+): Nodes {
+  if (displayConnections === "RELEVANT_SUBJECTS") {
+    return children.reduce((rdx: Nodes, subject: string) => {
+      const p = getNode(rdx, parentNode);
+      const c = getNode(rdx, subject);
+      return rdx
+        .set(parentNode, removeRelationToSubject(p, subject, "RELEVANT"))
+        .set(subject, removeRelationToObject(c, parentNode, "RELEVANT"));
+    }, nodes);
+  }
+  if (displayConnections === "RELEVANT_OBJECTS") {
+    return children.reduce((rdx: Nodes, obj: string) => {
+      const p = getNode(rdx, parentNode);
+      const c = getNode(rdx, obj);
+      return rdx
+        .set(parentNode, removeRelationToObject(p, obj, "RELEVANT"))
+        .set(obj, removeRelationToSubject(c, parentNode, "RELEVANT"));
+    }, nodes);
+  }
+  if (displayConnections === "CONTAINS_OBJECTS") {
+    return children.reduce((rdx: Nodes, obj: string) => {
+      const p = getNode(rdx, parentNode);
+      const c = getNode(rdx, obj);
+      return rdx
+        .set(parentNode, removeRelationToObject(p, obj, "CONTAINS"))
+        .set(obj, removeRelationToSubject(c, parentNode, "CONTAINS"));
+    }, nodes);
+  }
+  return nodes;
+}
+
 export function OuterNodeMenu({
+  nodeID,
   displayConnections,
   onConnectionsChange,
   onToggleMultiSelect,
   selectedItems
 }: OuterNodeMenuProps): JSX.Element {
   const nodes = useNodes();
-  const { getNode } = useSelectors();
   const deleteNodes = useDeleteNodes();
+  const upsertNodes = useUpsertNodes();
 
   const deleteSelectedNodes = (): void => {
     const deletePlan = selectedItems.reduce(
       (plan: DeleteNodesContext, id: string) => {
-        return planNodeDeletion(plan.toUpdate, getNode(id));
+        return planNodeDeletion(plan.toUpdate, getNode(nodes, id));
       },
       { toUpdate: nodes, toRemove: Set<string>() }
     );
     deleteNodes(deletePlan.toRemove, deletePlan.toUpdate);
+    onToggleMultiSelect();
+  };
+
+  const onDisconnect = (): void => {
+    const updatedNodes = disconnectNodes(
+      nodes,
+      nodeID,
+      selectedItems,
+      displayConnections
+    );
+    upsertNodes(updatedNodes);
     onToggleMultiSelect();
   };
 
@@ -76,15 +135,26 @@ export function OuterNodeMenu({
       </div>
       <div className="outer-node-menu-inner-nodes">
         {selectedItems.size > 0 && (
-          <button
-            type="button"
-            className="btn outer-node-menu-btn danger"
-            onClick={() => {
-              deleteSelectedNodes();
-            }}
-          >
-            <span className="simple-icon-trash" />
-          </button>
+          <>
+            <button
+              type="button"
+              className="btn outer-node-menu-btn hover-black"
+              onClick={() => {
+                onDisconnect();
+              }}
+            >
+              <span className="font-size-2">×</span>
+            </button>
+            <button
+              type="button"
+              className="btn outer-node-menu-btn danger"
+              onClick={() => {
+                deleteSelectedNodes();
+              }}
+            >
+              <span className="simple-icon-trash" />
+            </button>
+          </>
         )}
       </div>
     </div>

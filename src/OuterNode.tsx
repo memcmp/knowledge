@@ -156,6 +156,7 @@ export function OuterNode({
             <Card className="inner-node">
               <Card.Body className="p-0">
                 <OuterNodeMenu
+                  nodeID={node.id}
                   displayConnections={nodeView.displayConnections}
                   onToggleMultiSelect={() => {
                     deselectByPostfix(postfix);
