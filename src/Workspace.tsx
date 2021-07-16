@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Immutable, { Set } from "immutable";
 import { v4 } from "uuid";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
-import "./Workspace.css";
+import "./Workspace.scss";
 
 import { WorkspaceColumnView } from "./WorkspaceColumn";
 

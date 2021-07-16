@@ -1,6 +1,12 @@
+@import "./assets/css/sass/_mixins.scss";
+
 .workspace-columns {
   display: grid;
   grid-auto-columns: 375px;
+  @include respond-below(xs) {
+    grid-auto-columns: 100vw;
+    scroll-snap-type: x mandatory;
+  }
   grid-auto-flow: column;
   grid-gap: 8px;
   overflow-x: scroll;
@@ -12,6 +18,9 @@
 
 .workspace-column {
   height: calc(100vh - 56px);
+  @include respond-below(xs) {
+      scroll-snap-align: start;
+  }
 }
 
 .workspace-droppable {
@@ -81,7 +90,7 @@
 
 .backside .card {
   background-color: white;
-  box-shadow: inset 0 1px 15px rgb(0 0 0 / 4%), 0 1px 6px rgb(0 0 0 / 4%);
+  box-shadow: inset 0 1px 15px rgba(0, 0, 0, 0.04), 0 1px 6px rgba(0, 0, 0, 0.04);
 }
 
 .backside .inner-nodes .inner-node {

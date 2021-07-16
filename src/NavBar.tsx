@@ -149,7 +149,7 @@ export function NavBar(): JSX.Element {
           </Dropdown.Menu>
         </Dropdown>
       </div>
-      <div className="navbar-title sm-d-none d-flex align-items">
+      <div className="navbar-title d-flex align-items sm-d-none">
         <div className="workspace-title">{activeWorkspace.title}</div>
         <button
           type="button"
