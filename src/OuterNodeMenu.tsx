@@ -7,7 +7,7 @@ import { useNodes, useSelectors, useDeleteNodes } from "./DataContext";
 
 import { DeleteNodesContext, planNodeDeletion } from "./connections";
 
-type OuterNodeExtrasProps = {
+type OuterNodeMenuProps = {
   displayConnections: DisplayConnections;
   onConnectionsChange: (displayConnections: DisplayConnections) => void;
   onToggleMultiSelect: () => void;
@@ -19,7 +19,7 @@ export function OuterNodeMenu({
   onConnectionsChange,
   onToggleMultiSelect,
   selectedItems
-}: OuterNodeExtrasProps): JSX.Element {
+}: OuterNodeMenuProps): JSX.Element {
   const nodes = useNodes();
   const { getNode } = useSelectors();
   const deleteNodes = useDeleteNodes();

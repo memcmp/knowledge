@@ -11,7 +11,7 @@ import { InnerNode } from "./InnerNode";
 
 import { AddNodeToNode } from "./AddNode";
 
-import { OuterNodeMenu } from "./OuterNodeExtras";
+import { OuterNodeMenu } from "./OuterNodeMenu";
 
 import {
   useDeselectByPostfix,
