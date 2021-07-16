@@ -28,6 +28,7 @@ export function WorkspaceColumnView({
     });
     updateWorkspace(
       {
+        ...workspace,
         columns: workspace.columns.set(column.columnID, {
           ...column,
           nodeViews: column.nodeViews.push(...nodeViews)
@@ -47,6 +48,7 @@ export function WorkspaceColumnView({
           onNodeViewChange={(newView: NodeView, nodes: Nodes): void => {
             updateWorkspace(
               {
+                ...workspace,
                 columns: workspace.columns.set(column.columnID, {
                   ...column,
                   nodeViews: column.nodeViews.set(i, newView)
@@ -58,6 +60,7 @@ export function WorkspaceColumnView({
           onRemove={(): void => {
             updateWorkspace(
               {
+                ...workspace,
                 columns: workspace.columns.set(column.columnID, {
                   ...column,
                   nodeViews: column.nodeViews.remove(i)

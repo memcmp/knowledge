@@ -10,6 +10,9 @@ type Data = {
 type WorkspaceData = {
   updateWorkspace: UpdateWorkspace;
   workspace: Workspace;
+  addWorkspace: AddWorkspace;
+  selectWorkspace: SelectWorkspace;
+  workspaces: Immutable.List<Workspace>;
 };
 
 const RelationContext = React.createContext<Data | undefined>(undefined);
@@ -48,6 +51,18 @@ function useUpdateWorkspace(): UpdateWorkspace {
 
 function useWorkspace(): Workspace {
   return getWorkspaceContextOrThrow().workspace;
+}
+
+export function useAddWorkspace(): AddWorkspace {
+  return getWorkspaceContextOrThrow().addWorkspace;
+}
+
+export function useSelectWorkspace(): SelectWorkspace {
+  return getWorkspaceContextOrThrow().selectWorkspace;
+}
+
+export function useWorkspaces(): Immutable.List<Workspace> {
+  return getWorkspaceContextOrThrow().workspaces;
 }
 
 function useNodes(): Nodes {

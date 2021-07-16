@@ -2,7 +2,7 @@ import React from "react";
 import { v4 } from "uuid";
 import { Route, Switch } from "react-router-dom";
 import "./App.css";
-import Immutable from "immutable";
+import Immutable, { OrderedMap } from "immutable";
 import { Storage } from "@stacks/storage";
 import { UserSession } from "@stacks/connect";
 import {
@@ -27,6 +27,8 @@ import { useQueries } from "./useQueries";
 import { GraphView } from "./GraphView";
 
 import { Repair } from "./Repair";
+
+import { NavBar } from "./NavBar";
 
 export const TIMELINE = "TIMELINE";
 
@@ -80,6 +82,9 @@ function newDefaultWorkspace(nodes: Nodes): Workspace {
     };
   });
   return {
+    index: 0,
+    title: "Unnamed Workspace",
+    color: "#8f2c3b",
     columns: Immutable.OrderedMap<string, WorkspaceColumn>()
       .set(timelineID, {
         columnID: timelineID,
@@ -122,6 +127,7 @@ export function Main({ userSession, createStackStore }: AppProps): JSX.Element {
 
   const upsertNodes = (nodes: Immutable.Map<string, KnowNode>): void => {
     const newStorage = {
+      ...dataStore,
       nodes: dataStore.nodes.merge(nodes),
       workspaces: dataStore.workspaces
     };
@@ -143,6 +149,7 @@ export function Main({ userSession, createStackStore }: AppProps): JSX.Element {
       };
     });
     const newStorage = {
+      ...dataStore,
       nodes: dataStore.nodes.merge(toUpdate).removeAll(nodes),
       workspaces: newWorkspaces
     };
@@ -151,52 +158,93 @@ export function Main({ userSession, createStackStore }: AppProps): JSX.Element {
 
   const updateWorkspace = (workspace: Workspace, nodes: Nodes): void => {
     const newStorage = {
+      ...dataStore,
       nodes: dataStore.nodes.merge(nodes),
-      workspaces: Immutable.List<Workspace>([workspace])
+      workspaces: dataStore.workspaces.set(workspace.index, workspace)
     };
     updateStorageMutation.mutate(newStorage);
   };
 
-  const workspace = dataStore.workspaces.get(
-    0,
-    newDefaultWorkspace(dataStore.nodes)
-  );
+  const selectWorkspace = (index: number): void => {
+    const newStorage = {
+      ...dataStore,
+      activeWorkspace: index
+    };
+    updateStorageMutation.mutate(newStorage);
+  };
+
+  const addWorkspace = (title: string, color: string): void => {
+    const updatedWorkspaces = dataStore.workspaces.push({
+      title,
+      color,
+      columns: OrderedMap(),
+      index: dataStore.workspaces.size
+    });
+    const newStorage = {
+      ...dataStore,
+      workspaces: updatedWorkspaces,
+      activeWorkspace: updatedWorkspaces.size - 1
+    };
+    updateStorageMutation.mutate(newStorage);
+  };
+
+  const activeWorkspace =
+    dataStore.activeWorkspace > dataStore.workspaces.size
+      ? 0
+      : dataStore.activeWorkspace;
+  const workspaces =
+    dataStore.workspaces.size > 0
+      ? dataStore.workspaces
+      : Immutable.List([newDefaultWorkspace(dataStore.nodes)]);
+  const workspace = workspaces.get(activeWorkspace) as Workspace;
 
   return (
-    <RelationContext.Provider
-      value={{
-        nodes: dataStore.nodes,
-        upsertNodes,
-        deleteNodes
-      }}
-    >
-      <WorkspaceContext.Provider
-        value={{
-          workspace,
-          updateWorkspace
-        }}
+    <div className="h-100 w-100">
+      <div
+        id="app-container"
+        className="menu-sub-hidden main-hidden sub-hidden"
+        style={{ backgroundColor: workspace.color }}
       >
-        <Switch>
-          <Route exact path="/">
-            <WorkspaceView />
-          </Route>
-          <Route path="/notes/:id">
-            <ViewContainer>
-              <NodeView />
-            </ViewContainer>
-          </Route>
-          <Route path="/graph/:id">
-            <GraphView />
-          </Route>
-          <Route exact path="/graph">
-            <GraphView />
-          </Route>
-          <Route exact path="/repair">
-            <Repair />
-          </Route>
-        </Switch>
-      </WorkspaceContext.Provider>
-    </RelationContext.Provider>
+        <RelationContext.Provider
+          value={{
+            nodes: dataStore.nodes,
+            upsertNodes,
+            deleteNodes
+          }}
+        >
+          <WorkspaceContext.Provider
+            value={{
+              workspace,
+              updateWorkspace,
+              addWorkspace,
+              selectWorkspace,
+              workspaces
+            }}
+          >
+            <NavBar />
+            <Switch>
+              <Route exact path="/">
+                <WorkspaceView />
+              </Route>
+              <Route path="/notes/:id">
+                <ViewContainer>
+                  <NodeView />
+                </ViewContainer>
+              </Route>
+              <Route path="/graph/:id">
+                <GraphView />
+              </Route>
+              <Route exact path="/graph">
+                <GraphView />
+              </Route>
+              <Route exact path="/repair">
+                <Repair />
+              </Route>
+            </Switch>
+          </WorkspaceContext.Provider>
+        </RelationContext.Provider>
+      </div>
+    </div>
   );
 }
 

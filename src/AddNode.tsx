@@ -323,6 +323,7 @@ export function AddNodeToColumn({ column }: AddNodeToColumnProps): JSX.Element {
     const nodes = Immutable.Map<string, KnowNode>().set(node.id, node);
     updateWorkspace(
       {
+        ...workspace,
         columns: workspace.columns.set(column.columnID, {
           ...column,
           nodeViews: column.nodeViews.push({
@@ -339,6 +340,7 @@ export function AddNodeToColumn({ column }: AddNodeToColumnProps): JSX.Element {
   const onAddExistingNode = (node: KnowNode): void => {
     updateWorkspace(
       {
+        ...workspace,
         columns: workspace.columns.set(column.columnID, {
           ...column,
           nodeViews: column.nodeViews.push({

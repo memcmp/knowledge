@@ -85,9 +85,10 @@ export function WorkspaceView(): JSX.Element {
 
   const workspaceWithNewCol = {
     ...workspace,
-    columns: !isEmptyColumn(workspace.columns.last())
-      ? addEmptyColumn(workspace).columns
-      : workspace.columns
+    columns:
+      !isEmptyColumn(workspace.columns.last()) || workspace.columns.size === 0
+        ? addEmptyColumn(workspace).columns
+        : workspace.columns
   };
 
   const onDragEnd = (result: DropResult): void => {
@@ -186,16 +187,14 @@ export function WorkspaceView(): JSX.Element {
 
   return (
     <MultiSelectionContext.Provider value={{ selection, setSelection }}>
-      <div className="h-100 w-100">
-        <div className="workspace-columns">
-          <DragDropContext onDragEnd={onDragEnd}>
-            {columns.map(column => {
-              return (
-                <WorkspaceColumnView key={column.columnID} column={column} />
-              );
-            })}
-          </DragDropContext>
-        </div>
+      <div className="workspace-columns">
+        <DragDropContext onDragEnd={onDragEnd}>
+          {columns.map(column => {
+            return (
+              <WorkspaceColumnView key={column.columnID} column={column} />
+            );
+          })}
+        </DragDropContext>
       </div>
     </MultiSelectionContext.Provider>
   );

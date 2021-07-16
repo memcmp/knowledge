@@ -38,7 +38,8 @@ export const DEFAULT_STORE: Store = {
       relationsToSubjects: EMPTY_RELATIONS
     }
   }),
-  workspaces: Immutable.List<Workspace>()
+  workspaces: Immutable.List<Workspace>(),
+  activeWorkspace: 0
 };
 
 type RawNode = {
@@ -52,6 +53,7 @@ type RawNode = {
 type RawStore = {
   nodes: { [key: string]: RawNode };
   workspaces: undefined | Array<Workspace>;
+  activeWorkspace: undefined | number;
 };
 
 export async function getDataStore(storage: Storage): Promise<Store> {
@@ -70,13 +72,18 @@ export async function getDataStore(storage: Storage): Promise<Store> {
       };
     });
     const store: Store = {
+      activeWorkspace:
+        rawStore.activeWorkspace === undefined ? 0 : rawStore.activeWorkspace,
       nodes,
       workspaces:
         rawStore.workspaces === undefined
           ? Immutable.List<Workspace>()
           : Immutable.List<Workspace>(
-              rawStore.workspaces.map(rawWorkspace => {
+              rawStore.workspaces.map((rawWorkspace, index) => {
                 return {
+                  index,
+                  color: rawWorkspace.color || "#8f2c3b",
+                  title: rawWorkspace.title || "Unknown Workspace",
                   columns: Immutable.OrderedMap(rawWorkspace.columns).map(
                     rawColumn => {
                       return {
@@ -107,7 +114,8 @@ export async function getDataStore(storage: Storage): Promise<Store> {
     };
     return {
       nodes: DEFAULT_STORE.nodes.merge(Immutable.Map(store.nodes)),
-      workspaces: store.workspaces
+      workspaces: store.workspaces,
+      activeWorkspace: store.activeWorkspace
     };
   } catch (e) {
     return DEFAULT_STORE;

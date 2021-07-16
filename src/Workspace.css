@@ -5,11 +5,13 @@
   grid-gap: 8px;
   overflow-x: scroll;
   overflow-y: scroll;
-  background-color: #d29034;
+  padding-top: 4px;
+  padding-left: 4px;
+  padding-bottom: 4px;
 }
 
 .workspace-column {
-  height: 100vh;
+  height: calc(100vh - 56px);
 }
 
 .workspace-droppable {
@@ -92,7 +94,7 @@
 
 .inner-nodes {
   overflow-y: scroll;
-  max-height: 80vh;
+  max-height: calc(100vh - 180px);
 }
 
 .inner-node {
@@ -222,4 +224,133 @@
 
 .font-size-2 {
   font-size: 2rem;
+}
+
+.navbar-bg {
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.navbar-button {
+  font-size: 1.2rem;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.12);
+  padding: 5px;
+  width: 50px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.navbar-left {
+  margin-left: 10px;
+}
+
+.outer-node-menu {
+  background: rgba(0, 0, 0, 0.08);
+  font-size: 1.2rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.outer-node-menu-inner-nodes {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+.outer-node-menu-outer-node {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+}
+
+.outer-node-menu-btn {
+  font-size: 1.2rem;
+  background-color: transparent;
+  border: 0px;
+  z-index: 1;
+  padding: 0.2rem 0.2em 0.5rem 0.2rem;
+  line-height: 31px;
+}
+
+.outer-node-extras-btn {
+  position: absolute;
+  top: 0px;
+  right: 4px;
+  border-radius: 3px;
+  padding: 0px;
+  font-size: 1.8rem;
+}
+
+.danger {
+  color: red;
+}
+
+.outer-node-title .dropdown-toggle::after {
+  display: none;
+}
+
+.dropdown-menu {
+  border-radius: 3px;
+}
+
+.toggle-button {
+  border: 0px;
+  background-color: transparent;
+  color: gray;
+  margin: 0 5px 0 -5px;
+  padding: 0px;
+}
+
+.toggle-button:hover {
+  color: black;
+  border: 1px black;
+  border-radius: 50%;
+}
+
+.font-size-select {
+  font-size: 24px;
+}
+
+.checkbox {
+  flex: 0 0 5px;
+}
+
+.next-to-checkbox {
+  flex: 1;
+}
+
+.align-center {
+  align-items: center;
+}
+
+.pretty {
+  margin-right: 5px;
+}
+
+.font-size-2 {
+  font-size: 2rem;
+}
+
+.workspace-selection {
+  justify-content: flex-start;
+}
+
+.workspace-selection-color {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+}
+
+.workspace-selection-text {
+  font-family: "Nunito", sans-serif;
+  font-size: 18px;
+  margin-left: 5px;
+}
+
+.circle-picker {
+  margin-top: 20px;
+}
+
+.modal-content {
+  border-radius: 0px;
 }
