@@ -13,6 +13,7 @@ type WorkspaceData = {
   addWorkspace: AddWorkspace;
   selectWorkspace: SelectWorkspace;
   workspaces: Immutable.List<Workspace>;
+  deleteWorkspace: DeleteWorkspace;
 };
 
 const RelationContext = React.createContext<Data | undefined>(undefined);
@@ -59,6 +60,10 @@ export function useAddWorkspace(): AddWorkspace {
 
 export function useSelectWorkspace(): SelectWorkspace {
   return getWorkspaceContextOrThrow().selectWorkspace;
+}
+
+export function useDeleteWorkspace(): DeleteWorkspace {
+  return getWorkspaceContextOrThrow().deleteWorkspace;
 }
 
 export function useWorkspaces(): Immutable.List<Workspace> {

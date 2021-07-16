@@ -235,12 +235,24 @@
   border-radius: 4px;
   background: rgba(0, 0, 0, 0.12);
   padding: 5px;
-  width: 50px;
-  color: rgba(255, 255, 255, 0.5);
+  min-width: 50px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-right: 5px;
+}
+
+.workspace-title {
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.7);
+  padding: 5px;
+  margin-right: 5px;
 }
 
 .navbar-left {
   margin-left: 10px;
+}
+
+.navbar .navbar-right {
+  flex-basis: 40%;
 }
 
 .outer-node-menu {
@@ -345,6 +357,12 @@
   font-family: "Nunito", sans-serif;
   font-size: 18px;
   margin-left: 5px;
+}
+
+.navbar-title {
+  font-family: "Nunito", sans-serif;
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .circle-picker {

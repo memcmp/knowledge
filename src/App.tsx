@@ -188,13 +188,27 @@ export function Main({ userSession, createStackStore }: AppProps): JSX.Element {
     updateStorageMutation.mutate(newStorage);
   };
 
+  const deleteWorkspace = (index: number): void => {
+    const newStorage = {
+      ...dataStore,
+      workspaces: dataStore.workspaces.remove(index),
+      activeWorkspace: Math.max(0, index - 1)
+    };
+    updateStorageMutation.mutate(newStorage);
+  };
+
   const activeWorkspace =
     dataStore.activeWorkspace > dataStore.workspaces.size
       ? 0
       : dataStore.activeWorkspace;
   const workspaces =
     dataStore.workspaces.size > 0
-      ? dataStore.workspaces
+      ? dataStore.workspaces.map((w, i) => {
+          return {
+            ...w,
+            index: i
+          };
+        })
       : Immutable.List([newDefaultWorkspace(dataStore.nodes)]);
   const workspace = workspaces.get(activeWorkspace) as Workspace;
 
@@ -218,7 +232,8 @@ export function Main({ userSession, createStackStore }: AppProps): JSX.Element {
               updateWorkspace,
               addWorkspace,
               selectWorkspace,
-              workspaces
+              workspaces,
+              deleteWorkspace
             }}
           >
             <NavBar />

@@ -122,6 +122,12 @@ $error-color: #c43d4b;
   }
 }
 
+.sm-d-none {
+  @include respond-below(sm) {
+      display: none;
+  }
+}
+
 
 /* 01.Base */
 html {

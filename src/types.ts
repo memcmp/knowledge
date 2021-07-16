@@ -56,4 +56,5 @@ declare global {
   type UpdateWorkspace = (workspace: Workspace, nodes: Nodes) => void;
   type AddWorkspace = (title: string, color: string) => void;
   type SelectWorkspace = (index: number) => void;
+  type DeleteWorkspace = (index: number) => void;
 }

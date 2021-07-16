@@ -11,7 +11,9 @@ import { CirclePicker } from "react-color";
 
 import {
   useAddWorkspace,
+  useDeleteWorkspace,
   useSelectWorkspace,
+  useWorkspace,
   useWorkspaces
 } from "./DataContext";
 
@@ -90,6 +92,8 @@ export function NavBar(): JSX.Element {
   const addWorkspace = useAddWorkspace();
   const selectWorkspace = useSelectWorkspace();
   const workspaces = useWorkspaces();
+  const activeWorkspace = useWorkspace();
+  const deleteWorkspace = useDeleteWorkspace();
   return (
     <nav className="navbar navbar-bg">
       {newWorkspace && (
@@ -101,7 +105,7 @@ export function NavBar(): JSX.Element {
           }}
         />
       )}
-      <div className="navbar-left">
+      <div className="navbar-left d-flex align-items">
         <Dropdown>
           <Dropdown.Toggle as="button" className="btn navbar-button">
             <span className="simple-icon-layers" />
@@ -142,6 +146,19 @@ export function NavBar(): JSX.Element {
           </Dropdown.Menu>
         </Dropdown>
       </div>
+      <div className="navbar-title sm-d-none d-flex align-items">
+        <div className="workspace-title">{activeWorkspace.title}</div>
+        <button
+          type="button"
+          className="btn navbar-button"
+          onClick={() => {
+            deleteWorkspace(activeWorkspace.index);
+          }}
+        >
+          <span className="simple-icon-trash" />
+        </button>
+      </div>
+      <div className="navbar-right" />
     </nav>
   );
 }
