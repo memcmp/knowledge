@@ -216,7 +216,7 @@ export function Main({ userSession, createStackStore }: AppProps): JSX.Element {
     <div className="h-100 w-100">
       <div
         id="app-container"
-        className="menu-sub-hidden main-hidden sub-hidden"
+        className="menu-sub-hidden main-hidden sub-hidden scroll"
         style={{ backgroundColor: workspace.color }}
       >
         <RelationContext.Provider
