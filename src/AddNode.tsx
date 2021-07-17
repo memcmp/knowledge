@@ -55,14 +55,14 @@ function SaveButton({ onSave }: SaveButtonProps): JSX.Element {
   return (
     <Dropdown as={ButtonGroup}>
       <Button
-        variant="success"
+        variant="primary"
         onClick={() => {
           onSave(nodeType);
         }}
       >
         Save {nodeTypeString}
       </Button>
-      <Dropdown.Toggle split variant="success" id="dropdown-split-basic" />
+      <Dropdown.Toggle split variant="primary" id="dropdown-split-basic" />
       <Dropdown.Menu>
         <Dropdown.Item onSelect={() => setNodeType("TOPIC")}>
           Topic
@@ -238,7 +238,7 @@ function Search({ switchToNew, onSave, onClose }: SearchProps): JSX.Element {
       />
       <div className="mt-4">
         <Button
-          variant="success"
+          variant="primary"
           onClick={onAdd}
           disabled={selectedValue === undefined}
         >
