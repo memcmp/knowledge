@@ -2,11 +2,14 @@ import React from "react";
 import { Badge, Card } from "react-bootstrap";
 import { Draggable } from "react-beautiful-dnd";
 
+import { useMediaQuery } from "react-responsive";
 import {
   useFindSelectedByPostfix,
   useIsSelected,
   useSetSelected
 } from "./MultiSelectContext";
+
+import { IS_MOBILE } from "./responsive";
 
 type InnderNodeProps = {
   nodeID: string;
@@ -55,6 +58,7 @@ export function InnerNode({
   const isSelected = useIsSelected();
   const id = `${nodeID}.${dndPostfix}`;
   const checked = isSelected(id);
+  const isMobile = useMediaQuery(IS_MOBILE);
   const NodeCard = ({
     badge,
     checkbox
@@ -86,7 +90,12 @@ export function InnerNode({
   );
   const badgeCounter = checked ? findSelected(dndPostfix).size : undefined;
   return (
-    <Draggable key={nodeID} draggableId={`drag.inner.${id}`} index={index}>
+    <Draggable
+      key={nodeID}
+      draggableId={`drag.inner.${id}`}
+      index={index}
+      isDragDisabled={isMobile}
+    >
       {(providedDraggable, snapshot) => (
         <>
           <div
