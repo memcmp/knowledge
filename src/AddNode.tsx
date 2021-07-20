@@ -202,7 +202,7 @@ function Search({ switchToNew, onSave, onClose }: SearchProps): JSX.Element {
         renderInput={inputProps => {
           const modifiedProps = {
             ...inputProps,
-            value: inputProps.value.replace("\n", "")
+            value: inputProps.value.replaceAll("\n", " ")
           };
           return <TypeaheadInputSingle {...modifiedProps} />;
         }}
