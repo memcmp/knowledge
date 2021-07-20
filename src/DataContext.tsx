@@ -148,7 +148,7 @@ export type Selectors = {
   getAllNodesByType: (nodeTypes: Array<NodeType>) => Array<KnowNode>;
 };
 
-function createSelectors(nodes: Nodes): Selectors {
+export function createSelectors(nodes: Nodes): Selectors {
   return {
     getNode: (id: string): KnowNode => {
       return getNode(nodes, id);
@@ -190,6 +190,5 @@ export {
   WorkspaceContext,
   useSelectors,
   getNode,
-  useDeleteNodes,
-  createSelectors
+  useDeleteNodes
 };

@@ -8,11 +8,11 @@ import { WorkspaceColumnView } from "./WorkspaceColumn";
 
 import {
   useNodes,
-  useSelectors,
   useUpdateWorkspace,
   useUpsertNodes,
   useWorkspace,
-  getNode
+  getNode,
+  createSelectors
 } from "./DataContext";
 
 import { defaultDisplayConnection } from "./connections";
@@ -79,7 +79,6 @@ export function WorkspaceView(): JSX.Element {
   const workspace = useWorkspace();
   const updateWorkspace = useUpdateWorkspace();
   const upsertNodes = useUpsertNodes();
-  const { getSubjects } = useSelectors();
   const nodes = useNodes();
   const [selection, setSelection] = useState<Set<string>>(Set<string>());
 
@@ -150,7 +149,7 @@ export function WorkspaceView(): JSX.Element {
               outerNode,
               innerNode,
               view.displayConnections,
-              getSubjects,
+              createSelectors(rdx).getSubjects,
               index
             )
           );
@@ -171,7 +170,7 @@ export function WorkspaceView(): JSX.Element {
               outerNode,
               innerNode,
               view.displayConnections,
-              getSubjects
+              createSelectors(rdx).getSubjects
             )
           );
         }, nodes);
