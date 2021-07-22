@@ -75,6 +75,33 @@ function addEmptyColumn(workspace: Workspace): Workspace {
   };
 }
 
+function parseDroppableID(
+  droppableID: string
+): {
+  dropTargetType: string;
+  outerNodeID: string;
+  column: string;
+  viewIndex: number;
+} {
+  if (
+    !(
+      droppableID.startsWith("drop.outer") ||
+      droppableID.startsWith("drop.addtonode")
+    )
+  ) {
+    throw new Error(`Unknown droppable ID: '${droppableID}'`);
+  }
+  const [dropTargetType, outerNodeID, column, n] = droppableID
+    .replace("drop.", "")
+    .split(".");
+  return {
+    dropTargetType,
+    outerNodeID,
+    column,
+    viewIndex: parseInt(n, 10)
+  };
+}
+
 export function WorkspaceView(): JSX.Element {
   const workspace = useWorkspace();
   const updateWorkspace = useUpdateWorkspace();
@@ -133,16 +160,21 @@ export function WorkspaceView(): JSX.Element {
           },
           Immutable.Map<string, KnowNode>()
         );
-      } else if (droppableID.startsWith("drop.outer")) {
-        const { index } = result.destination;
-        const [outerNodeID, column, n] = droppableID
-          .replace("drop.outer.", "")
-          .split(".");
+      } else if (
+        droppableID.startsWith("drop.outer") ||
+        droppableID.startsWith("drop.addtonode")
+      ) {
+        const { dropTargetType, column, viewIndex } = parseDroppableID(
+          droppableID
+        );
+        const index =
+          dropTargetType === "outer" ? result.destination.index : undefined;
         const view = (workspaceWithNewCol.columns.get(
           column
-        ) as WorkspaceColumn).nodeViews.get(parseInt(n, 10)) as NodeView;
+        ) as WorkspaceColumn).nodeViews.get(viewIndex) as NodeView;
+
         const updatedNodes = sourceIDs.toArray().reduceRight((rdx, id) => {
-          const outerNode = getNode(rdx, outerNodeID);
+          const outerNode = getNode(rdx, view.nodeID);
           const innerNode = getNode(rdx, id);
           return rdx.merge(
             connectNodes(
@@ -151,26 +183,6 @@ export function WorkspaceView(): JSX.Element {
               view.displayConnections,
               createSelectors(rdx).getSubjects,
               index
-            )
-          );
-        }, nodes);
-        upsertNodes(updatedNodes);
-      } else if (droppableID.startsWith("drop.addtonode")) {
-        const [outerNodeID, column, n] = droppableID
-          .replace("drop.addtonode.", "")
-          .split(".");
-        const view = (workspaceWithNewCol.columns.get(
-          column
-        ) as WorkspaceColumn).nodeViews.get(parseInt(n, 10)) as NodeView;
-        const updatedNodes = sourceIDs.toArray().reduceRight((rdx, id) => {
-          const outerNode = getNode(rdx, outerNodeID);
-          const innerNode = getNode(rdx, id);
-          return rdx.merge(
-            connectNodes(
-              outerNode,
-              innerNode,
-              view.displayConnections,
-              createSelectors(rdx).getSubjects
             )
           );
         }, nodes);
