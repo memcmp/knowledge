@@ -1,9 +1,9 @@
 import React from "react";
-import { Set } from "immutable";
+import { OrderedSet, Set } from "immutable";
 
 type MultiSelection = {
-  selection: Set<string>;
-  setSelection: (selection: Set<string>) => void;
+  selection: OrderedSet<string>;
+  setSelection: (selection: OrderedSet<string>) => void;
 };
 
 type SetSelected = (id: string, selected: boolean) => void;
@@ -46,9 +46,9 @@ export function useIsSelected(): IsSelected {
 }
 
 export function findSelectedByPostfix(
-  selection: Set<string>,
+  selection: OrderedSet<string>,
   postfix: string
-): Set<string> {
+): OrderedSet<string> {
   return selection
     .filter(sel => sel.endsWith(postfix))
     .map(sel => sel.split(".")[0]);
@@ -60,9 +60,9 @@ export function useFindSelectedByPostfix(): FindSelectedByPostfix {
 }
 
 export function deselectByPostfix(
-  selection: Set<string>,
+  selection: OrderedSet<string>,
   postfix: string
-): Set<string> {
+): OrderedSet<string> {
   return selection.filterNot(sel => sel.endsWith(postfix));
 }
 

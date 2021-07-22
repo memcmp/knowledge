@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Immutable, { Set } from "immutable";
+import Immutable, { OrderedSet } from "immutable";
 import { v4 } from "uuid";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import "./Workspace.scss";
@@ -107,7 +107,9 @@ export function WorkspaceView(): JSX.Element {
   const updateWorkspace = useUpdateWorkspace();
   const upsertNodes = useUpsertNodes();
   const nodes = useNodes();
-  const [selection, setSelection] = useState<Set<string>>(Set<string>());
+  const [selection, setSelection] = useState<OrderedSet<string>>(
+    OrderedSet<string>()
+  );
 
   const workspaceWithNewCol = {
     ...workspace,
@@ -128,11 +130,11 @@ export function WorkspaceView(): JSX.Element {
       const sourcePostfix = parsePostfix(result.draggableId);
       const selectedSources =
         sourcePostfix === undefined
-          ? Set([sourceID])
+          ? OrderedSet([sourceID])
           : findSelectedByPostfix(selection, sourcePostfix);
       const sourceIDs = selectedSources.contains(sourceID)
         ? selectedSources
-        : Set([sourceID]);
+        : OrderedSet([sourceID]);
       if (droppableID.startsWith("drop.column.")) {
         const updatedColumns = workspaceWithNewCol.columns.map(column => {
           if (column.columnID === destID) {
@@ -173,19 +175,21 @@ export function WorkspaceView(): JSX.Element {
           column
         ) as WorkspaceColumn).nodeViews.get(viewIndex) as NodeView;
 
-        const updatedNodes = sourceIDs.toArray().reduceRight((rdx, id) => {
-          const outerNode = getNode(rdx, view.nodeID);
-          const innerNode = getNode(rdx, id);
-          return rdx.merge(
-            connectNodes(
-              outerNode,
-              innerNode,
-              view.displayConnections,
-              createSelectors(rdx).getSubjects,
-              index
-            )
-          );
-        }, nodes);
+        const updatedNodes = sourceIDs
+          .toArray()
+          .reduce((rdx, id, currentIndex) => {
+            const outerNode = getNode(rdx, view.nodeID);
+            const innerNode = getNode(rdx, id);
+            return rdx.merge(
+              connectNodes(
+                outerNode,
+                innerNode,
+                view.displayConnections,
+                createSelectors(rdx).getSubjects,
+                index === undefined ? undefined : index + currentIndex
+              )
+            );
+          }, nodes);
         upsertNodes(updatedNodes);
       }
       if (sourcePostfix) {
